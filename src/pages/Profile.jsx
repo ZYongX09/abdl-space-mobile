@@ -247,7 +247,7 @@ const S = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '12px 20px 8px',
+    padding: 'calc(env(safe-area-inset-top, 0px) + 16px) 20px 8px',
   },
   topTitle: {
     fontSize: '20px',
