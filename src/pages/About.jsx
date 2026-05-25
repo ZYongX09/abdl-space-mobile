@@ -4,144 +4,18 @@ import { externalLinkUrl } from '../utils/externalLink';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 
-const VERSION = '2.9.0';
-const LAST_UPDATE = '2026-05-24';
+const VERSION = '0.1.0';
+const LAST_UPDATE = '2026-05-26';
 
 const CHANGELOG = [
   {
-    version: '2.20.4',
-    date: '2026-05-25',
+    version: '0.1.0',
+    date: '2026-05-26',
     changes: [
-      '新增宝宝新天地第三方登录，未绑定账户可选关联已有或注册新账号',
-      '修复移动端页面加载时标题栏显示异常',
-      '优化第三方账户绑定体验，绑定后即时更新状态',
-      '优化深色/多彩主题下第三方登录按钮适配',
-      '优化授权管理，同一应用不再重复显示',
-      '移动端账户页新增退出登录与切换账号入口',
-      '修复账户切换面板已保存账户显示问题',
-    ],
-  },
-  {
-    version: '2.20.3',
-    date: '2026-05-24',
-    changes: [
-      '优化注册登录流程体验',
-      '优化网页动效',
-      '修复安全性问题',
-      '修复已知问题，提升产品稳定性',
-    ],
-  },
-  {
-    version: '2.9.0',
-    date: '2026-05-21',
-    changes: [
-      '新增邮件验证码注册，强化账户安全',
-      '新增找回密码功能，支持邮箱验证码重置',
-      '新增账户隐私页，集中管理个人资料与邮箱',
-      '新增管理后台纸尿裤商品管理，支持图片上传与尺码设置',
-      '新增新版个人主页预览（/profile-v2）',
-      '优化个人资料编辑，数据实时同步',
-      '优化通知与私信，新增实时消息弹窗与未读提醒',
-      '纸尿裤列表改为瀑布流布局，支持产品图片展示',
-      '密码输入框支持查看明文',
-      '提升账户安全，验证码防暴力破解与邮箱枚举防护',
-    ],
-  },
-  {
-    version: '2.8.0',
-    date: '2026-05-20',
-    changes: [
-      '新增敏感内容智能检测与分级管理',
-      '新增内容举报功能',
-      '新增头像上传功能',
-      '新增个人中心帖子批量管理',
-      '全面优化移动端交互体验',
-      '优化图片上传与安全检测流程',
-      '修复已知问题，提升产品性能',
-    ],
-  },
-  {
-    version: '2.7.0',
-    date: '2026-05-19',
-    changes: [
-      '发帖支持上传图片，新增图片预览与查看功能',
-      '全面优化移动端页面布局与交互体验',
-      '新增私信功能（开发调试中）',
-      '优化个人中心页面',
-      '提升产品性能，修复已知问题',
-    ],
-  },
-  {
-    version: '2.6.1',
-    date: '2026-05-18',
-    changes: [
-      '关于页新增 GitHub 和开发者博客入口',
-      '支持 Cloudflare Pages 部署',
-    ],
-  },
-  {
-    version: '2.6.0',
-    date: '2026-05-17',
-    changes: [
-      '新增图片上传组件',
-      '优化人机验证触发逻辑，减少频繁弹窗',
-      '优化登录页安全验证体验',
-    ],
-  },
-  {
-    version: '2.5.1',
-    date: '2026-05-16',
-    changes: [
-      '优化页面布局设计，优化用户体验',
-      '接入百度统计',
-      '更新隐私政策与用户协议',
-    ],
-  },
-  {
-    version: '2.5.0',
-    date: '2026-05-16',
-    changes: [
-      '新增捐赠功能',
-    ],
-  },
-  {
-    version: '2.4.0',
-    date: '2026-05-16',
-    changes: [
-      '提升安全性与稳定性',
-      '优化用户体验',
-    ],
-  },
-  {
-    version: '2.3.0',
-    date: '2026-05-15',
-    changes: [
-      '优化用户体验',
-      '修复已知问题',
-    ],
-  },
-  {
-    version: '2.1.0',
-    date: '2026-05-15',
-    changes: [
-      '优化用户体验',
-      '修复已知问题',
-    ],
-  },
-  {
-    version: '2.0.0',
-    date: '2026-05-15',
-    changes: [
-      '全新架构，全面重写',
-      '新增三套主题：浅色 / 深色 / 多彩',
-      '新增 AI 智能推荐',
-      '新增纸尿裤对比功能',
-      '新增使用感受系统',
-      '新增用户等级与经验值',
-      '新增 Wiki 与术语百科',
-      '优化移动端体验',
-      '优化页面切换动画',
-      '修复已知问题',
+      '移动端正式独立，从主站分离为独立项目',
+      '专属移动端优化的页面布局和交互',
+      '独立部署至 m.abdl-space.top',
+      '支持宝宝新天地第三方登录',
     ],
   },
 ];
@@ -163,15 +37,15 @@ export default function About() {
 
   return (
     <>
-    <PageLayout hero={{ icon: 'fa-circle-info', title: '关于', subtitle: `v${VERSION}` }}>
+    <PageLayout hero={{ icon: 'fa-circle-info', title: '关于', subtitle: `v${VERSION} 移动版` }}>
       {/* 项目简介 */}
       <div className="card mb-5">
         <h3 className="font-bold mb-3" style={{ color: 'var(--text)' }}>
           <i className="fa-solid fa-baby mr-2" style={{ color: 'var(--primary-dark)' }} />
-          ABDL Space
+          ABDL Space 移动版
         </h3>
         <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-light)' }}>
-          ABDL Space 是一个面向 ABDL 群体的中文社区平台，提供纸尿裤评价、排行榜、AI 推荐、广场讨论等功能。
+          ABDL Space 移动版是面向 ABDL 群体的中文社区平台的移动端应用，提供纸尿裤评价、排行榜、AI 推荐、广场讨论等功能。
           致力于为爱好者打造一个温馨友好的交流空间。
         </p>
         <div className="flex flex-wrap gap-3">

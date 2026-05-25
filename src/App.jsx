@@ -80,7 +80,7 @@ export default function App() {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' })
-    document.title = getTitle(pathname) + ' — ABDL Space'
+    document.title = getTitle(pathname) + ' — ABDL Space 移动版'
   }, [pathname])
 
   return (
