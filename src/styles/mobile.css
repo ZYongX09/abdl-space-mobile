@@ -3,7 +3,6 @@
 
 /* 强制移动端布局（不依赖 media query） */
 .app-layout {
-  display: flex !important;
   flex-direction: column !important;
   min-height: 100dvh !important;
   height: auto !important;
@@ -31,20 +30,43 @@
   display: none !important;
 }
 
-/* 移动端卡片适配 */
-.card {
-  padding: 16px !important;
-  border-radius: 12px !important;
-}
-
-/* 移动端按钮最小触摸区域 */
-.btn {
-  min-height: 44px !important;
-}
-
-/* 底部导航浮层 */
+/* 底部导航栏 — 显示 + 保留毛玻璃效果 */
 .bottom-nav-floating {
   display: flex !important;
   align-items: center;
   justify-content: space-around;
+  background: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(24px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="dark"] .bottom-nav-floating {
+  background: rgba(26, 29, 35, 0.65) !important;
+  border-top-color: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="colorful"] .bottom-nav-floating {
+  background: rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(32px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
+}
+
+/* 顶部标题栏毛玻璃 */
+.mobile-header {
+  background: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(24px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
+}
+
+[data-theme="dark"] .mobile-header {
+  background: rgba(26, 29, 35, 0.65) !important;
+}
+
+[data-theme="colorful"] .mobile-header {
+  background: rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(32px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
 }
