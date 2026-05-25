@@ -1,0 +1,2637 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   ABDL Space v2 — 全局样式
+   ============================================================ */
+
+/* CSS 变量 — 浅色主题（默认） */
+:root {
+  --primary: #A8D8F0;
+  --primary-dark: #6AAEC8;
+  --primary-light: #DEEEFF;
+  --accent: #FFB7C5;
+  --accent-dark: #F5989E;
+  --bg: #F5F8FC;
+  --bg-card: #FFFFFF;
+  --bg-sidebar: #FFFFFF;
+  --border: #E8F0F8;
+  --text: #2C3E50;
+  --text-light: #7F8C9B;
+  --text-muted: #999;
+  --success: #7BC67E;
+  --danger: #E8837C;
+  --warning: #F0C040;
+  --warning-bg: #FFF8E1;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 2px 12px rgba(168, 216, 240, 0.25);
+  --shadow-hover: 0 8px 30px rgba(168, 216, 240, 0.4);
+  --font: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --skeleton-base: #E8F0F8;
+  --skeleton-shine: #F8FBFF;
+  --input-bg: #F5F8FC;
+  --hero-bg: linear-gradient(135deg, #A8D8F0 0%, #D4EEF8 50%, #FFE0E8 100%);
+  --hero-text: #4A7D95;
+  --overlay-bg: rgba(0, 0, 0, 0.4);
+  --hover-bg: var(--primary-light);
+  --link-color: var(--primary-dark);
+}
+
+/* 深色主题 */
+[data-theme="dark"] {
+  --primary: #7EB8D4;
+  --primary-dark: #A8D8F0;
+  --primary-light: #2A3F50;
+  --accent: #F5989E;
+  --accent-dark: #FFB7C5;
+  --bg: #1A1D23;
+  --bg-card: #252830;
+  --bg-sidebar: #1E2128;
+  --border: #383C44;
+  --text: #E0E4EA;
+  --text-light: #9BA1AC;
+  --text-muted: #6B7080;
+  --success: #5DAE60;
+  --danger: #D35F5A;
+  --warning: #D4A830;
+  --warning-bg: #2A2518;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.5);
+  --skeleton-base: #2A2E35;
+  --skeleton-shine: #353940;
+  --input-bg: #2A2E35;
+  --hero-bg: linear-gradient(135deg, #2A3F50 0%, #283540 50%, #3A2830 100%);
+  --hero-text: #A8D8F0;
+  --overlay-bg: rgba(0, 0, 0, 0.6);
+  --hover-bg: var(--primary-light);
+  --link-color: #A8D8F0;
+}
+
+/* 多彩主题 */
+[data-theme="colorful"] {
+  --primary: #9BB8E0;
+  --primary-dark: #7A9CD0;
+  --primary-light: rgba(168, 216, 240, 0.25);
+  --accent: #F0A0B8;
+  --accent-dark: #D88CA0;
+  --bg: transparent;
+  --bg-card: rgba(255, 255, 255, 0.55);
+  --bg-sidebar: rgba(255, 255, 255, 0.45);
+  --border: rgba(255, 255, 255, 0.5);
+  --text: #3A4A5C;
+  --text-light: #6B7B8D;
+  --text-muted: #8A9AAA;
+  --success: #6BC67A;
+  --danger: #E07070;
+  --warning: #E8B830;
+  --warning-bg: rgba(232, 184, 48, 0.12);
+  --shadow: 0 4px 20px rgba(168, 180, 216, 0.2);
+  --shadow-hover: 0 8px 36px rgba(168, 180, 216, 0.35);
+  --skeleton-base: rgba(255, 255, 255, 0.3);
+  --skeleton-shine: rgba(255, 255, 255, 0.6);
+  --input-bg: rgba(255, 255, 255, 0.4);
+  --hero-bg: linear-gradient(135deg, rgba(168, 216, 240, 0.4) 0%, rgba(255, 183, 197, 0.3) 50%, rgba(197, 184, 232, 0.3) 100%);
+  --hero-text: #4A6080;
+  --overlay-bg: rgba(0, 0, 0, 0.25);
+  --hover-bg: rgba(168, 216, 240, 0.2);
+  --link-color: #6A9EC0;
+}
+
+/* 多彩主题 — 动态渐变背景 */
+[data-theme="colorful"] body {
+  background: linear-gradient(-45deg, #A8D8F0, #FFB7C5, #C5B8E8, #FFF3CD, #DEEEFF, #FFD0DC, #D8D0F0, #FFF8E8);
+  background-size: 400% 400%;
+  animation: colorfulGradient 20s ease infinite;
+  min-height: 100vh;
+}
+
+/* 多彩主题 — 毛玻璃 */
+[data-theme="colorful"] .glass-card {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 24px rgba(168, 180, 216, 0.15);
+}
+
+[data-theme="colorful"] .glass-sidebar {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border-right: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+[data-theme="colorful"] .sidebar-collapsible {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-right: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="colorful"] .glass-navbar {
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+[data-theme="dark"] .bottom-nav-floating {
+  background: var(--bg-card);
+  border-top-color: var(--border);
+}
+[data-theme="dark"] .bottom-nav-floating a.active {
+  /* 仅图标变色，无背景 */
+}
+
+[data-theme="colorful"] .bottom-nav-floating {
+  background: var(--bg-card);
+  border-top-color: var(--border);
+}
+[data-theme="colorful"] .bottom-nav-floating a.active {
+  /* 仅图标变色，无背景 */
+}
+
+/* ====== 基础重置 ====== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* ====== 滚动条 ====== */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; border: 2px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary-dark); border: 2px solid transparent; background-clip: content-box; }
+
+/* ====== 焦点样式 ====== */
+*:focus-visible {
+  outline: 2px solid var(--primary-dark);
+  outline-offset: 2px;
+}
+
+/* ====== 卡片 ====== */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  box-shadow: var(--shadow);
+  transition: transform 0.35s var(--miui-spring), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-hover);
+  border-color: rgba(168, 216, 240, 0.35);
+  transform: translateY(-3px);
+}
+
+.card-interactive {
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.card-interactive:active {
+  transform: scale(0.97) !important;
+  transition-duration: 0.12s;
+}
+
+/* 交错入场 */
+.stagger-item { animation: fadeInUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.stagger-item:nth-child(1) { animation-delay: 0s; }
+.stagger-item:nth-child(2) { animation-delay: 0.05s; }
+.stagger-item:nth-child(3) { animation-delay: 0.1s; }
+.stagger-item:nth-child(4) { animation-delay: 0.15s; }
+.stagger-item:nth-child(5) { animation-delay: 0.2s; }
+.stagger-item:nth-child(6) { animation-delay: 0.25s; }
+.stagger-item:nth-child(7) { animation-delay: 0.3s; }
+.stagger-item:nth-child(8) { animation-delay: 0.35s; }
+
+/* ====== Hero Card ====== */
+.hero-card {
+  background: var(--hero-bg);
+  border-radius: var(--radius);
+  padding: 2rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid rgba(168, 216, 240, 0.15);
+  box-shadow: 0 2px 8px rgba(168, 216, 240, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.08) 40%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.08) 60%, transparent 100%);
+  animation: heroShimmer 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* ====== 按钮 ====== */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px 24px; border-radius: var(--radius-sm);
+  font-size: 0.95rem; font-weight: 600; cursor: pointer;
+  transition: all 0.25s var(--miui-spring);
+  border: none; text-decoration: none; font-family: var(--font);
+  position: relative; overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:active { transform: scale(0.94); transition-duration: 0.1s; }
+
+.btn:disabled {
+  opacity: 0.5; cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 2px 8px rgba(168, 216, 240, 0.3);
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(168, 216, 240, 0.4);
+}
+
+.btn-accent {
+  background: var(--accent);
+  color: white;
+}
+.btn-accent:hover:not(:disabled) {
+  background: var(--accent-dark);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--primary);
+  color: var(--primary-dark);
+}
+.btn-outline:hover:not(:disabled) {
+  background: var(--primary-light);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+
+.btn-sm { padding: 6px 16px; font-size: 0.85rem; }
+
+/* ====== 表单 ====== */
+.form-control {
+  width: 100%; padding: 12px 16px;
+  border: 2px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  transition: border-color 0.3s var(--miui-smooth), box-shadow 0.3s ease, transform 0.2s ease;
+  background: var(--input-bg); font-family: var(--font); color: var(--text);
+}
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(168, 216, 240, 0.25);
+}
+
+textarea.form-control { min-height: 80px; resize: vertical; }
+
+/* ====== 标签 ====== */
+.tag {
+  display: inline-block; padding: 3px 10px; border-radius: 0.625rem;
+  font-size: 0.78rem; font-weight: 600;
+  background: var(--primary-light); color: var(--primary-dark);
+  transition: transform 0.25s var(--miui-spring), box-shadow 0.2s ease;
+}
+.tag:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 2px 8px rgba(168, 216, 240, 0.3); }
+
+/* ====== 骨架屏 ====== */
+.skeleton {
+  background: linear-gradient(90deg, var(--skeleton-base) 0px, var(--skeleton-shine) 40px, var(--skeleton-base) 80px);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+/* ====== Toast ====== */
+.toast-container {
+  position: fixed; top: 20px; right: 20px; z-index: 9999;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.toast {
+  padding: 14px 20px; border-radius: var(--radius-sm); color: white;
+  font-weight: 600; font-size: 0.9rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  animation: slideInLeft 0.3s ease-out;
+  max-width: 380px; display: flex; align-items: center; gap: 10px;
+}
+.toast-success { background: var(--success); }
+.toast-error { background: var(--danger); }
+.toast-info { background: var(--primary-dark); }
+
+/* ====== 加载 ====== */
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--primary-light); border-top-color: var(--primary);
+  border-radius: 50%; animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ====== 空状态 ====== */
+.empty-state {
+  text-align: center; padding: 60px 20px; color: var(--text-light);
+}
+.empty-state .icon {
+  font-size: 3.5rem; margin-bottom: 16px; opacity: 0.6;
+}
+
+/* ====== 滚动进度条 ====== */
+.scroll-progress {
+  position: fixed; top: 0; left: 0; height: 3px; z-index: 999;
+  background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
+  background-size: 200% 100%;
+  animation: progressGradient 3s linear infinite;
+  transition: width 0.1s linear;
+  border-radius: 0 2px 2px 0;
+}
+@keyframes progressGradient {
+  0% { background-position: 0% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ====== 回到顶部 ====== */
+.back-to-top {
+  position: fixed; bottom: 24px; right: 24px; z-index: 101;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--primary); color: white;
+  border: none; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(168, 216, 240, 0.4);
+  font-size: 1.3rem; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center;
+}
+@media (max-width: 768px) {
+  .back-to-top {
+    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+  }
+}
+.back-to-top:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(168, 216, 240, 0.6);
+}
+
+/* ====== 侧边栏 ====== */
+
+
+/* 账户切换面板 — 高模糊毛玻璃 */
+.account-switcher-panel {
+  background: rgba(255,255,255,0.55);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.35);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+}
+[data-theme="dark"] .account-switcher-panel {
+  background: rgba(37,40,48,0.65);
+  border-color: rgba(255,255,255,0.1);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+}
+[data-theme="colorful"] .account-switcher-panel {
+  background: rgba(255,255,255,0.4);
+  border-color: rgba(255,255,255,0.4);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+/* ====== 排行榜 ====== */
+.rank-item {
+  display: flex; align-items: center; gap: 16px;
+  padding: 16px 20px; border-radius: 1rem; margin-bottom: 8px;
+  background: var(--bg-card); box-shadow: 0 1px 6px rgba(168, 216, 240, 0.12);
+  transition: all 0.2s; border: 1px solid var(--border);
+}
+.rank-item:hover {
+  transform: translateX(6px); box-shadow: var(--shadow);
+}
+.rank-number { font-size: 1.4rem; font-weight: 800; width: 40px; text-align: center; color: var(--primary-dark); flex-shrink: 0; }
+.rank-number.top1 { color: #F0C040; }
+.rank-number.top2 { color: #B0B0B0; }
+.rank-number.top3 { color: #CD7F32; }
+
+/* ====== 通知红点 ====== */
+.notif-badge {
+  position: absolute; top: -4px; right: -6px;
+  background: var(--danger); color: white;
+  border-radius: 50%; min-width: 18px; height: 18px;
+  font-size: 10px; display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+}
+
+/* ====== 页面切换 ====== */
+.page-enter {
+  animation: fadeInUp 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ====== 模态弹窗 ====== */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5);
+  z-index: 300; display: flex; align-items: flex-start; justify-content: center;
+  animation: fadeIn 0.25s ease-out;
+  backdrop-filter: blur(4px);
+  overflow-y: auto; padding: 40px 16px;
+}
+.modal {
+  background: var(--bg-card); color: var(--text);
+  border-radius: var(--radius); padding: 32px;
+  max-width: 520px; width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: miuiModalIn 0.4s var(--miui-spring);
+}
+
+/* ====== 布局 ====== */
+.app-layout {
+  display: flex; height: 100vh; overflow: hidden;
+}
+.app-main-content {
+  flex: 1; min-width: 0; min-height: 0; overflow-y: auto;
+}
+
+/* ====== MIUI 风格标签栏 ====== */
+.miui-tab-bar-wrapper {
+  margin-bottom: 1.25rem;
+}
+.miui-tab-bar {
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  background: var(--input-bg);
+  border-radius: var(--radius-sm);
+  position: relative;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.miui-tab-bar::-webkit-scrollbar { display: none; }
+
+.miui-tab {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: calc(var(--radius-sm) - 4px);
+  transition: color 0.2s ease;
+  white-space: nowrap;
+  position: relative;
+  z-index: 2;
+  font-family: var(--font);
+}
+.miui-tab i {
+  font-size: 0.8rem;
+}
+.miui-tab.active {
+  color: var(--text);
+}
+.miui-tab:not(.active):hover {
+  color: var(--text-light);
+}
+
+/* 滑动指示器 — MIUI 弹性动画 */
+.miui-tab-indicator {
+  position: absolute;
+  top: 4px;
+  left: 0;
+  height: calc(100% - 8px);
+  background: var(--bg-card);
+  border-radius: calc(var(--radius-sm) - 4px);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08), 0 0.5px 1px rgba(0, 0, 0, 0.04);
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  z-index: 1;
+  pointer-events: none;
+}
+[data-theme="dark"] .miui-tab-indicator {
+  background: var(--bg-sidebar);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+[data-theme="colorful"] .miui-tab-indicator {
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* 标签内容切换 — 方向感知滑动 */
+.miui-tab-content {
+  position: relative;
+  overflow: hidden;
+}
+.miui-tab-content > div {
+  animation: tabSlideRight 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.miui-tab-content > .tab-slide-left {
+  animation: tabSlideLeft 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.miui-tab-content > .tab-slide-right {
+  animation: tabSlideRight 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes tabSlideLeft {
+  from { opacity: 0; transform: translateX(-16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes tabSlideRight {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+
+/* 页面切换入场 */
+.page-transition-enter {
+  animation: miuiPageIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* 列表交错入场 */
+.miui-list-enter > * {
+  animation: miuiCardIn 0.35s var(--miui-spring) both;
+}
+.miui-list-enter > *:nth-child(1) { animation-delay: 0s; }
+.miui-list-enter > *:nth-child(2) { animation-delay: 0.04s; }
+.miui-list-enter > *:nth-child(3) { animation-delay: 0.08s; }
+.miui-list-enter > *:nth-child(4) { animation-delay: 0.12s; }
+.miui-list-enter > *:nth-child(5) { animation-delay: 0.16s; }
+.miui-list-enter > *:nth-child(6) { animation-delay: 0.20s; }
+.miui-list-enter > *:nth-child(7) { animation-delay: 0.24s; }
+.miui-list-enter > *:nth-child(8) { animation-delay: 0.28s; }
+.miui-list-enter > *:nth-child(n+9) { animation-delay: 0.32s; }
+
+/* 底部导航 MIUI 风格交互 */
+.bottom-nav-floating a {
+  transition: color 0.2s ease, transform 0.25s var(--miui-spring, cubic-bezier(0.175, 0.885, 0.32, 1.275));
+  -webkit-tap-highlight-color: transparent;
+}
+.bottom-nav-floating a:active {
+  transform: scale(0.88);
+  transition-duration: 0.08s;
+}
+.bottom-nav-floating a.active {
+  animation: navPop 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes navPop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+@media (max-width: 768px) {
+  .miui-tab-bar {
+    gap: 1px;
+    padding: 3px;
+  }
+  .miui-tab {
+    padding: 7px 12px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .miui-tab-indicator {
+    transition: none;
+  }
+  .miui-tab-content > div,
+  .miui-list-enter > *,
+  .page-transition-enter {
+    animation: none !important;
+  }
+}
+.bottom-nav-floating {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.04);
+  display: none;
+}
+[data-theme="dark"] .bottom-nav-floating {
+  background: rgba(26, 29, 35, 0.65);
+  border-top-color: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.2);
+}
+[data-theme="colorful"] .bottom-nav-floating {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
+  border-top-color: rgba(255, 255, 255, 0.3);
+}
+.bottom-nav-floating a {
+  display: flex; align-items: center; justify-content: center;
+  text-decoration: none; color: var(--text-light);
+  padding: 0; height: 48px; flex: 1;
+  transition: color 0.2s ease, transform 0.2s var(--miui-spring);
+  -webkit-tap-highlight-color: transparent;
+}
+.bottom-nav-floating a:active {
+  transform: scale(0.88);
+  transition-duration: 0.1s;
+}
+.bottom-nav-floating a.active {
+  color: var(--primary-dark);
+  transition: color 0.2s ease;
+}
+.bottom-nav-floating a i { font-size: 1.35rem; }
+
+/* ====== 响应式 ====== */
+@media (max-width: 768px) {
+  html, body { overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: auto; }
+  .app-layout { flex-direction: column; min-height: 100vh; min-height: 100dvh; height: auto; overflow: visible; }
+  .app-main-content {
+    flex: 1; overflow-y: visible; overflow-x: hidden;
+    padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px));
+    padding-top: 48px;
+  }
+  .sidebar-desktop { display: none !important; }
+  .sidebar-placeholder { display: none; }
+  .btn { min-height: 44px; }
+  .card { padding: 16px; border-radius: 12px; }
+  .hero-card { display: none; }
+  .bottom-nav-floating {
+    display: flex; align-items: center; justify-content: space-around;
+  }
+}
+
+@media (min-width: 769px) {
+  .bottom-nav-floating { display: none; }
+}
+
+/* ====== 可折叠侧边栏 ====== */
+.sidebar-collapsible {
+  width: 64px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  transition: width 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+  z-index: 30;
+  will-change: width;
+}
+.sidebar-collapsible.expanded {
+  width: 240px;
+  overflow-y: auto;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
+  z-index: 31;
+}
+
+/* 占位元素 — 折叠时撑开布局 */
+.sidebar-placeholder {
+  width: 64px;
+  flex-shrink: 0;
+}
+.sidebar-placeholder.expanded {
+  width: 64px;
+}
+
+/* 毛玻璃遮罩 — 覆盖内容区 */
+.sidebar-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 30;
+  animation: fadeIn 0.2s ease;
+}
+
+/* Header */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 10px;
+  min-height: 60px;
+  gap: 8px;
+}
+.sidebar-collapsible:not(.expanded) .sidebar-header {
+  padding: 16px 0;
+  gap: 0;
+}
+.sidebar-logo {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.sidebar-header-text {
+  flex: 1;
+  min-width: 0;
+  opacity: 0;
+  transition: opacity 0.2s ease 0.08s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sidebar-collapsible:not(.expanded) .sidebar-header-text {
+  display: none;
+}
+.sidebar-collapsible.expanded .sidebar-header-text {
+  opacity: 1;
+}
+.sidebar-title {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+.sidebar-subtitle {
+  font-size: 0.7rem;
+  color: var(--text-light);
+}
+.sidebar-icon-btn {
+  padding: 6px;
+  border-radius: 8px;
+  color: var(--text-light);
+  opacity: 0;
+  transition: opacity 0.2s ease 0.08s;
+  font-size: 0.85rem;
+}
+.sidebar-collapsible:not(.expanded) .sidebar-icon-btn {
+  display: none;
+}
+.sidebar-collapsible.expanded .sidebar-icon-btn {
+  opacity: 1;
+}
+.sidebar-icon-btn:hover {
+  background: var(--primary-light);
+}
+
+/* 搜索 */
+.sidebar-search-wrap {
+  padding: 0 12px;
+  margin-bottom: 8px;
+  position: relative;
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+  transition: opacity 0.15s ease 0.1s, height 0.2s ease;
+}
+.sidebar-collapsible.expanded .sidebar-search-wrap {
+  opacity: 1;
+  height: 40px;
+}
+.sidebar-search-icon {
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+/* 导航链接 */
+.sidebar-nav {
+  flex: 1;
+  padding: 4px 8px;
+}
+.sidebar-collapsible:not(.expanded) .sidebar-nav {
+  padding: 4px 6px;
+}
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.25s var(--miui-spring);
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+.sidebar-collapsible:not(.expanded) .sidebar-link {
+  padding: 10px 0 !important;
+  gap: 0 !important;
+  margin: 2px 0;
+  width: 100%;
+  text-align: center;
+}
+.sidebar-collapsible:not(.expanded) .sidebar-link-icon {
+  width: 100% !important;
+  text-align: center;
+  display: block;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.sidebar-link:hover {
+  background: var(--primary-light);
+  transform: translateX(3px);
+}
+.sidebar-link:active {
+  transform: scale(0.96);
+  transition-duration: 0.1s;
+}
+
+/* 弹性牵扯展开动画 */
+.sidebar-ripple-item {
+  opacity: 1;
+  transform: translateX(0);
+}
+.sidebar-ripple-item.ripple-expanded {
+  animation: sidebarRippleIn 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  animation-delay: var(--ripple-delay, 0ms);
+}
+@keyframes sidebarRippleIn {
+  0% {
+    opacity: 0.4;
+    transform: translateX(-8px) scale(0.95);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(2px) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+.sidebar-link.active {
+  background: var(--primary);
+  color: white;
+  transition: background 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.15s ease;
+}
+.sidebar-link-icon {
+  width: 20px;
+  text-align: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.sidebar-link-label {
+  opacity: 0;
+  transition: opacity 0.2s ease 0.06s;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.sidebar-collapsible.expanded .sidebar-link-label {
+  opacity: 1;
+}
+
+/* 底部 */
+.sidebar-footer {
+  padding: 8px;
+  border-top: 1px solid var(--border);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* ====== 侧边栏搜索 ====== */
+.sidebar-search-input {
+  width: 100%; padding: 8px 12px 8px 36px;
+  border-radius: 24px; border: 1px solid var(--border);
+  background: var(--input-bg); font-size: 0.85rem;
+  color: var(--text); outline: none; font-family: var(--font);
+  transition: all 0.2s ease;
+}
+.sidebar-search-input:focus {
+  border-color: var(--primary);
+  background: var(--bg-card);
+  box-shadow: 0 0 0 3px rgba(168, 216, 240, 0.15);
+}
+
+/* ====== 返回按钮 ====== */
+.back-btn-wrap {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.back-btn-spacer {
+  width: 0;
+}
+.back-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  opacity: 0.78;
+  transition: opacity 0.2s, transform 0.15s, background-color 0.3s, border-color 0.3s, color 0.3s;
+  flex-shrink: 0;
+}
+.back-btn:hover {
+  opacity: 1;
+  transform: scale(1.08);
+}
+.back-btn:active {
+  transform: scale(0.92);
+}
+
+/* ====== 人机验证加载动画 ====== */
+.cap-loading-ring {
+  width: 36px; height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary-dark);
+  border-radius: 50%;
+  animation: capSpin 0.8s linear infinite;
+}
+@keyframes capSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* 验证画布容器 — 适配多彩主题 */
+.quantum-verify {
+  background: var(--bg-card);
+}
+
+/* ====== 图片上传器 ====== */
+.img-uploader { margin-top: 8px; }
+.img-preview-grid {
+  display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px;
+}
+.img-preview-item {
+  position: relative; width: 72px; height: 72px; border-radius: 10px; overflow: hidden;
+  border: 1.5px solid var(--border);
+}
+.img-preview-item img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+.img-remove {
+  position: absolute; top: 2px; right: 2px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: rgba(0,0,0,0.6); color: #fff; border: none;
+  font-size: 10px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.img-nsfw-badge {
+  position: absolute; top: 2px; left: 2px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: rgba(232,131,124,0.9); color: #fff;
+  font-size: 9px; display: flex; align-items: center; justify-content: center;
+}
+.img-drop-zone {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px; border-radius: 10px;
+  border: 1.5px dashed var(--border);
+  cursor: pointer; transition: border-color 0.2s, background 0.2s;
+  color: var(--text-muted); font-size: 0.8rem;
+}
+.img-drop-zone:hover {
+  border-color: var(--primary-dark);
+  background: var(--primary-light);
+}
+.img-upload-warning {
+  display: flex; align-items: center; gap: 6px;
+  margin-top: 6px; padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(232, 131, 124, 0.08);
+  color: var(--danger);
+  font-size: 0.7rem; font-weight: 500;
+}
+.img-upload-warning i { font-size: 0.75rem; flex-shrink: 0; }
+.img-upload-donate {
+  margin-left: auto; white-space: nowrap;
+  font-size: 0.7rem; font-weight: 600;
+  color: var(--primary-dark);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+.img-upload-donate:hover { opacity: 0.7; text-decoration: underline; }
+
+/* ====== 个人中心自定义头部 ====== */
+.profile-header-title {
+  font-size: 0.95rem; font-weight: 700; color: var(--text);
+  position: absolute; left: 50%; transform: translateX(-50%);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  max-width: 50%;
+}
+@media (min-width: 769px) {
+  .profile-header-title { display: none; }
+}
+
+/* 侧边抽屉 */
+.profile-drawer-overlay {
+  position: fixed; inset: 0; z-index: 60;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  animation: fadeIn 0.2s ease;
+}
+.profile-drawer {
+  position: fixed; top: 0; left: 0; bottom: 0;
+  width: 260px; z-index: 61;
+  background: var(--bg-card);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+  display: flex; flex-direction: column;
+  animation: slideInLeft 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.profile-drawer-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 24px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.profile-drawer-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--primary-light); color: var(--primary-dark);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; font-weight: 700; flex-shrink: 0;
+}
+.profile-drawer-nav {
+  flex: 1; padding: 8px;
+}
+.profile-drawer-item {
+  display: flex; align-items: center; gap: 14px;
+  width: 100%; padding: 12px 16px;
+  border: none; background: none; cursor: pointer;
+  color: var(--text); font-size: 0.9rem; font-weight: 500;
+  border-radius: 12px; transition: background 0.15s;
+  font-family: var(--font); text-align: left;
+}
+.profile-drawer-item:hover { background: var(--hover-bg); }
+.profile-drawer-item i {
+  width: 20px; text-align: center; font-size: 1rem; color: var(--text-light);
+}
+.profile-drawer-item.danger { color: var(--danger); }
+.profile-drawer-item.danger i { color: var(--danger); }
+.profile-drawer-footer {
+  padding: 8px;
+  border-top: 1px solid var(--border);
+}
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+/* ====== 私信页面 ====== */
+.msg-container {
+  display: flex;
+  height: calc(100vh - 120px);
+  min-height: 400px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.msg-sidebar {
+  width: 300px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+}
+.msg-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.msg-icon-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--primary); color: white;
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; transition: opacity 0.2s;
+}
+.msg-icon-btn:hover { opacity: 0.85; }
+.msg-list { flex: 1; overflow-y: auto; }
+.msg-convo-item {
+  width: 100%; display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px; text-align: left;
+  border: none; border-bottom: 1px solid var(--border);
+  background: transparent; cursor: pointer;
+  transition: background 0.15s; color: var(--text);
+}
+.msg-convo-item:hover, .msg-convo-item.active { background: var(--hover-bg); }
+.msg-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--primary-light); color: var(--primary-dark);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem; font-weight: 700; flex-shrink: 0;
+}
+.msg-avatar-sm {
+  width: 32px; height: 32px; font-size: 0.75rem; text-decoration: none;
+}
+.msg-convo-info { flex: 1; min-width: 0; }
+.msg-convo-top { display: flex; justify-content: space-between; align-items: center; }
+.msg-convo-name {
+  font-size: 0.85rem; font-weight: 600;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.msg-convo-time { font-size: 0.65rem; color: var(--text-muted); flex-shrink: 0; margin-left: 8px; }
+.msg-convo-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; }
+.msg-convo-preview {
+  font-size: 0.75rem; color: var(--text-light);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;
+}
+.msg-unread {
+  min-width: 18px; height: 18px; border-radius: 50%;
+  background: var(--danger); color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.6rem; font-weight: 700; flex-shrink: 0; margin-left: 8px;
+}
+.msg-chat { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.msg-chat-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; border-bottom: 1px solid var(--border);
+}
+.msg-back-btn {
+  display: none; width: 32px; height: 32px; border-radius: 50%;
+  background: var(--input-bg); color: var(--text);
+  border: none; cursor: pointer; align-items: center; justify-content: center;
+}
+.msg-chat-name {
+  font-size: 0.85rem; font-weight: 600; text-decoration: none; color: var(--text);
+}
+.msg-chat-name:hover { text-decoration: underline; }
+.msg-messages { flex: 1; overflow-y: auto; padding: 16px; }
+.msg-empty {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; color: var(--text-muted);
+}
+.msg-input-bar {
+  display: flex; align-items: flex-end; gap: 8px;
+  padding: 12px 16px; border-top: 1px solid var(--border);
+  background: var(--bg-card);
+}
+.msg-fab {
+  position: fixed; bottom: 80px; right: 20px;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--primary); color: white;
+  border: none; cursor: pointer; z-index: 101;
+  display: none; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 16px rgba(168, 216, 240, 0.4);
+}
+@media (max-width: 768px) {
+  .msg-container {
+    height: calc(100vh - 48px - 60px);
+    border-radius: 0; border: none;
+    margin-left: -20px; margin-right: -20px;
+    margin-top: -24px;
+    width: calc(100% + 40px);
+    max-width: none;
+    position: relative;
+  }
+  .msg-sidebar { width: 100%; display: none; border-right: none; }
+  .msg-sidebar.show { display: flex; }
+  .msg-chat { display: none; }
+  .msg-chat.show {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    background: var(--bg-card);
+  }
+  .msg-chat.show .msg-chat-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    padding: 12px 16px;
+    background: var(--bg-card);
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    border-bottom: 1px solid var(--border);
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .msg-chat.show .msg-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    padding-bottom: 80px;
+  }
+  .msg-chat.show .msg-input-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background: var(--bg-card);
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    border-top: 1px solid var(--border);
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+  .msg-back-btn { display: flex; }
+  .msg-fab { display: flex; }
+}
+@media (min-width: 769px) {
+  .msg-sidebar { display: flex !important; }
+  .msg-chat { display: flex !important; }
+}
+
+/* ====== 图片网格 (Twitter 风格) ====== */
+.img-grid {
+  display: grid; gap: 3px; border-radius: 12px; overflow: hidden;
+  margin-top: 10px; max-width: 400px;
+}
+.img-grid-1 { grid-template-columns: 1fr; }
+.img-grid-2 { grid-template-columns: 1fr 1fr; }
+.img-grid-3 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+.img-grid-3 .img-grid-item:first-child { grid-row: 1 / 3; }
+.img-grid-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+.img-grid-item {
+  position: relative; cursor: pointer; overflow: hidden;
+  background: var(--bg-card);
+  border-radius: 8px;
+  max-height: 320px;
+  display: flex; align-items: center; justify-content: center;
+}
+.img-grid-1 .img-grid-item {
+  max-height: 400px;
+}
+.img-grid-item img {
+  width: 100%; height: 100%; object-fit: contain;
+  transition: transform 0.2s, opacity 0.3s ease;
+}
+.img-grid-item:hover img { transform: scale(1.03); }
+
+/* 图片加载动画 */
+.img-grid-loading {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--skeleton-base);
+  animation: shimmer 1.5s infinite;
+}
+.img-grid-loading-spinner {
+  width: 24px; height: 24px;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+.img-grid-error {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--input-bg);
+  color: var(--text-muted);
+  font-size: 1.2rem;
+}
+.img-grid-more {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.45); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; font-weight: 700;
+}
+
+/* ====== 移动端全屏灯箱 ====== */
+.lightbox-mobile {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  animation: fadeIn 0.2s ease;
+  touch-action: none;
+  -ms-touch-action: none;
+}
+.lightbox-mobile img {
+  max-width: 100vw;
+  max-height: 100vh;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: none;
+  -ms-touch-action: none;
+  pointer-events: none;
+}
+.lightbox-mobile-close {
+  position: absolute;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  right: 12px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 501;
+  transition: background 0.2s;
+  backdrop-filter: blur(8px);
+  touch-action: auto;
+  pointer-events: auto;
+}
+.lightbox-mobile-close:active {
+  background: rgba(255, 255, 255, 0.3);
+}
+.lightbox-mobile-counter {
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  font-weight: 500;
+  z-index: 501;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+.lightbox-mobile-hint {
+  position: absolute;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  z-index: 501;
+}
+
+/* 图片灯箱 ====== */
+.img-lightbox {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(0,0,0,0.85);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.2s ease;
+}
+.img-lightbox img {
+  max-width: 90vw; max-height: 80vh; object-fit: contain;
+  border-radius: 8px;
+}
+.img-lightbox-close {
+  position: absolute; top: 16px; right: 16px;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(255,255,255,0.15); color: #fff; border: none;
+  font-size: 1.2rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.img-lightbox-close:hover { background: rgba(255,255,255,0.3); }
+.img-lightbox-nav {
+  display: flex; align-items: center; gap: 16px;
+  margin-top: 12px; color: rgba(255,255,255,0.8); font-size: 0.85rem;
+}
+.img-lightbox-nav button {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,0.12); color: #fff; border: none;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.img-lightbox-nav button:hover { background: rgba(255,255,255,0.25); }
+[data-theme="dark"] .back-btn {
+  background: rgba(40,44,52,0.6);
+  border-color: rgba(255,255,255,0.12);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+[data-theme="colorful"] .back-btn {
+  background: rgba(255,255,255,0.45);
+  border-color: rgba(255,255,255,0.4);
+}
+
+/* 主题切换过渡 */
+body, .card, .hero-card, .btn, .form-control, .sidebar-link,
+.rank-item, .tag, .toast, .back-to-top {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* ====== 更多菜单按钮 ====== */
+.btn-menu {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--input-bg); border: 1px solid var(--border);
+  color: var(--text-muted); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem; transition: all 0.2s;
+  flex-shrink: 0;
+}
+.btn-menu:hover {
+  background: var(--primary-light);
+  color: var(--text);
+  border-color: var(--primary);
+}
+
+/* ====== 下拉菜单 ====== */
+.dropdown-menu {
+  position: absolute; top: 100%; right: 0; z-index: 50;
+  min-width: 160px; padding: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+  margin-top: 4px;
+  animation: miuiDropdownIn 0.25s var(--miui-spring);
+  transform-origin: top right;
+}
+@keyframes miuiDropdownIn {
+  from { opacity: 0; transform: scale(0.92) translateY(-8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+[data-theme="dark"] .dropdown-menu {
+  background: var(--bg-sidebar);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.dropdown-item {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; padding: 8px 12px;
+  border: none; background: none;
+  color: var(--text); font-size: 0.85rem;
+  border-radius: 6px; cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s var(--miui-spring);
+  font-family: var(--font);
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+}
+.dropdown-item:hover {
+  background: var(--primary-light);
+  transform: translateX(3px);
+}
+.dropdown-item:active {
+  transform: scale(0.97);
+  transition-duration: 0.1s;
+}
+.dropdown-item i {
+  width: 16px; text-align: center;
+  font-size: 0.8rem;
+}
+.dropdown-item-danger {
+  color: var(--danger);
+}
+.dropdown-item-danger:hover {
+  background: rgba(232, 131, 124, 0.1);
+}
+
+/* ====== 置顶帖子 ====== */
+.post-pinned {
+  border-left: 3px solid var(--warning);
+  background: linear-gradient(135deg, var(--bg-card) 0%, rgba(240, 192, 64, 0.04) 100%);
+}
+[data-theme="dark"] .post-pinned {
+  background: linear-gradient(135deg, var(--bg-card) 0%, rgba(240, 192, 64, 0.06) 100%);
+}
+[data-theme="colorful"] .post-pinned {
+  background: linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(240, 192, 64, 0.08) 100%);
+}
+.post-pinned-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 0.7rem; font-weight: 700;
+  color: var(--warning);
+  margin-bottom: 8px;
+  letter-spacing: 0.02em;
+}
+.post-pinned-tag i {
+  font-size: 0.65rem;
+}
+
+/* ====== 点赞按钮 ====== */
+.btn-icon {
+  display: flex; align-items: center; gap: 4px;
+  background: none; border: none; cursor: pointer;
+  color: var(--text-light); font-size: 0.9rem;
+  padding: 4px 8px; border-radius: 8px;
+  transition: all 0.2s;
+}
+.btn-icon:hover {
+  background: rgba(232, 131, 124, 0.08);
+}
+.btn-icon.liked {
+  color: var(--danger);
+}
+.btn-icon:active {
+  transform: scale(0.92);
+}
+
+/* ====== 更多动画 ====== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-fade-in-scale {
+  animation: fadeInScale 0.2s ease-out;
+}
+
+/* 卡片悬停增强 */
+.hover-lift {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+  will-change: transform;
+}
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(168, 216, 240, 0.3);
+}
+
+/* GPU加速卡 */
+.card, .hover-lift, .rank-item {
+  transform: translateZ(0);
+}
+
+/* 减少动效偏好 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .hero-card::after {
+    animation: none;
+    display: none;
+  }
+  .stagger-item {
+    animation: none !important;
+    opacity: 1;
+  }
+  [data-theme="colorful"] body {
+    animation: none !important;
+  }
+}
+
+/* 脉冲动画（用于通知红点） */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* 移动端触控反馈 */
+@media (max-width: 768px) {
+  .card:active { transform: scale(0.985); transition: transform 0.1s ease; }
+  .hero-card::after { display: none; }
+  .bottom-nav-floating a:active { transform: scale(0.92); transition: transform 0.1s ease; }
+  .rank-item { gap: 10px; padding: 12px 14px; }
+  .rank-number { font-size: 1.1rem; width: 30px; }
+  .back-btn-wrap {
+    position: fixed; top: 10px; left: 10px; z-index: 90;
+    margin-bottom: 0;
+  }
+  .back-btn-spacer { display: none; }
+}
+
+/* ====== 移动端专项优化 ====== */
+@media (max-width: 768px) {
+  /* 卡片内边距缩小 */
+  .card { padding: 1rem; }
+  .hero-card { padding: 1.25rem; }
+
+  /* 按钮更紧凑 */
+  .btn { padding: 8px 18px; font-size: 0.9rem; }
+  .btn-sm { padding: 5px 12px; font-size: 0.8rem; }
+
+  /* 表单更大触控区域 */
+  .form-control { padding: 12px 14px; font-size: 16px; /* 防止iOS缩放 */ }
+  textarea.form-control { min-height: 100px; }
+
+  /* 下拉菜单全宽 */
+  .dropdown-menu {
+    position: fixed; top: auto; bottom: 0; left: 0; right: 0;
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding: 12px;
+    animation: slideUp 0.25s ease-out;
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.15);
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  .dropdown-item {
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    border-radius: var(--radius-sm);
+  }
+
+  /* 帖子内容区域优化 */
+  .img-grid { max-width: 100%; }
+
+  /* 置顶标签移动端 */
+  .post-pinned { border-left-width: 3px; }
+
+  /* 搜索栏优化 */
+  input.form-control[type="search"],
+  input.form-control[placeholder*="搜索"] {
+    font-size: 16px;
+  }
+
+  /* 帖子卡片移动端布局 */
+  .post-card-mobile {
+    flex-direction: column;
+  }
+  .post-card-mobile .post-avatar {
+    width: 36px; height: 36px; font-size: 0.8rem;
+  }
+
+  /* 快捷操作按钮 2列自适应 */
+  .quick-actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .quick-action-item {
+    padding: 12px 8px;
+  }
+  .quick-action-item i {
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+  }
+  .quick-action-item .text-sm {
+    font-size: 0.75rem;
+  }
+
+  /* 帖子操作栏移动端 */
+  .post-actions {
+    gap: 12px;
+  }
+  .post-actions button,
+  .post-actions a {
+    min-height: 36px;
+    padding: 6px 10px;
+  }
+
+  /* 评论卡片移动端 */
+  .comment-card {
+    padding: 0.75rem;
+  }
+  .comment-card .comment-avatar {
+    width: 28px; height: 28px; font-size: 0.65rem;
+  }
+
+  /* 管理后台统计卡片 */
+  .admin-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .admin-stat-card {
+    padding: 12px 8px;
+  }
+  .admin-stat-card .text-2xl {
+    font-size: 1.25rem;
+  }
+
+  /* 用户列表移动端 */
+  .admin-user-item {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .admin-user-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  /* 图片网格移动端更大 */
+  .img-grid-item { min-height: 80px; }
+
+  /* 返回按钮移动端 */
+  .back-link {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+
+  /* 表单区域移动端 */
+  .form-section {
+    padding: 12px;
+  }
+
+  /* 标签页移动端 */
+  .tab-bar {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 6px;
+    padding-bottom: 4px;
+  }
+  .tab-bar::-webkit-scrollbar { display: none; }
+  .tab-bar .btn-sm {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* 个人中心头像缩小 */
+  .profile-avatar {
+    width: 48px; height: 48px;
+    font-size: 1.25rem;
+  }
+
+  /* 设置主题卡片 */
+  .theme-card {
+    padding: 14px 10px;
+  }
+  .theme-card .text-2xl {
+    font-size: 1.5rem;
+  }
+
+  /* 列表项触控优化 */
+  .list-item {
+    min-height: 48px;
+    padding: 10px 12px;
+  }
+
+  /* 文字截断 */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Hero Card 移动端图标缩小 */
+  .hero-card .w-12 {
+    width: 40px; height: 40px;
+    font-size: 1rem;
+    border-radius: 12px;
+  }
+  .hero-card .text-lg {
+    font-size: 1rem;
+  }
+}
+
+/* ====== 移动端顶部导航栏 ====== */
+.mobile-header {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 48px; z-index: 50;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 12px;
+  animation: fadeIn 0.2s ease;
+}
+[data-theme="dark"] .mobile-header {
+  background: rgba(26, 29, 35, 0.65);
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+[data-theme="colorful"] .mobile-header {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
+  border-bottom-color: rgba(255, 255, 255, 0.3);
+}
+.mobile-header-title {
+  font-size: 0.95rem; font-weight: 700; color: var(--text);
+  position: absolute; left: 50%; transform: translateX(-50%);
+}
+.mobile-header-left, .mobile-header-right {
+  display: flex; align-items: center; gap: 4px;
+  z-index: 1;
+}
+.mobile-header-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: none; cursor: pointer;
+  color: var(--text); font-size: 1.1rem;
+  transition: background 0.2s ease, transform 0.2s var(--miui-spring);
+  -webkit-tap-highlight-color: transparent;
+}
+.mobile-header-btn:active {
+  background: var(--hover-bg);
+  transform: scale(0.88);
+  transition-duration: 0.1s;
+}
+
+@media (min-width: 769px) {
+  .mobile-header { display: none; }
+  .account-mobile-actions { display: none; }
+}
+
+/* ====== 小屏手机 (≤375px) ====== */
+@media (max-width: 375px) {
+  .card { padding: 0.85rem; }
+  .hero-card { padding: 1rem; }
+  .btn { padding: 7px 14px; font-size: 0.85rem; }
+  .btn-sm { padding: 4px 10px; font-size: 0.75rem; }
+  .form-control { padding: 10px 12px; }
+  .quick-actions-grid { gap: 6px; }
+  .admin-stats-grid { gap: 6px; }
+}
+
+/* ====== 安全区适配（刘海屏/底部横条） ====== */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .bottom-nav-floating {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .sidebar-mobile {
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+}
+
+/* ====== 横屏优化 ====== */
+@media (max-width: 768px) and (orientation: landscape) {
+  .hero-card { padding: 12px 20px; }
+  .bottom-nav-floating { height: 48px; bottom: 8px; }
+  .bottom-nav-floating a { padding: 4px 10px; font-size: 0.6rem; }
+  .bottom-nav-floating a i { font-size: 1rem; }
+}
+
+/* ====== 聊天气泡 Chat Bubbles ====== */
+.chat-bubble-own {
+  background: var(--primary);
+  color: white;
+  border-radius: 18px 18px 4px 18px;
+  padding: 10px 14px;
+  word-break: break-word;
+  white-space: pre-wrap;
+  min-width: 0;
+  max-width: 100%;
+  animation: chatFadeIn 0.2s ease;
+}
+.chat-bubble-other {
+  background: var(--input-bg);
+  color: var(--text);
+  border-radius: 18px 18px 18px 4px;
+  padding: 10px 14px;
+  word-break: break-word;
+  white-space: pre-wrap;
+  min-width: 0;
+  max-width: 100%;
+  animation: chatFadeIn 0.2s ease;
+}
+@keyframes chatFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.chat-input-bar {
+  position: sticky;
+  bottom: 0;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+  padding: 12px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+/* 聊天布局响应式 */
+@media (max-width: 767px) {
+  .chat-bubble-own,
+  .chat-bubble-other {
+    max-width: 85%;
+  }
+}
+
+/* ====== MIUI / HyperOS 风格移动端优化 ====== */
+@media (max-width: 768px) {
+  /* MIUI 风格弹性卡片 */
+  .card {
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.15s ease;
+  }
+  .card:active {
+    transform: scale(0.98);
+    box-shadow: 0 0 0 rgba(0,0,0,0);
+  }
+
+  /* MIUI 风格按钮触控反馈 */
+  .btn:active {
+    transform: scale(0.95);
+    transition: transform 0.08s ease;
+  }
+  .btn-primary:active {
+    opacity: 0.85;
+  }
+
+  /* 底部导航栏 MIUI 毛玻璃增强 */
+  .bottom-nav-floating {
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: 0 -2px 20px rgba(0,0,0,0.06);
+  }
+  .bottom-nav-floating a {
+    transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), color 0.15s ease;
+  }
+  .bottom-nav-floating a:active {
+    transform: scale(0.88);
+  }
+  .bottom-nav-floating a.active {
+    transform: scale(1.05);
+  }
+
+  /* 移动端标题栏毛玻璃增强 */
+  .mobile-header {
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .mobile-header-btn {
+    transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), background 0.15s ease;
+  }
+  .mobile-header-btn:active {
+    transform: scale(0.85);
+  }
+
+  /* 帖子卡片 MIUI 风格 */
+  .post-card {
+    border-radius: 16px;
+    transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1);
+  }
+  .post-card:active {
+    transform: scale(0.985);
+  }
+
+  /* 图片网格圆角增强 */
+  .img-grid {
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .img-grid-item {
+    transition: transform 0.15s ease;
+  }
+  .img-grid-item:active {
+    transform: scale(0.96);
+  }
+
+  /* NSFW 遮罩移动端触控优化 */
+  .nsfw-overlay button {
+    min-height: 36px;
+    padding: 6px 16px;
+    font-size: 0.7rem;
+  }
+
+  /* 下拉菜单 MIUI 底部弹出样式 */
+  .dropdown-menu {
+    border-radius: 20px 20px 0 0;
+    padding: 8px 12px 20px;
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.12);
+  }
+  .dropdown-item {
+    border-radius: 12px;
+    transition: background 0.15s ease;
+  }
+  .dropdown-item:active {
+    background: var(--hover-bg);
+  }
+
+  /* 模态框 MIUI 底部弹出 */
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .modal {
+    border-radius: 20px 20px 0 0;
+    max-height: 85vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  /* 输入框 MIUI 风格 */
+  .form-control {
+    border-radius: 12px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .form-control:focus {
+    box-shadow: 0 0 0 3px rgba(168, 216, 240, 0.3);
+  }
+
+  /* 标签页 MIUI 风格 */
+  .tab-bar {
+    gap: 4px;
+    padding: 4px;
+    background: var(--input-bg);
+    border-radius: 14px;
+  }
+
+  /* 页面切换 — 无动画 */
+}
+
+@keyframes miuiPageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0.8;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes sheetUp {
+  0% {
+    transform: translateY(100%);
+    opacity: 0.6;
+  }
+  60% {
+    transform: translateY(-3%);
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(1%);
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.animate-sheet-up {
+  animation: sheetUp 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* 编辑资料全屏面板 */
+.edit-profile-sheet {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  background: var(--bg-card);
+  border-radius: 20px 20px 0 0;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.12);
+  animation: sheetUp 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: hidden;
+}
+.edit-profile-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+@media (max-width: 768px) {
+  .edit-profile-sheet {
+    max-width: none;
+    max-height: 100vh;
+    border-radius: 0;
+    height: 100vh;
+  }
+}
+
+/* ====== 移动端细节打磨 ====== */
+@media (max-width: 768px) {
+  /* Toast 移动端居中 + 安全区 */
+  .toast-container {
+    top: auto;
+    bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+    left: 16px;
+    right: 16px;
+    align-items: stretch;
+  }
+  .toast {
+    max-width: none;
+    border-radius: 14px;
+    padding: 12px 16px;
+    font-size: 0.85rem;
+    justify-content: center;
+    animation: miuiToastIn 0.3s cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  /* 骨架屏更丝滑 */
+  .skeleton {
+    border-radius: 10px;
+    animation: miuiShimmer 1.8s ease-in-out infinite;
+  }
+
+  /* 隐藏全局滚动条 */
+  ::-webkit-scrollbar { width: 0; height: 0; }
+
+  /* Tag 移动端 */
+  .tag {
+    padding: 2px 8px;
+    font-size: 0.7rem;
+    border-radius: 8px;
+  }
+
+  /* 通知徽章脉冲 */
+  .notif-badge {
+    animation: notifPulse 2s ease-in-out infinite;
+  }
+
+  /* 搜索输入框 MIUI */
+  input[type="search"],
+  input[placeholder*="搜索"] {
+    border-radius: 12px;
+    padding: 10px 14px 10px 36px;
+    font-size: 15px;
+    background: var(--input-bg);
+    border: 1.5px solid transparent;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  input[type="search"]:focus,
+  input[placeholder*="搜索"]:focus {
+    border-color: var(--primary);
+    background: var(--bg-card);
+  }
+
+  /* 帖子操作栏触控区加大 */
+  .post-actions button,
+  .post-actions a {
+    min-height: 40px;
+    min-width: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* 评论区移动端间距 */
+  .comment-card {
+    border-radius: 14px;
+    padding: 12px;
+  }
+
+  /* 链接触控反馈 */
+  a:active {
+    opacity: 0.7;
+    transition: opacity 0.1s ease;
+  }
+
+  /* 个人中心头像区 */
+  .profile-avatar {
+    width: 64px;
+    height: 64px;
+    font-size: 1.5rem;
+  }
+
+  /* 关注按钮移动端 */
+  .btn-follow {
+    padding: 6px 16px;
+    font-size: 0.8rem;
+    border-radius: 20px;
+  }
+
+  /* 空状态居中 */
+  .empty-state {
+    padding: 40px 20px;
+    text-align: center;
+  }
+  .empty-state i {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    opacity: 0.3;
+  }
+
+  /* 加载动画 MIUI 风格 */
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border-width: 2.5px;
+    animation: miuiSpin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  /* 图片预览网格移动端 */
+  .img-preview-grid {
+    gap: 4px;
+  }
+  .img-preview-item {
+    width: 64px;
+    height: 64px;
+    border-radius: 10px;
+  }
+
+  /* 管理后台统计卡片移动端 */
+  .admin-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* 发帖页面移动端 */
+  textarea.form-control {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* 举报弹窗移动端 */
+  .modal {
+    padding: 20px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* 侧边栏移动端 */
+  .sidebar-mobile {
+    border-radius: 0 20px 20px 0;
+    box-shadow: 8px 0 30px rgba(0,0,0,0.15);
+  }
+
+  /* 设置页开关触控区 */
+  .settings-toggle {
+    min-width: 48px;
+    min-height: 26px;
+  }
+
+  /* 快捷键区域隐藏（移动端无键盘） */
+  kbd {
+    display: none;
+  }
+}
+
+@keyframes miuiShimmer {
+  0% { background-position: -200px 0; }
+  50% { background-position: calc(200px + 100%) 0; }
+  100% { background-position: -200px 0; }
+}
+
+@keyframes notifPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+@keyframes miuiSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* ====== Toast Popup 实时消息弹窗 ====== */
+.toast-popup-container {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+  max-width: 360px;
+  width: calc(100vw - 32px);
+}
+.toast-popup-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border-radius: 16px;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  pointer-events: auto;
+  animation: toastSlideIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.3s, transform 0.3s;
+}
+.toast-popup-item:hover {
+  transform: translateX(-4px);
+}
+.toast-popup-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  background: var(--primary-light);
+}
+.toast-popup-body {
+  flex: 1;
+  min-width: 0;
+}
+.toast-popup-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.toast-popup-msg {
+  font-size: 12px;
+  color: var(--text-light);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.toast-popup-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 14px;
+  padding: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+}
+.toast-popup-item:hover .toast-popup-close {
+  opacity: 1;
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@media (max-width: 768px) {
+  .toast-popup-container {
+    top: auto;
+    bottom: 80px;
+    right: 12px;
+    left: 12px;
+    max-width: none;
+    width: auto;
+  }
+  .toast-popup-item {
+    border-radius: 14px;
+  }
+}
+
+/* ============================================================
+   MIUI / HyperOS 交互动画系统
+   核心原则：零自动动画，只响应用户操作
+   弹簧物理：按下快速回弹，释放弹性归位
+   ============================================================ */
+
+:root {
+  /* MIUI 弹簧曲线 — 释放时的弹性回弹 */
+  --miui-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  /* MIUI 快速响应 — 按下时的快速反馈 */
+  --miui-fast: cubic-bezier(0.2, 0, 0, 1);
+  /* MIUI 平滑过渡 — hover 等温和变化 */
+  --miui-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* ====== 页面入场 ====== */
+.miui-page-in {
+  animation: miuiPageIn 0.4s var(--miui-spring) both;
+}
+@keyframes miuiPageIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ====== 卡片入场 ====== */
+.miui-card-in {
+  animation: miuiCardIn 0.4s var(--miui-spring) both;
+}
+@keyframes miuiCardIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ====== 淡入上浮 ====== */
+.miui-fade-in-up {
+  animation: miuiFadeInUp 0.4s var(--miui-spring) both;
+}
+@keyframes miuiFadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ====== 淡入缩放 ====== */
+.miui-fade-in-scale {
+  animation: miuiFadeInScale 0.35s var(--miui-spring) both;
+}
+@keyframes miuiFadeInScale {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ====== 滑入 ====== */
+.miui-slide-in-right {
+  animation: miuiSlideInRight 0.4s var(--miui-spring) both;
+}
+@keyframes miuiSlideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.miui-slide-in-left {
+  animation: miuiSlideInLeft 0.4s var(--miui-spring) both;
+}
+@keyframes miuiSlideInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ====== Tab 内容切换 ====== */
+.miui-tab-content {
+  animation: miuiTabFade 0.3s var(--miui-spring) both;
+}
+@keyframes miuiTabFade {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ====== 按压反馈（按钮/卡片/可点击元素） ====== */
+.miui-press {
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s var(--miui-fast);
+}
+.miui-press:active {
+  transform: scale(0.95);
+  transition-duration: 0.06s;
+}
+
+/* ====== Hover 悬停抬起（卡片/列表项） ====== */
+.miui-hover-lift {
+  transition: transform 0.35s var(--miui-spring), box-shadow 0.35s var(--miui-smooth);
+}
+.miui-hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(168, 216, 240, 0.3);
+}
+.miui-hover-lift:active {
+  transform: scale(0.98) translateY(0);
+  transition-duration: 0.08s;
+}
+
+/* ====== 涟漪效果（纯 CSS，点击时从中心扩散） ====== */
+.miui-ripple {
+  position: relative;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+.miui-ripple::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--ripple-x, 50%) var(--ripple-y, 50%),
+    rgba(168, 216, 240, 0.35) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+.miui-ripple:active::after {
+  opacity: 1;
+  transition: opacity 0s;
+}
+
+/* ====== 点赞弹跳 ====== */
+.miui-like {
+  transition: transform 0.1s var(--miui-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+.miui-like:active {
+  transform: scale(1.25);
+  transition-duration: 0.06s;
+}
+.miui-like.liked {
+  animation: miuiLikePop 0.4s var(--miui-spring);
+}
+@keyframes miuiLikePop {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.45); }
+  60% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
+/* ====== Badge 弹入（通知数字出现时） ====== */
+.miui-badge-in {
+  animation: miuiBadgeIn 0.35s var(--miui-spring);
+}
+@keyframes miuiBadgeIn {
+  0% { transform: scale(0); }
+  60% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* ====== 侧边栏交互 ====== */
+.miui-sidebar-item {
+  transition: background 0.15s ease, transform 0.25s var(--miui-spring);
+  -webkit-tap-highlight-color: transparent;
+}
+.miui-sidebar-item:hover {
+  transform: translateX(3px);
+}
+.miui-sidebar-item:active {
+  transform: scale(0.97);
+  transition-duration: 0.08s;
+}
+
+/* ====== 输入框组 focus 微光 ====== */
+.miui-input-group {
+  transition: box-shadow 0.3s var(--miui-smooth);
+}
+.miui-input-group:focus-within {
+  box-shadow: 0 4px 16px rgba(168, 216, 240, 0.2);
+}
+
+/* ====== Tab 指示器 ====== */
+.miui-tab-indicator {
+  position: relative;
+}
+.miui-tab-indicator::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 50%;
+  width: 0; height: 3px;
+  background: var(--primary);
+  border-radius: 2px;
+  transition: width 0.3s var(--miui-spring), left 0.3s var(--miui-spring);
+}
+.miui-tab-indicator.active::after {
+  width: 100%;
+  left: 0;
+}
+
+/* ====== 模态框 / Sheet / Toast ====== */
+.modal {
+  animation: miuiModalIn 0.35s var(--miui-spring);
+}
+@keyframes miuiModalIn {
+  from { opacity: 0; transform: scale(0.9) translateY(16px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.miui-sheet {
+  animation: miuiSheetIn 0.4s var(--miui-spring);
+}
+@keyframes miuiSheetIn {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.miui-toast-in {
+  animation: miuiToastIn 0.35s var(--miui-spring);
+}
+@keyframes miuiToastIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ====== 加载 spinner ====== */
+.miui-spinner {
+  width: 32px; height: 32px;
+  border: 2.5px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: miuiSpinner 0.7s linear infinite;
+}
+@keyframes miuiSpinner {
+  to { transform: rotate(360deg); }
+}
+
+/* ====== 骨架屏 ====== */
+.miui-skeleton {
+  background: linear-gradient(90deg, var(--skeleton-base) 0%, var(--skeleton-shine) 50%, var(--skeleton-base) 100%);
+  background-size: 400px 100%;
+  animation: miuiSkeleton 1.6s ease-in-out infinite;
+}
+@keyframes miuiSkeleton {
+  0% { background-position: -200px 0; }
+  50% { background-position: 200px 0; }
+  100% { background-position: -200px 0; }
+}
+
+/* ====== 减少动效（无障碍） ====== */
+@media (prefers-reduced-motion: reduce) {
+  .miui-press:active,
+  .miui-hover-lift:hover,
+  .miui-hover-lift:active,
+  .miui-like:active,
+  .miui-sidebar-item:hover,
+  .miui-sidebar-item:active {
+    transform: none !important;
+  }
+  .miui-like.liked,
+  .miui-badge-in,
+  .miui-sheet,
+  .miui-toast-in,
+  .miui-spinner,
+  .miui-skeleton {
+    animation: none !important;
+  }
+  .miui-ripple::after { display: none; }
+}

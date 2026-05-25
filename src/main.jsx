@@ -5,7 +5,9 @@ import App from './App'
 import { AuthProvider } from './contexts/AuthContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { ToastProvider } from './contexts/ToastContext'
-import './styles/index.css'
+import { NotificationProvider } from './contexts/NotificationContext'
+import { NsfwProvider } from './contexts/NsfwContext'
+import './styles/global.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -13,7 +15,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <ThemeProvider>
         <AuthProvider>
           <ToastProvider>
-            <App />
+            <NotificationProvider>
+              <NsfwProvider>
+                <App />
+              </NsfwProvider>
+            </NotificationProvider>
           </ToastProvider>
         </AuthProvider>
       </ThemeProvider>
