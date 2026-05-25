@@ -69,9 +69,9 @@ export default function App() {
 
   return (
     <MobileHeaderProvider>
-    <div className="app-layout" style={{ flexDirection: 'column', minHeight: '100dvh' }}>
+    <div className="app-layout">
       <MobileHeader title={getTitle(pathname)} />
-      <main className="app-main-content" style={{ paddingTop: '48px', paddingBottom: 'calc(60px + env(safe-area-inset-bottom, 0px))' }}>
+      <main className="app-main-content">
         <div className="container mx-auto px-4 py-4 max-w-[720px]">
           <ErrorBoundary>
             <Suspense fallback={<Loading />}>

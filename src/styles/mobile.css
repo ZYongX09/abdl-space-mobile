@@ -1,0 +1,50 @@
+/* 移动端专属覆盖 — 确保布局在纯移动端结构下正确 */
+@import "tailwindcss";
+
+/* 强制移动端布局（不依赖 media query） */
+.app-layout {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 100dvh !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.app-main-content {
+  flex: 1 !important;
+  overflow-y: visible !important;
+  overflow-x: hidden !important;
+  padding-top: 48px !important;
+  padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+/* 隐藏桌面端侧边栏 */
+.sidebar-desktop,
+.sidebar-placeholder,
+.sidebar-collapsible,
+.sidebar-overlay {
+  display: none !important;
+}
+
+/* 隐藏桌面端 hero 卡片 */
+.hero-card {
+  display: none !important;
+}
+
+/* 移动端卡片适配 */
+.card {
+  padding: 16px !important;
+  border-radius: 12px !important;
+}
+
+/* 移动端按钮最小触摸区域 */
+.btn {
+  min-height: 44px !important;
+}
+
+/* 底部导航浮层 */
+.bottom-nav-floating {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-around;
+}

@@ -8,6 +8,7 @@ import { ToastProvider } from './contexts/ToastContext'
 import { NotificationProvider } from './contexts/NotificationContext'
 import { NsfwProvider } from './contexts/NsfwContext'
 import './styles/global.css'
+import './styles/mobile.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
