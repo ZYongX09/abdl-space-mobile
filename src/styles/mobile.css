@@ -1,4 +1,4 @@
-/* 移动端专属覆盖 — 确保布局在纯移动端结构下正确 */
+/* 移动端专属覆盖 — 仅处理布局结构差异，不覆盖组件样式 */
 
 /* 强制移动端布局（不依赖 media query） */
 .app-layout {
@@ -29,43 +29,7 @@
   display: none !important;
 }
 
-/* 底部导航栏 — 显示 + 保留毛玻璃效果 */
+/* 底部导航栏显示（global.css 中默认 display:none） */
 .bottom-nav-floating {
   display: flex !important;
-  align-items: center;
-  justify-content: space-around;
-  background: rgba(255, 255, 255, 0.6) !important;
-  backdrop-filter: blur(24px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.04);
-}
-
-[data-theme="dark"] .bottom-nav-floating {
-  background: rgba(26, 29, 35, 0.65) !important;
-  border-top-color: rgba(255, 255, 255, 0.06);
-  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.2);
-}
-
-[data-theme="colorful"] .bottom-nav-floating {
-  background: rgba(255, 255, 255, 0.4) !important;
-  backdrop-filter: blur(32px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
-}
-
-/* 顶部标题栏毛玻璃 */
-.mobile-header {
-  background: rgba(255, 255, 255, 0.6) !important;
-  backdrop-filter: blur(24px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
-}
-
-[data-theme="dark"] .mobile-header {
-  background: rgba(26, 29, 35, 0.65) !important;
-}
-
-[data-theme="colorful"] .mobile-header {
-  background: rgba(255, 255, 255, 0.4) !important;
-  backdrop-filter: blur(32px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
 }
