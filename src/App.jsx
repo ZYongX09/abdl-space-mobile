@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext'
 import { initNBWConfig } from './utils/nbwOAuth'
-import { MobileHeaderProvider } from './contexts/MobileHeaderContext'
+import { MobileHeaderProvider, useMobileHeaderActions } from './contexts/MobileHeaderContext'
 import MobileHeader from './components/MobileHeader'
 import MobileBottomNav from './components/MobileBottomNav'
 import ToastPopup from './components/ToastPopup'
@@ -57,6 +57,22 @@ function Loading() {
   )
 }
 
+function MobileHeaderLayout() {
+  const { pathname } = useLocation()
+  const { headerVisible } = useMobileHeaderActions()
+  if (!headerVisible) return null
+  return <MobileHeader title={getTitle(pathname)} />
+}
+
+function AppMainContent({ children }) {
+  const { headerVisible } = useMobileHeaderActions()
+  return (
+    <main className="app-main-content" style={headerVisible ? {} : { paddingTop: 0 }}>
+      {children}
+    </main>
+  )
+}
+
 export default function App() {
   const { pathname } = useLocation()
 
@@ -70,8 +86,8 @@ export default function App() {
   return (
     <MobileHeaderProvider>
     <div className="app-layout">
-      <MobileHeader title={getTitle(pathname)} />
-      <main className="app-main-content">
+      <MobileHeaderLayout />
+      <AppMainContent>
         <div className="container mx-auto px-4 py-4 max-w-[720px]">
           <ErrorBoundary>
             <Suspense fallback={<Loading />}>
@@ -97,7 +113,7 @@ export default function App() {
             </Suspense>
           </ErrorBoundary>
         </div>
-      </main>
+      </AppMainContent>
       <MobileBottomNav />
       <ToastPopup />
     </div>

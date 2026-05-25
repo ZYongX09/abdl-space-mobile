@@ -5,6 +5,7 @@ const MobileHeaderContext = createContext(null);
 export function MobileHeaderProvider({ children }) {
   const [actions, setActions] = useState([]);
   const [leftActions, setLeftActions] = useState([]);
+  const [headerVisible, setHeaderVisible] = useState(true);
 
   const registerActions = useCallback((newActions = [], newLeftActions = []) => {
     setActions(newActions);
@@ -17,7 +18,7 @@ export function MobileHeaderProvider({ children }) {
   }, []);
 
   return (
-    <MobileHeaderContext.Provider value={{ actions, leftActions, registerActions, clearActions }}>
+    <MobileHeaderContext.Provider value={{ actions, leftActions, registerActions, clearActions, headerVisible, setHeaderVisible }}>
       {children}
     </MobileHeaderContext.Provider>
   );

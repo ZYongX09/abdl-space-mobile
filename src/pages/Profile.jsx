@@ -14,6 +14,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useMobileHeaderActions } from '../contexts/MobileHeaderContext';
 import { useToast } from '../contexts/ToastContext';
 import { forumAPI, followsAPI, authAPI, usersAPI } from '../api';
 import OfficialBadge from '../components/OfficialBadge';
@@ -799,6 +800,13 @@ export default function ProfilePageV2() {
   const navigate = useNavigate();
   const { user: currentUser } = useAuth();
   const toast = useToast();
+  const { setHeaderVisible } = useMobileHeaderActions();
+
+  // 隐藏全局标题栏
+  useEffect(() => {
+    setHeaderVisible(false);
+    return () => setHeaderVisible(true);
+  }, []);
 
   const targetId = paramId || currentUser?.id;
   const isSelf = !paramId || String(paramId) === String(currentUser?.id);
