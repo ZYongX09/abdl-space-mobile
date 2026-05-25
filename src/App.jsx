@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext'
 import { initNBWConfig } from './utils/nbwOAuth'
+import { MobileHeaderProvider } from './contexts/MobileHeaderContext'
 import MobileHeader from './components/MobileHeader'
 import MobileBottomNav from './components/MobileBottomNav'
 import ToastPopup from './components/ToastPopup'
@@ -67,6 +68,7 @@ export default function App() {
   }, [pathname])
 
   return (
+    <MobileHeaderProvider>
     <div className="app-layout" style={{ flexDirection: 'column', minHeight: '100dvh' }}>
       <MobileHeader title={getTitle(pathname)} />
       <main className="app-main-content" style={{ paddingTop: '48px', paddingBottom: 'calc(60px + env(safe-area-inset-bottom, 0px))' }}>
@@ -99,5 +101,6 @@ export default function App() {
       <MobileBottomNav />
       <ToastPopup />
     </div>
+    </MobileHeaderProvider>
   )
 }
