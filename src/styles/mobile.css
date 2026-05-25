@@ -1,5 +1,4 @@
 /* 移动端专属覆盖 — 确保布局在纯移动端结构下正确 */
-@import "tailwindcss";
 
 /* 强制移动端布局（不依赖 media query） */
 .app-layout {
