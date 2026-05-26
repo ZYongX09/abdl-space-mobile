@@ -131,6 +131,18 @@ export default function App() {
             </Suspense>
           </ErrorBoundary>
         </div>
+        <footer className="text-center py-6 text-xs space-y-2" style={{ color: 'var(--text-muted)' }}>
+          <div className="flex items-center justify-center gap-3 flex-wrap">
+            <i className="fa-solid fa-baby" style={{ color: 'var(--primary)' }} />
+            <span>ABDL Space 移动版 · © {new Date().getFullYear()}</span>
+          </div>
+          <div className="flex items-center justify-center gap-3 flex-wrap">
+            <a href="/" style={{ color: 'var(--link-color)', textDecoration: 'none' }}>广场</a>
+            <a href="/rankings" style={{ color: 'var(--link-color)', textDecoration: 'none' }}><i className="fa-solid fa-trophy mr-1" />排行榜</a>
+            <a href="/settings" style={{ color: 'var(--link-color)', textDecoration: 'none' }}><i className="fa-solid fa-gear mr-1" />设置</a>
+            <a href="/about" style={{ color: 'var(--link-color)', textDecoration: 'none' }}><i className="fa-solid fa-circle-info mr-1" />关于</a>
+          </div>
+        </footer>
       </AppMainContent>
       <MobileBottomNav />
       <ToastPopup />
