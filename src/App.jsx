@@ -26,6 +26,10 @@ const MessagesPage = lazy(() => import('./pages/MessagesPage'))
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage'))
 const AccountPrivacy = lazy(() => import('./pages/AccountPrivacy'))
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
+const ComparePage = lazy(() => import('./pages/ComparePage'))
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'))
+const TermsOfService = lazy(() => import('./pages/TermsOfService'))
+const CookiePolicy = lazy(() => import('./pages/CookiePolicy'))
 
 const ROUTE_TITLES = {
   '/': '广场',
@@ -42,6 +46,10 @@ const ROUTE_TITLES = {
   '/create-post': '发帖',
   '/account': '账户与隐私',
   '/forgot-password': '找回密码',
+  '/compare': '纸尿裤对比',
+  '/privacy': '隐私政策',
+  '/terms': '用户协议',
+  '/cookies': 'Cookie 政策',
 }
 
 function getTitle(pathname) {
@@ -115,6 +123,10 @@ export default function App() {
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/account" element={<AccountPrivacy />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/compare" element={<ComparePage />} />
+                <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/terms" element={<TermsOfService />} />
+                <Route path="/cookies" element={<CookiePolicy />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>
