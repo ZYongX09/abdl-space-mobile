@@ -24,6 +24,8 @@ const About = lazy(() => import('./pages/About'))
 const CreatePost = lazy(() => import('./pages/CreatePost'))
 const MessagesPage = lazy(() => import('./pages/MessagesPage'))
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage'))
+const AccountPrivacy = lazy(() => import('./pages/AccountPrivacy'))
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
 
 const ROUTE_TITLES = {
   '/': '广场',
@@ -38,6 +40,8 @@ const ROUTE_TITLES = {
   '/messages': '私信',
   '/notifications': '通知',
   '/create-post': '发帖',
+  '/account': '账户与隐私',
+  '/forgot-password': '找回密码',
 }
 
 function getTitle(pathname) {
@@ -109,6 +113,8 @@ export default function App() {
                 <Route path="/create-post" element={<CreatePost />} />
                 <Route path="/messages" element={<MessagesPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
+                <Route path="/account" element={<AccountPrivacy />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>
