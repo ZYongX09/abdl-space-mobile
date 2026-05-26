@@ -7,6 +7,7 @@ import MobileHeader from './components/MobileHeader'
 import MobileBottomNav from './components/MobileBottomNav'
 import ToastPopup from './components/ToastPopup'
 import ErrorBoundary from './components/ErrorBoundary'
+import RedirectNotice from './components/RedirectNotice'
 
 // 路由级懒加载
 const ForumFeed = lazy(() => import('./pages/ForumFeed'))
@@ -97,6 +98,7 @@ export default function App() {
 
   return (
     <MobileHeaderProvider>
+    <RedirectNotice />
     <div className="app-layout">
       <MobileHeaderLayout />
       <AppMainContent>
