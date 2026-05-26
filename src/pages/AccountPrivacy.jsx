@@ -311,7 +311,7 @@ function NBWBindSection({ user, toast }) {
   }, []);
 
   useEffect(() => {
-    if (user?.nbw_bound || user?.nbw_username) {
+    if (user?.nbw_uid) {
       setNbwUsername(user.nbw_username || null);
     }
   }, [user]);
@@ -328,11 +328,11 @@ function NBWBindSection({ user, toast }) {
           <div>
             <div className="text-sm font-semibold" style={{ color: 'var(--text)' }}>NewBabyWorld</div>
             <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
-              {user?.nbw_bound || user?.nbw_username ? '已绑定' : '未绑定'}
+              {user?.nbw_uid ? '已绑定' : '未绑定'}
             </div>
           </div>
         </div>
-        {user?.nbw_bound || user?.nbw_username ? (
+        {user?.nbw_uid ? (
           <span className="text-sm" style={{ color: 'var(--success)' }}>
             <i className="fa-solid fa-check mr-1" />已绑定{nbwUsername ? ` · @${nbwUsername}` : ''}
           </span>
