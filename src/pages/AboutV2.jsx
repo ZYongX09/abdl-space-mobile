@@ -125,7 +125,7 @@ export default function AboutV2() {
 
       {/* ====== 版本信息卡片 ====== */}
       <HyperCard delay={0.06}>
-        <HyperRow label="OS 版本" value={`v${VERSION}`} />
+        <HyperRow label="Space 版本" value={`v${VERSION}`} />
         <HyperRow label="构建日期" value={BUILD_DATE} />
         <HyperRow label="前端框架" value="React 18 + Vite 5" />
         <HyperRow label="后端服务" value="Hono + CF Workers" />
