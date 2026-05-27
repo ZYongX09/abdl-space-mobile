@@ -23,6 +23,8 @@ const Profile = lazy(() => import('./pages/Profile'))
 const Settings = lazy(() => import('./pages/Settings'))
 const About = lazy(() => import('./pages/About'))
 const AboutV2 = lazy(() => import('./pages/AboutV2'))
+const MinorProtection = lazy(() => import('./pages/MinorProtection'))
+const ExternalLink = lazy(() => import('./pages/ExternalLink'))
 const CreatePost = lazy(() => import('./pages/CreatePost'))
 const MessagesPage = lazy(() => import('./pages/MessagesPage'))
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage'))
@@ -131,6 +133,8 @@ export default function App() {
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/terms" element={<TermsOfService />} />
                 <Route path="/cookies" element={<CookiePolicy />} />
+                <Route path="/minor-protection" element={<MinorProtection />} />
+                <Route path="/external" element={<ExternalLink />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>
