@@ -105,7 +105,7 @@ export default function AboutV2() {
       `}</style>
 
       {/* ====== 顶部 Logo 区域 ====== */}
-      <div style={{ padding: '60px 24px 28px', textAlign: 'center' }}>
+      <div style={{ padding: '60px 24px 28px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <img
           src="https://img.abdl-space.top/file/1779879250278_ABDL_icon.svg"
           alt="ABDL Space"
