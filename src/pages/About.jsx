@@ -1,13 +1,22 @@
 import { useState, useEffect } from 'react';
-import PageLayout from '../components/PageLayout';
+import { useNavigate } from 'react-router-dom';
 import { externalLinkUrl } from '../utils/externalLink';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 
-const VERSION = '0.1.0';
-const LAST_UPDATE = '2026-05-26';
+const VERSION = '0.2.0';
+const LAST_UPDATE = '2026-05-27';
+const BUILD_DATE = '2026-05-27';
 
 const CHANGELOG = [
+  {
+    version: '0.2.0',
+    date: '2026-05-27',
+    changes: [
+      '重构「关于」页面，更符合移动设备用户操作习惯和审美风格',
+      '修复已知 bug',
+    ],
+  },
   {
     version: '0.1.0',
     date: '2026-05-26',
@@ -20,9 +29,58 @@ const CHANGELOG = [
   },
 ];
 
-export default function About() {
+/* ====== HyperOS 风格行 ====== */
+function HyperRow({ label, value, onClick, href, external, last }) {
+  const Tag = href ? 'a' : 'div';
+  const props = href
+    ? { href: external ? externalLinkUrl(href) : href, target: external ? '_blank' : undefined, rel: external ? 'noopener noreferrer' : undefined }
+    : {};
+
+  return (
+    <Tag
+      {...props}
+      onClick={onClick}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '14px 20px',
+        textDecoration: 'none',
+        color: 'var(--text)',
+        cursor: onClick || href ? 'pointer' : 'default',
+        borderBottom: last ? 'none' : '0.5px solid var(--border)',
+      }}
+    >
+      <span style={{ fontSize: 14, color: 'var(--text)' }}>{label}</span>
+      <span style={{ fontSize: 13, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
+        {value && <span>{value}</span>}
+        {(onClick || href) && <i className="fa-solid fa-chevron-right" style={{ fontSize: 9 }} />}
+      </span>
+    </Tag>
+  );
+}
+
+/* ====== 卡片 ====== */
+function HyperCard({ children, style, delay = 0 }) {
+  return (
+    <div style={{
+      background: 'var(--bg-card)',
+      borderRadius: 14,
+      margin: '0 16px 10px',
+      overflow: 'hidden',
+      animation: `fadeSlideUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) ${delay}s both`,
+      ...style,
+    }}>
+      {children}
+    </div>
+  );
+}
+
+/* ====== 主组件 ====== */
+export default function AboutV2() {
   const { user, getConsentStatus, withdrawConsent } = useAuth();
   const toast = useToast();
+  const navigate = useNavigate();
   const [consent, setConsent] = useState({ privacy: false, terms: false, date: null });
 
   useEffect(() => {
@@ -30,218 +88,161 @@ export default function About() {
   }, [user, getConsentStatus]);
 
   const handleWithdraw = () => {
-    if (!confirm('撤回同意隐私政策和用户协议将导致您被退出登录，且无法继续使用本平台服务。确定要撤回吗？')) return;
+    if (!confirm('撤回同意将导致您被退出登录，且无法继续使用本平台服务。确定要撤回吗？')) return;
     withdrawConsent();
-    toast.success('已撤回同意，您已被退出登录');
+    toast.success('已撤回同意');
   };
 
   return (
-    <>
-    <PageLayout hero={{ icon: 'fa-circle-info', title: '关于', subtitle: `v${VERSION} 移动版` }}>
-      {/* 项目简介 */}
-      <div className="card mb-5">
-        <div className="flex gap-4 items-stretch">
-          {/* 左侧 logo */}
-          <img
-            src="https://img.abdl-space.top/file/1779879267209_ABDL_logo_word.svg"
-            alt="ABDL Space"
-            style={{ height: 72, flexShrink: 0 }}
-          />
-          {/* 右侧：介绍 + 按钮 */}
-          <div className="flex flex-col justify-center gap-3 min-w-0">
-            <p className="text-sm leading-relaxed" style={{ color: 'var(--text-light)' }}>
-              ABDL Space 移动版是面向 ABDL 群体的中文社区平台的移动端应用，提供纸尿裤评价、排行榜、AI 推荐、广场讨论等功能。
-              致力于为爱好者打造一个温馨友好的交流空间。
+    <div style={{
+      minHeight: '100vh',
+      background: 'var(--bg)',
+      paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)',
+    }}>
+      {/* ====== 动画 keyframes（全局唯一） ====== */}
+      <style>{`
+        @keyframes aboutLogoScale {
+          0% { opacity: 0; transform: scale(0.7); }
+          60% { transform: scale(1.05); }
+          100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes fadeSlideUp {
+          0% { opacity: 0; transform: translateY(12px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+
+      {/* ====== 顶部 Logo 区域 ====== */}
+      <div style={{ padding: '60px 24px 28px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <img
+          src="https://img.abdl-space.top/file/1779879250278_ABDL_icon.svg"
+          alt="ABDL Space"
+          style={{
+            width: 100, height: 100, marginBottom: 20,
+            animation: 'aboutLogoScale 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) both',
+            filter: 'drop-shadow(0 8px 24px rgba(106, 174, 200, 0.25))',
+          }}
+        />
+        <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.02em', marginBottom: 4 }}>
+          ABDL Space
+        </div>
+        <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+          移动版 · v{VERSION}
+        </div>
+      </div>
+
+      {/* ====== 版本信息卡片 ====== */}
+      <HyperCard delay={0.06}>
+        <HyperRow label="Space 版本" value={`v${VERSION}`} />
+        <HyperRow label="构建日期" value={BUILD_DATE} />
+        <HyperRow label="前端框架" value="React 18 + Vite 5" />
+        <HyperRow label="后端服务" value="Hono + CF Workers" />
+        <HyperRow label="数据库" value="Cloudflare D1" last />
+      </HyperCard>
+
+      {/* ====== 更多信息 ====== */}
+      <HyperCard delay={0.12}>
+        <HyperRow label="官方网站" value="abdl-space.top" href="https://abdl-space.top" external />
+        <HyperRow label="GitHub" value="ABDL-Space-V2" href="https://github.com/ZYongX09/ABDL-Space-V2" external />
+        <HyperRow label="开发者博客" value="zhx-blog.top" href="https://zhx-blog.top" external last />
+      </HyperCard>
+
+      {/* ====== 法律信息 ====== */}
+      <HyperCard delay={0.18}>
+        <HyperRow label="隐私政策" href="/privacy" />
+        <HyperRow label="用户协议" href="/terms" />
+        <HyperRow label="未成年人保护政策" href="/minor-protection" />
+        <HyperRow label="Cookie 政策" href="/cookies" last />
+      </HyperCard>
+
+      {user && consent.date && (
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', padding: '2px 32px 10px', marginTop: -4 }}>
+          协议同意时间：{new Date(consent.date).toLocaleString('zh-CN')}
+        </div>
+      )}
+
+      {user && (
+        <HyperCard delay={0.24} style={{ background: 'rgba(232, 131, 124, 0.06)', border: '1px solid rgba(232, 131, 124, 0.15)' }}>
+          <div style={{ padding: '14px 20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <i className="fa-solid fa-triangle-exclamation" style={{ fontSize: 12, color: 'var(--danger)' }} />
+              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--danger)' }}>撤回同意</span>
+            </div>
+            <p style={{ fontSize: 12, color: 'var(--text-light)', marginBottom: 12, lineHeight: 1.6 }}>
+              撤回同意隐私政策和用户协议将导致您被退出登录，且无法继续使用本平台服务。
             </p>
-            <div className="flex flex-wrap gap-2">
-              <a href={externalLinkUrl('https://github.com/ZYongX09/ABDL-Space-V2')}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-all hover:opacity-80"
-                style={{ background: '#24292e', textDecoration: 'none' }}>
-                <i className="fa-brands fa-github" /> GitHub
-              </a>
-              <a href={externalLinkUrl('https://zhx-blog.top')}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all hover:opacity-80"
-                style={{ background: 'var(--primary-dark)', color: '#fff', textDecoration: 'none' }}>
-                <i className="fa-solid fa-blog" /> ZhX 的博客
-              </a>
-            </div>
+            <button
+              className="miui-press"
+              style={{ background: 'var(--danger)', color: '#fff', border: 'none', padding: '8px 20px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+              onClick={handleWithdraw}
+            >
+              撤回同意
+            </button>
           </div>
-        </div>
-      </div>
+        </HyperCard>
+      )}
 
-      {/* 技术栈 */}
-      <div className="card mb-5">
-        <h3 className="font-bold mb-3" style={{ color: 'var(--text)' }}>
-          <i className="fa-solid fa-code mr-2" style={{ color: 'var(--primary-dark)' }} />
-          技术栈
-        </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
-          {[
-            ['React 18', 'fa-brands fa-react'],
-            ['Vite', 'fa-solid fa-bolt'],
-            ['Tailwind CSS', 'fa-solid fa-wind'],
-            ['Font Awesome 6', 'fa-solid fa-icons'],
-            ['Hono', 'fa-solid fa-server'],
-            ['Cloudflare Workers', 'fa-solid fa-cloud'],
-            ['Cloudflare D1', 'fa-solid fa-database'],
-          ].map(([tech, icon]) => (
-            <div key={tech} className="flex items-center gap-2">
-              <i className={`${icon} w-5 text-center`} style={{ color: 'var(--primary-dark)' }} />
-              <span>{tech}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 政策与条款 */}
-      <div className="card mb-5">
-        <h3 className="font-bold mb-3" style={{ color: 'var(--text)' }}>
-          <i className="fa-solid fa-file-contract mr-2" style={{ color: 'var(--primary-dark)' }} />
-          政策与条款
-        </h3>
-        <div className="space-y-2">
-          <a href="/privacy" className="flex items-center gap-3 p-3 rounded-xl transition-all hover:opacity-80" style={{ background: 'var(--input-bg)', textDecoration: 'none' }}>
-            <i className="fa-solid fa-shield-halved w-5 text-center" style={{ color: 'var(--primary-dark)' }} />
-            <span className="text-sm font-semibold" style={{ color: 'var(--text)' }}>Privacy Policy</span>
-            {user && consent.privacy && <i className="fa-solid fa-circle-check text-xs ml-1" style={{ color: 'var(--success)' }} />}
-            <i className="fa-solid fa-chevron-right ml-auto text-xs" style={{ color: 'var(--text-muted)' }} />
-          </a>
-          <a href="/minor-protection" className="flex items-center gap-3 p-3 rounded-xl transition-all hover:opacity-80" style={{ background: 'var(--input-bg)', textDecoration: 'none' }}>
-            <i className="fa-solid fa-child w-5 text-center" style={{ color: 'var(--primary-dark)' }} />
-            <span className="text-sm font-semibold" style={{ color: 'var(--text)' }}>未成年人个人信息保护政策</span>
-            <i className="fa-solid fa-chevron-right ml-auto text-xs" style={{ color: 'var(--text-muted)' }} />
-          </a>
-          <a href="/cookies" className="flex items-center gap-3 p-3 rounded-xl transition-all hover:opacity-80" style={{ background: 'var(--input-bg)', textDecoration: 'none' }}>
-            <i className="fa-solid fa-cookie-bite w-5 text-center" style={{ color: 'var(--primary-dark)' }} />
-            <span className="text-sm font-semibold" style={{ color: 'var(--text)' }}>Cookie 政策</span>
-            <i className="fa-solid fa-chevron-right ml-auto text-xs" style={{ color: 'var(--text-muted)' }} />
-          </a>
-          <a href="/terms" className="flex items-center gap-3 p-3 rounded-xl transition-all hover:opacity-80" style={{ background: 'var(--input-bg)', textDecoration: 'none' }}>
-            <i className="fa-solid fa-file-contract w-5 text-center" style={{ color: 'var(--primary-dark)' }} />
-            <span className="text-sm font-semibold" style={{ color: 'var(--text)' }}>用户协议</span>
-            {user && consent.terms && <i className="fa-solid fa-circle-check text-xs ml-1" style={{ color: 'var(--success)' }} />}
-            <i className="fa-solid fa-chevron-right ml-auto text-xs" style={{ color: 'var(--text-muted)' }} />
-          </a>
-        </div>
-        {user && consent.date && (
-          <p className="text-xs mt-3" style={{ color: 'var(--text-muted)' }}>
-            同意时间：{new Date(consent.date).toLocaleString('zh-CN')}
-          </p>
-        )}
-        {user && (
-          <div className="mt-4 p-3 rounded-xl" style={{ background: 'rgba(232, 131, 124, 0.08)', border: '1px solid rgba(232, 131, 124, 0.3)' }}>
-            <div className="flex items-start gap-2">
-              <i className="fa-solid fa-triangle-exclamation mt-0.5 text-xs" style={{ color: 'var(--danger)' }} />
-              <div className="flex-1">
-                <p className="text-xs mb-2" style={{ color: 'var(--text-light)' }}>
-                  撤回同意将导致您被退出登录，且无法继续使用本平台服务。
-                </p>
-                <button className="btn btn-sm" style={{ background: 'var(--danger)', color: 'white' }} onClick={handleWithdraw}>
-                  <i className="fa-solid fa-ban" /> 撤回同意
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* 支持我们 */}
-      <div id="donate" className="card mb-5" style={{ position: 'relative', overflow: 'hidden' }}>
-        {/* 爱发电背景图标 */}
+      {/* ====== 支持我们 ====== */}
+      <HyperCard delay={0.3} style={{ position: 'relative', overflow: 'hidden' }}>
         <img
           src="https://static.afdiancdn.com/static/img/logo/logo.png"
           alt=""
-          style={{
-            position: 'absolute', top: -20, right: -20,
-            width: 160, height: 160, opacity: 0.15,
-            pointerEvents: 'none', userSelect: 'none',
-            objectFit: 'contain',
-          }}
+          style={{ position: 'absolute', top: -30, right: -30, width: 150, height: 150, opacity: 0.06, pointerEvents: 'none', userSelect: 'none', objectFit: 'contain' }}
         />
-        <h3 className="font-bold mb-3" style={{ color: 'var(--text)', position: 'relative' }}>
-          <i className="fa-solid fa-heart mr-2" style={{ color: 'var(--accent)' }} />
-          支持我们
-        </h3>
-        <p className="text-sm mb-4" style={{ color: 'var(--text-light)' }}>
-          如果你觉得 ABDL Space 对你有帮助，欢迎捐赠我们哦~ 🍼
-        </p>
-        <div className="space-y-3">
-          {/* 捐赠选择1 */}
-          <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'var(--input-bg)' }}>
-            <div className="flex-1">
-              <div className="text-sm font-semibold" style={{ color: 'var(--text)' }}>
-                给开发者买<span style={{ color: 'var(--primary-dark)', fontWeight: 800 }}>一片</span>裤裤
-              </div>
-              <div className="text-xs" style={{ color: 'var(--text-muted)' }}>哇~好舒服的裤裤</div>
-            </div>
-            <div className="flex items-center gap-3 flex-shrink-0">
-              <div className="text-lg font-bold" style={{ color: 'var(--primary-dark)' }}>￥5</div>
-              <a href={externalLinkUrl('https://ifdian.net/order/create?plan_id=a9a8a704508c11f1be9a52540025c377&product_type=0')}>
-                <img width="120" src="https://pic1.afdiancdn.com/static/img/welcome/button-sponsorme.png" alt="赞助" style={{ borderRadius: '0.5rem' }} />
-              </a>
-            </div>
+        <div style={{ padding: '14px 20px', position: 'relative' }}>
+          <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4, color: 'var(--text)' }}>
+            <i className="fa-solid fa-heart mr-2" style={{ color: 'var(--accent)' }} />
+            支持我们
           </div>
-          {/* 捐赠选择2 */}
-          <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'var(--input-bg)' }}>
-            <div className="flex-1">
-              <div className="text-sm font-semibold" style={{ color: 'var(--text)' }}>
-                给开发者买<span style={{ color: 'var(--accent)', fontWeight: 800 }}>一包</span>裤裤
-              </div>
-              <div className="text-xs" style={{ color: 'var(--text-muted)' }}>哇哦~好多好多裤裤呀~</div>
-            </div>
-            <div className="flex items-center gap-3 flex-shrink-0">
-              <div className="text-lg font-bold" style={{ color: 'var(--accent)' }}>￥20</div>
-              <a href={externalLinkUrl('https://ifdian.net/order/create?plan_id=bde9dab2508c11f1b80752540025c377&product_type=0')}>
-                <img width="120" src="https://pic1.afdiancdn.com/static/img/welcome/button-sponsorme.png" alt="赞助" style={{ borderRadius: '0.5rem' }} />
+          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14 }}>如果 ABDL Space 对你有帮助，欢迎鼓励一下 🍼</div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {[
+              { price: '￥5', label: '一片裤裤', color: 'var(--primary-dark)', url: 'https://ifdian.net/order/create?plan_id=a9a8a704508c11f1be9a52540025c377&product_type=0' },
+              { price: '￥20', label: '一包裤裤', color: 'var(--accent)', url: 'https://ifdian.net/order/create?plan_id=bde9dab2508c11f1b80752540025c377&product_type=0' },
+              { price: '···', label: '自定义', color: 'var(--text)', url: 'https://ifdian.net/order/create?user_id=399f44cc508c11f18b7752540025c377' },
+            ].map(item => (
+              <a key={item.label} href={externalLinkUrl(item.url)} className="miui-press"
+                style={{ flex: 1, padding: '10px 8px', borderRadius: 10, background: 'var(--input-bg)', textDecoration: 'none', textAlign: 'center' }}>
+                <div style={{ fontSize: 18, fontWeight: 700, color: item.color }}>{item.price}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{item.label}</div>
               </a>
-            </div>
-          </div>
-          {/* 捐赠选择3 */}
-          <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'var(--input-bg)' }}>
-            <div className="flex-1">
-              <div className="text-sm font-semibold" style={{ color: 'var(--text)' }}>
-                自定义捐赠
-              </div>
-              <div className="text-xs" style={{ color: 'var(--text-muted)' }}>大老板~嘿嘿</div>
-            </div>
-            <div className="flex-shrink-0">
-              <a href={externalLinkUrl('https://ifdian.net/order/create?user_id=399f44cc508c11f18b7752540025c377')}>
-                <img width="120" src="https://pic1.afdiancdn.com/static/img/welcome/button-sponsorme.png" alt="赞助" style={{ borderRadius: '0.5rem' }} />
-              </a>
-            </div>
+            ))}
           </div>
         </div>
-      </div>
+      </HyperCard>
 
-      {/* 更新日志 */}
-      <div className="card">
-        <h3 className="font-bold mb-4" style={{ color: 'var(--text)' }}>
-          <i className="fa-solid fa-clock-rotate-left mr-2" style={{ color: 'var(--primary-dark)' }} />
-          更新日志
-        </h3>
-        <div className="space-y-5">
-          {CHANGELOG.map(log => (
-            <div key={log.version}>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="tag">v{log.version}</span>
-                <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{log.date}</span>
+      {/* ====== 更新日志 ====== */}
+      <HyperCard delay={0.36}>
+        <div style={{ padding: '14px 20px' }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)', marginBottom: 14 }}>
+            <i className="fa-solid fa-clock-rotate-left mr-2" style={{ color: 'var(--primary-dark)', fontSize: 13 }} />
+            更新日志
+          </div>
+          {CHANGELOG.map((log, logIdx) => (
+            <div key={log.version} style={{ display: 'flex', gap: 12, marginBottom: logIdx < CHANGELOG.length - 1 ? 16 : 0 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0, paddingTop: 3 }}>
+                <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--primary)', flexShrink: 0 }} />
+                {logIdx < CHANGELOG.length - 1 && <div style={{ width: 1, flex: 1, background: 'var(--border)', marginTop: 4 }} />}
               </div>
-              <ul className="space-y-1 text-sm" style={{ color: 'var(--text-light)' }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                  <span style={{ fontSize: 11, padding: '1px 8px', borderRadius: 8, background: 'var(--primary-light)', color: 'var(--primary-dark)', fontWeight: 600 }}>v{log.version}</span>
+                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{log.date}</span>
+                </div>
                 {log.changes.map((c, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <span style={{ color: 'var(--text-muted)' }}>·</span>
-                    <span>{c}</span>
-                  </li>
+                  <div key={i} style={{ fontSize: 12, color: 'var(--text-light)', lineHeight: 1.8, paddingLeft: 10, position: 'relative' }}>
+                    <span style={{ position: 'absolute', left: 0, color: 'var(--text-muted)', fontSize: 10 }}>·</span>
+                    {c}
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           ))}
         </div>
-        <p className="text-xs mt-5" style={{ color: 'var(--text-muted)' }}>
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', padding: '8px 20px 12px', textAlign: 'right', borderTop: '0.5px solid var(--border)' }}>
           最后更新: {LAST_UPDATE}
-        </p>
-      </div>
-    </PageLayout>
-    </>
+        </div>
+      </HyperCard>
+    </div>
   );
 }
