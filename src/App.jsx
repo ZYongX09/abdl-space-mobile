@@ -22,6 +22,7 @@ const NBWCallback = lazy(() => import('./pages/NBWCallback'))
 const Profile = lazy(() => import('./pages/Profile'))
 const Settings = lazy(() => import('./pages/Settings'))
 const About = lazy(() => import('./pages/About'))
+const AboutV2 = lazy(() => import('./pages/AboutV2'))
 const CreatePost = lazy(() => import('./pages/CreatePost'))
 const MessagesPage = lazy(() => import('./pages/MessagesPage'))
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage'))
@@ -120,6 +121,7 @@ export default function App() {
                 <Route path="/user/:id" element={<Profile />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/about" element={<About />} />
+                <Route path="/about-v2" element={<AboutV2 />} />
                 <Route path="/create-post" element={<CreatePost />} />
                 <Route path="/messages" element={<MessagesPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
