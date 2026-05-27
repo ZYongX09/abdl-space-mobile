@@ -21,6 +21,7 @@ const Register = lazy(() => import('./pages/Register'))
 const NBWCallback = lazy(() => import('./pages/NBWCallback'))
 const Profile = lazy(() => import('./pages/Profile'))
 const Settings = lazy(() => import('./pages/Settings'))
+const SettingsV2 = lazy(() => import('./pages/SettingsV2'))
 const About = lazy(() => import('./pages/About'))
 const MinorProtection = lazy(() => import('./pages/MinorProtection'))
 const ExternalLink = lazy(() => import('./pages/ExternalLink'))
@@ -43,6 +44,7 @@ const ROUTE_TITLES = {
   '/login': '登录',
   '/register': '注册',
   '/settings': '设置',
+  '/settings-v2': '设置',
   '/about': '关于',
   '/messages': '私信',
   '/notifications': '通知',
@@ -121,6 +123,7 @@ export default function App() {
                 <Route path="/profile/:id" element={<Profile />} />
                 <Route path="/user/:id" element={<Profile />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="/settings-v2" element={<SettingsV2 />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/create-post" element={<CreatePost />} />
                 <Route path="/messages" element={<MessagesPage />} />
