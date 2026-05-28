@@ -4,11 +4,20 @@ import { externalLinkUrl } from '../utils/externalLink';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 
-const VERSION = '0.2.0';
-const LAST_UPDATE = '2026-05-27';
-const BUILD_DATE = '2026-05-27';
+const VERSION = '0.3.0';
+const LAST_UPDATE = '2026-05-28';
+const BUILD_DATE = '2026-05-28';
 
 const CHANGELOG = [
+  {
+    version: '0.3.0',
+    date: '2026-05-28',
+    changes: [
+      '全新设置页面，采用 HyperOS 3.0 设计风格',
+      '主题切换支持自动深浅色模式',
+      '下拉刷新交互优化',
+    ],
+  },
   {
     version: '0.2.0',
     date: '2026-05-27',
@@ -66,7 +75,7 @@ function HyperCard({ children, style, delay = 0 }) {
     <div style={{
       background: 'var(--bg-card)',
       borderRadius: 14,
-      margin: '0 16px 10px',
+      margin: '0 0 10px',
       overflow: 'hidden',
       animation: `fadeSlideUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) ${delay}s both`,
       ...style,

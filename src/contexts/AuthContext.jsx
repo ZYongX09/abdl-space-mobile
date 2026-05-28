@@ -183,7 +183,9 @@ export function AuthProvider({ children }) {
   const logout = useCallback(async () => {
     // 清除后端 cookie（确保请求完成）
     try {
-      await fetch(`${API_BASE}/api/auth/logout`, { method: 'POST', credentials: 'include' });
+      const res = await fetch(`${API_BASE}/api/auth/logout`, { method: 'POST', credentials: 'include' });
+      // 等待浏览器处理 Set-Cookie
+      await new Promise(r => setTimeout(r, 100));
     } catch {}
     // 清除内存缓存
     if (window.__apiCache) window.__apiCache.clear();
