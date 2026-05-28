@@ -118,7 +118,7 @@ export default function Login() {
               className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-lg"
               style={{ background: 'var(--input-bg)', border: '1px solid var(--border)', color: 'var(--text-muted)', cursor: 'not-allowed', opacity: 0.6 }}
               disabled
-n              title="暂未开放"
+              title="暂未开放"
             >
               <img src={NBW_LOGO} alt="" style={{ width: 22, height: 22, objectFit: 'contain', opacity: 0.5 }} />
               <span className="text-sm">使用 宝宝新天地 账户授权登录（暂未开放）</span>

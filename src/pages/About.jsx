@@ -13,7 +13,7 @@ const CHANGELOG = [
     version: '0.3.0',
     date: '2026-05-28',
     changes: [
-      '全新设置页面，采用 HyperOS 3.0 设计风格',
+      '全新设置页面，采用扁平化分组设计风格',
       '主题切换支持自动深浅色模式',
       '下拉刷新交互优化',
     ],
@@ -38,7 +38,7 @@ const CHANGELOG = [
   },
 ];
 
-/* ====== HyperOS 风格行 ====== */
+/* ====== 设置行 ====== */
 function HyperRow({ label, value, onClick, href, external, last }) {
   const Tag = href ? 'a' : 'div';
   const props = href

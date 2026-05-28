@@ -30,6 +30,7 @@ const NotificationsPage = lazy(() => import('./pages/NotificationsPage'))
 const AccountPrivacy = lazy(() => import('./pages/AccountPrivacy'))
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
 const ComparePage = lazy(() => import('./pages/ComparePage'))
+const BugDashboard = lazy(() => import('./pages/BugDashboard'))
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'))
 const TermsOfService = lazy(() => import('./pages/TermsOfService'))
 const CookiePolicy = lazy(() => import('./pages/CookiePolicy'))
@@ -50,6 +51,7 @@ const ROUTE_TITLES = {
   '/account': '账户与隐私',
   '/forgot-password': '找回密码',
   '/compare': '纸尿裤对比',
+  '/bugs': 'Bug 追踪面板',
   '/privacy': '隐私政策',
   '/terms': '用户协议',
   '/cookies': 'Cookie 政策',
@@ -128,6 +130,7 @@ export default function App() {
                 <Route path="/account" element={<AccountPrivacy />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/compare" element={<ComparePage />} />
+                <Route path="/bugs" element={<BugDashboard />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/terms" element={<TermsOfService />} />
                 <Route path="/cookies" element={<CookiePolicy />} />

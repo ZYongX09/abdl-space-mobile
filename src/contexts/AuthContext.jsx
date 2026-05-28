@@ -149,14 +149,30 @@ export function AuthProvider({ children }) {
     return data;
   }, []);
 
-  // 切换账户
-  // 切换账户（cookie 模式下需要重新登录）
+  // 切换账户（通过后端切换活跃会话）
   const switchAccount = useCallback(async (accountId) => {
     const saved = getSavedAccounts();
     const target = saved.find(a => a.id === accountId);
     if (!target) throw new Error('账户不存在');
-    // httpOnly cookie 只能存一个活跃账户，切换需要重新登录
-    throw new Error('切换账户需要重新登录');
+
+    // 调用后端切换会话
+    const res = await fetch(`${API_BASE}/api/auth/switch-account`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ target_user_id: accountId }),
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      // 后端不支持切换，回退到重新登录提示
+      throw new Error('切换账户需要重新登录');
+    }
+
+    const data = await res.json();
+    const u = data.user || target;
+    setUser(u);
+    setActiveAccountId(u.id);
+    return data;
   }, []);
 
   // 移除保存的账户
