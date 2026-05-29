@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react'
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, useLocation, useSearchParams } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext'
 import { initNBWConfig } from './utils/nbwOAuth'
 import { MobileHeaderProvider, useMobileHeaderActions } from './contexts/MobileHeaderContext'
@@ -81,6 +81,15 @@ function MobileHeaderLayout() {
   return <MobileHeader title={getTitle(pathname)} />
 }
 
+/** OAuth 授权页跳转到主站 */
+function OAuthRedirect() {
+  const [params] = useSearchParams();
+  const qs = params.toString();
+  const target = `https://abdl-space.top/oauth/authorize${qs ? '?' + qs : ''}`;
+  window.location.replace(target);
+  return null;
+}
+
 function AppMainContent({ children }) {
   const { headerVisible } = useMobileHeaderActions()
   return (
@@ -136,6 +145,7 @@ export default function App() {
                 <Route path="/cookies" element={<CookiePolicy />} />
                 <Route path="/minor-protection" element={<MinorProtection />} />
                 <Route path="/external" element={<ExternalLink />} />
+                <Route path="/oauth/*" element={<OAuthRedirect />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>
