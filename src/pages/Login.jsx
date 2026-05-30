@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import PageLayout from '../components/PageLayout';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
@@ -23,6 +23,7 @@ export default function Login() {
   const { login: authLogin, saveConsent, logout, user } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const needCaptcha = failCount >= FAIL_THRESHOLD;
   const canSubmit = !loading && (!needCaptcha || captchaOk);
@@ -78,7 +79,7 @@ export default function Login() {
       });
       saveConsent({ privacy: true, userId: result?.user?.id });
       toast.success('登录成功');
-      navigate('/');
+      navigate(location.state?.from || '/');
     } catch (e) {
       toast.error(e.message);
       setFailCount(c => c + 1);

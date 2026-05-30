@@ -73,6 +73,8 @@ export default function DiaperDetail() {
 
   const doSubmitRating = async () => {
     if (submitting) return;
+    const hasScore = Object.values(scores).some(v => v > 0);
+    if (!hasScore) { toast.error('请至少选择一项评分'); return; }
     setSubmitting(true);
     try {
       await ratingsAPI.create({ diaper_id: Number(id), ...scores, review: reviewText || undefined, captchaToken: captchaToken.current });
