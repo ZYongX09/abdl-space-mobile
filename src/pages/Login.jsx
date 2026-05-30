@@ -71,12 +71,12 @@ export default function Login() {
     if (needCaptcha && !captchaOk) { toast.error('请完成安全验证'); return; }
     try {
       setLoading(true);
-      await authLogin({
+      const result = await authLogin({
         login: login.trim(),
         password,
         captchaToken: captchaTokenRef.current || undefined,
       });
-      saveConsent({ privacy: true });
+      saveConsent({ privacy: true, userId: result?.user?.id });
       toast.success('登录成功');
       navigate('/');
     } catch (e) {
@@ -166,17 +166,15 @@ export default function Login() {
             <label className="block text-sm font-semibold mb-1.5" style={{ color: 'var(--text)' }}>用户名 / 邮箱</label>
             <input className="form-control" value={login} onChange={e => { setLogin(e.target.value); if (e.target.value) setShowPassword(true); }} placeholder="输入用户名或邮箱" autoFocus />
           </div>
-          {showPassword && (
-            <div className="mb-5 miui-input-group">
-              <label className="block text-sm font-semibold mb-1.5" style={{ color: 'var(--text)' }}>密码</label>
-              <div className="relative">
-                <input type={showPassword ? 'text' : 'password'} className="form-control pr-10" value={password} onChange={e => setPassword(e.target.value)} placeholder="输入密码" />
+          <div className="mb-5 miui-input-group">
+            <label className="block text-sm font-semibold mb-1.5" style={{ color: 'var(--text)' }}>密码</label>
+            <div className="relative">
+              <input type={showPassword ? 'text' : 'password'} className="form-control pr-10" value={password} onChange={e => setPassword(e.target.value)} placeholder="输入密码" />
                 <button type="button" onClick={() => setShowPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 0 }}>
                   <i className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`} />
                 </button>
               </div>
             </div>
-          )}
 
           {needCaptcha && (
             <div className="mb-5 p-4 rounded-xl flex flex-col" style={{ border: `1.5px solid ${captchaOk ? 'var(--success)' : 'var(--border)'}`, background: 'var(--input-bg)' }}>

@@ -371,6 +371,7 @@ export default function PostDetail() {
             value={commentText}
             onChange={e => setCommentText(e.target.value)}
             rows={3}
+            maxLength={5000}
             disabled={publishing}
           />
           <ImageUploader ref={imgRef} max={2} onError={msg => toast.error(msg)} />

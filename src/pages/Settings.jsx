@@ -121,8 +121,8 @@ function ThemeCards({ theme, setTheme, autoTheme, colorfulLocked, toast }) {
             <div
               key={c.id}
               onClick={() => {
-                if (c.id === 'colorful' && colorfulLocked) { toast.show('多彩模式下无法自动切换'); return; }
-                if (autoTheme) { toast.show('请先关闭自动切换'); return; }
+                if (c.id === 'colorful' && colorfulLocked) { toast.info('多彩模式下无法自动切换'); return; }
+                if (autoTheme) { toast.info('请先关闭自动切换'); return; }
                 setTheme(c.id);
               }}
               style={{
@@ -200,7 +200,7 @@ export default function SettingsV2() {
   const colorfulLocked = theme === 'colorful';
   const handleToggleAutoTheme = () => {
     if (theme === 'colorful') {
-      toast.show('多彩模式不支持自动切换');
+      toast.info('多彩模式不支持自动切换');
       return;
     }
     toggleAutoTheme();

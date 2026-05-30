@@ -16,7 +16,7 @@ export default function CreatePost() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const toast = useToast();
-  const { trigger, VerifyModal } = useVerifyModal();
+  const { trigger, VerifyModal, captchaToken } = useVerifyModal();
 
   const doPost = async () => {
     if (!content.trim() && !imgRef.current?.hasPending()) return;
@@ -34,6 +34,7 @@ export default function CreatePost() {
       const result = await forumAPI.create({
         content: content.trim(),
         images: imageData.length > 0 ? imageData : undefined,
+        captchaToken: captchaToken.current,
       });
       toast.success(imageData.length > 0 ? '图片上传完成，发布成功！' : '发布成功');
       navigate(`/forum/${result.id}`, { replace: true });

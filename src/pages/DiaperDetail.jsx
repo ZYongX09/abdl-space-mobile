@@ -47,7 +47,7 @@ export default function DiaperDetail() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const toast = useToast();
-  const { trigger, VerifyModal } = useVerifyModal();
+  const { trigger, VerifyModal, captchaToken } = useVerifyModal();
   const navigate = useNavigate();
   const isLoggedIn = !!user;
 
@@ -69,9 +69,13 @@ export default function DiaperDetail() {
     })();
   }, [id]);
 
+  const [submitting, setSubmitting] = useState(false);
+
   const doSubmitRating = async () => {
+    if (submitting) return;
+    setSubmitting(true);
     try {
-      await ratingsAPI.create({ diaper_id: Number(id), ...scores, review: reviewText || undefined });
+      await ratingsAPI.create({ diaper_id: Number(id), ...scores, review: reviewText || undefined, captchaToken: captchaToken.current });
       toast.success('评分成功');
       setShowRating(false);
       setScores({});
@@ -80,6 +84,8 @@ export default function DiaperDetail() {
       setReviews(rData.reviews || []);
     } catch (e) {
       toast.error(e.message);
+    } finally {
+      setSubmitting(false);
     }
   };
 

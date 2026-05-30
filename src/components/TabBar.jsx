@@ -79,7 +79,8 @@ export function TabContent({ activeKey, children }) {
     prevKeyRef.current = activeKey;
     setCurrentKey(activeKey);
     // 动画播放完后重置 class
-    setTimeout(() => setAnimClass(''), 400);
+    const timer = setTimeout(() => setAnimClass(''), 400);
+    return () => clearTimeout(timer);
   }, [activeKey]);
 
   return (

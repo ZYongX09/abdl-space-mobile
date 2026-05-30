@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../contexts/ToastContext';
 import { messagesAPI } from '../api';
@@ -10,8 +10,9 @@ export default function NewConversation({ onClose }) {
   const toast = useToast();
   const navigate = useNavigate();
 
-  const handleSearch = async (q) => {
-    setSearch(q);
+  const searchTimerRef = useRef(null);
+
+  const doSearch = async (q) => {
     if (!q.trim()) { setResults([]); return; }
     setSearching(true);
     try {
@@ -37,6 +38,12 @@ export default function NewConversation({ onClose }) {
     } finally {
       setSearching(false);
     }
+  };
+
+  const handleSearch = (q) => {
+    setSearch(q);
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    searchTimerRef.current = setTimeout(() => doSearch(q), 300);
   };
 
   const handleSelect = async (u) => {

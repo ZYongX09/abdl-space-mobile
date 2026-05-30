@@ -38,15 +38,25 @@ export default function Rankings() {
     })();
   }, [tab, isLoggedIn]);
 
-  // 基准分每 10 秒刷新
+  // 基准分每 10 秒刷新（页面不可见时暂停）
   useEffect(() => {
-    const timer = setInterval(async () => {
-      try {
-        const data = await rankingsAPI.get(tab, undefined, isLoggedIn ? undefined : 10);
-        setBaseScores(data.base_scores || { adult: 0, baby: 0 });
-      } catch {}
-    }, 10000);
-    return () => clearInterval(timer);
+    let timer = null
+    const startPolling = () => {
+      timer = setInterval(async () => {
+        try {
+          const data = await rankingsAPI.get(tab, undefined, isLoggedIn ? undefined : 10);
+          setBaseScores(data.base_scores || { adult: 0, baby: 0 });
+        } catch {}
+      }, 10000);
+    }
+    const stopPolling = () => { if (timer) { clearInterval(timer); timer = null } }
+    const onVisibility = () => {
+      if (document.hidden) stopPolling()
+      else startPolling()
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+    if (!document.hidden) startPolling()
+    return () => { stopPolling(); document.removeEventListener('visibilitychange', onVisibility) }
   }, [tab, isLoggedIn]);
 
   return (
