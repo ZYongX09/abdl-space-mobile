@@ -78,7 +78,10 @@ export default function CreatePost() {
         <div className="flex gap-3 justify-end mt-4">
           <button
             className="btn btn-outline"
-            onClick={() => navigate('/')}
+            onClick={() => {
+              if ((content.trim() || imgRef.current?.hasPending()) && !confirm('有未保存的内容，确定离开吗？')) return;
+              navigate('/');
+            }}
             disabled={publishing}
           >
             取消
