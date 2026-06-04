@@ -6,10 +6,10 @@ import { authAPI } from '../api';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { isNBWConfigured } from '../utils/nbwOAuth';
+import { useInlineVerify } from '../components/useInlineVerify';
 
 export default function Register() {
   const location = useLocation();
-  // 支持 location.state 和 sessionStorage 两种来源（仅读取一次）
   const [storedNBW] = useState(() => {
     try {
       const d = JSON.parse(sessionStorage.getItem('nbw_register_data') || 'null');
@@ -28,20 +28,17 @@ export default function Register() {
   const [codeSent, setCodeSent] = useState(false);
   const [sendCodeCount, setSendCodeCount] = useState(0);
   const [sendCodeCaptchaOk, setSendCodeCaptchaOk] = useState(false);
-  const [sendCodeCaptchaStarted, setSendCodeCaptchaStarted] = useState(false);
   const [cooldown, setCooldown] = useState(0);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
-  const [captchaOk, setCaptchaOk] = useState(false);
-  const [captchaStarted, setCaptchaStarted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const regContainerRef = useRef(null);
-  const sendCodeContainerRef = useRef(null);
   const regTokenRef = useRef(null);
   const sendCodeTokenRef = useRef(null);
   const { register, saveConsent } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
+  const { trigger: triggerRegVerify, InlineVerify: RegInlineVerify, verified: regVerified, active: regActive } = useInlineVerify();
+  const { trigger: triggerSendCodeVerify, InlineVerify: SendCodeInlineVerify, verified: sendCodeVerified, active: sendCodeActive } = useInlineVerify();
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -49,46 +46,13 @@ export default function Register() {
     return () => clearTimeout(t);
   }, [cooldown]);
 
-  // 渲染 SDK 的通用函数
-  const renderSDK = useCallback((container, onVerified) => {
-    if (!container || !window.ABDLCaptcha) return;
-    container.innerHTML = '';
-    const apiKey = window.__ABDL_CAPTCHA_KEY || '';
-    try {
-      window.ABDLCaptcha.render(container, {
-        apiKey,
-        onSuccess: (token) => onVerified(token),
-        onError: (err) => {
-          if (err.message?.includes('Locked')) toast.error('验证已锁定');
-        },
-      });
-    } catch (err) {
-      console.error('Captcha render failed:', err);
-    }
-  }, [toast]);
-
-  // 注册验证码 SDK
-  useEffect(() => {
-    if (!captchaStarted || !regContainerRef.current) return;
-    const wait = setInterval(() => {
-      if (window.ABDLCaptcha) { clearInterval(wait); renderSDK(regContainerRef.current, (token) => { regTokenRef.current = token; setCaptchaOk(true); }); }
-    }, 200);
-    return () => clearInterval(wait);
-  }, [captchaStarted, renderSDK]);
-
-  // 发送验证码 SDK
-  useEffect(() => {
-    if (!sendCodeCaptchaStarted || !sendCodeContainerRef.current) return;
-    const wait = setInterval(() => {
-      if (window.ABDLCaptcha) { clearInterval(wait); renderSDK(sendCodeContainerRef.current, (token) => { sendCodeTokenRef.current = token; setSendCodeCaptchaOk(true); }); }
-    }, 200);
-    return () => clearInterval(wait);
-  }, [sendCodeCaptchaStarted, renderSDK]);
-
   const handleSendCode = useCallback(async () => {
     if (!email.trim()) { toast.error('请输入邮箱'); return; }
     if (!email.includes('@')) { toast.error('请输入合法邮箱'); return; }
-    if (sendCodeCount >= 2 && !sendCodeCaptchaOk) { toast.error('请先完成安全验证'); return; }
+    if (sendCodeCount >= 2 && !sendCodeCaptchaOk) {
+      triggerSendCodeVerify();
+      return;
+    }
     setLoading(true);
     try {
       await authAPI.sendCode({ email: email.trim(), type: 'register', captchaToken: sendCodeTokenRef.current || undefined });
@@ -97,7 +61,6 @@ export default function Register() {
       setSendCodeCount(v => v + 1);
       setCooldown(60);
       setSendCodeCaptchaOk(false);
-      setSendCodeCaptchaStarted(false);
       sendCodeTokenRef.current = null;
     } catch (e) { toast.error(e.message); }
     finally { setLoading(false); }
@@ -112,9 +75,8 @@ export default function Register() {
     if (password !== confirm) { toast.error('两次密码不一致'); return; }
     if (!agreeTerms || !agreePrivacy) { toast.error('请阅读并同意用户协议和隐私政策'); return; }
 
-    // 普通注册（NBW 也需要邮箱验证和安全验证）
     if (!codeSent || code.length < 6) { toast.error('请先获取并输入验证码'); return; }
-    if (!captchaOk) { toast.error('请完成安全验证'); return; }
+    if (!regVerified) { toast.error('请完成安全验证'); return; }
     try {
       setLoading(true);
       const result = await register({
@@ -129,7 +91,7 @@ export default function Register() {
     finally { setLoading(false); }
   };
 
-  const allReady = agreeTerms && agreePrivacy && captchaOk && codeSent && code.length >= 6;
+  const allReady = agreeTerms && agreePrivacy && regVerified && codeSent && code.length >= 6;
 
   return (
     <>
@@ -158,7 +120,6 @@ export default function Register() {
                   {loading ? <i className="fa-solid fa-spinner fa-spin" /> : cooldown > 0 ? `${cooldown}s` : codeSent ? '重新发送' : '发送验证码'}
                 </button>
               </div>
-
             </div>
 
             {sendCodeCount >= 2 && !sendCodeCaptchaOk && (
@@ -166,16 +127,15 @@ export default function Register() {
                 <label className="text-xs font-semibold mb-2 block" style={{ color: 'var(--text)' }}>
                   <i className="fa-solid fa-shield-halved mr-1" style={{ color: 'var(--primary-dark)' }} />安全验证
                 </label>
-                {!sendCodeCaptchaStarted ? (
-                  <div className="text-center">
-                    <p className="text-xs mb-2" style={{ color: 'var(--text-muted)' }}>频繁获取验证码需要安全验证</p>
-                    <button type="button" className="btn btn-outline btn-sm" onClick={() => setSendCodeCaptchaStarted(true)}>
+                <div className="text-center">
+                  <p className="text-xs mb-2" style={{ color: 'var(--text-muted)' }}>频繁获取验证码需要安全验证</p>
+                  {!sendCodeActive && (
+                    <button type="button" className="btn btn-outline btn-sm" onClick={triggerSendCodeVerify}>
                       <i className="fa-solid fa-play" /> 开始验证
                     </button>
-                  </div>
-                ) : (
-                  <div ref={sendCodeContainerRef} style={{ minHeight: 280 }} />
-                )}
+                  )}
+                </div>
+                {SendCodeInlineVerify}
               </div>
             )}
 
@@ -208,30 +168,27 @@ export default function Register() {
               </div>
             </div>
 
-            <div className="mb-5 p-4 rounded-xl flex flex-col" style={{ border: `1.5px solid ${captchaOk ? 'var(--success)' : 'var(--border)'}`, background: 'var(--input-bg)' }}>
+            <div className="mb-5 p-4 rounded-xl flex flex-col" style={{ border: `1.5px solid ${regVerified ? 'var(--success)' : 'var(--border)'}`, background: 'var(--input-bg)' }}>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-sm font-semibold" style={{ color: 'var(--text)' }}>
                   <i className="fa-solid fa-shield-halved mr-1.5" style={{ color: 'var(--primary-dark)' }} />安全验证
                 </label>
-                {captchaOk && <span className="text-xs font-semibold" style={{ color: 'var(--success)' }}><i className="fa-solid fa-circle-check mr-1" />已通过</span>}
+                {regVerified && <span className="text-xs font-semibold" style={{ color: 'var(--success)' }}><i className="fa-solid fa-circle-check mr-1" />已通过</span>}
               </div>
 
-              {!captchaStarted && !captchaOk && (
+              {!regVerified && !regActive && (
                 <div className="flex flex-col items-center justify-center py-4">
                   <p className="text-xs mb-3 text-center" style={{ color: 'var(--text-light)' }}>
                     请完成安全验证<br />每个节点只能点击一次，5次错误将锁定5分钟
                   </p>
-                  <button type="button" className="btn btn-outline" onClick={() => setCaptchaStarted(true)}>
+                  <button type="button" className="btn btn-outline" onClick={triggerRegVerify}>
                     <i className="fa-solid fa-play" /> 开始验证
                   </button>
                 </div>
               )}
+              {RegInlineVerify}
 
-              {captchaStarted && !captchaOk && (
-                <div ref={regContainerRef} />
-              )}
-
-              {captchaOk && (
+              {regVerified && (
                 <div className="flex flex-col items-center justify-center py-4">
                   <i className="fa-solid fa-circle-check text-3xl mb-2" style={{ color: 'var(--success)' }} />
                   <p className="text-sm font-semibold" style={{ color: 'var(--success)' }}>验证已通过</p>

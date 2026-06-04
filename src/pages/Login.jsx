@@ -4,6 +4,7 @@ import PageLayout from '../components/PageLayout';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { isNBWConfigured, startNBWOAuth } from '../utils/nbwOAuth';
+import { useInlineVerify } from '../components/useInlineVerify';
 
 const FAIL_THRESHOLD = 2;
 const NBW_LOGO = 'https://img.abdl-space.top/file/nbwlogo.png';
@@ -12,56 +13,22 @@ export default function Login() {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [consented, setConsented] = useState(false);
-  const [captchaOk, setCaptchaOk] = useState(false);
-  const [captchaStarted, setCaptchaStarted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [failCount, setFailCount] = useState(0);
   const [showNBWConsent, setShowNBWConsent] = useState(false);
-  const captchaContainerRef = useRef(null);
   const captchaTokenRef = useRef(null);
   const { login: authLogin, saveConsent, logout, user } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
   const location = useLocation();
+  const { trigger: triggerCaptcha, InlineVerify, verified, active: captchaActive } = useInlineVerify();
 
   const needCaptcha = failCount >= FAIL_THRESHOLD;
-  const canSubmit = !loading && (!needCaptcha || captchaOk);
+  const canSubmit = !loading && (!needCaptcha || verified);
   const nbwConfigured = isNBWConfigured();
 
-  // SDK 加载后渲染
-  useEffect(() => {
-    if (!captchaStarted || !captchaContainerRef.current) return;
-    if (!window.ABDLCaptcha) {
-      const check = setInterval(() => {
-        if (window.ABDLCaptcha) { clearInterval(check); renderCaptcha(); }
-      }, 200);
-      return () => clearInterval(check);
-    }
-    renderCaptcha();
 
-    function renderCaptcha() {
-      if (!captchaContainerRef.current) return;
-      captchaContainerRef.current.innerHTML = '';
-      const apiKey = window.__ABDL_CAPTCHA_KEY || '';
-      try {
-        window.ABDLCaptcha.render(captchaContainerRef.current, {
-          apiKey,
-          onSuccess: (token) => {
-            captchaTokenRef.current = token;
-            setCaptchaOk(true);
-          },
-          onError: (err) => {
-            if (err.message?.includes('Locked')) {
-              toast.error('验证已锁定，请稍后再试');
-            }
-          },
-        });
-      } catch (err) {
-        console.error('Captcha render failed:', err);
-      }
-    }
-  }, [captchaStarted, toast]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -69,7 +36,10 @@ export default function Login() {
     if (showPassword && !password) { toast.error('请填写密码'); return; }
     if (!showPassword) { setShowPassword(true); return; }
     if (!consented) { toast.error('请阅读并同意隐私政策'); return; }
-    if (needCaptcha && !captchaOk) { toast.error('请完成安全验证'); return; }
+    if (needCaptcha && !verified) {
+      triggerCaptcha();
+      return;
+    }
     try {
       setLoading(true);
       const result = await authLogin({
@@ -83,11 +53,7 @@ export default function Login() {
     } catch (e) {
       toast.error(e.message);
       setFailCount(c => c + 1);
-      if (needCaptcha) {
-        setCaptchaOk(false);
-        setCaptchaStarted(false);
-        captchaTokenRef.current = null;
-      }
+      if (needCaptcha) { captchaTokenRef.current = null; }
     } finally {
       setLoading(false);
     }
@@ -178,31 +144,27 @@ export default function Login() {
             </div>
 
           {needCaptcha && (
-            <div className="mb-5 p-4 rounded-xl flex flex-col" style={{ border: `1.5px solid ${captchaOk ? 'var(--success)' : 'var(--border)'}`, background: 'var(--input-bg)' }}>
+            <div className="mb-5 p-4 rounded-xl flex flex-col" style={{ border: `1.5px solid ${verified ? 'var(--success)' : 'var(--border)'}`, background: 'var(--input-bg)' }}>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-sm font-semibold" style={{ color: 'var(--text)' }}>
                   <i className="fa-solid fa-shield-halved mr-1.5" style={{ color: 'var(--primary-dark)' }} />
                   安全验证
                 </label>
-                {captchaOk && <span className="text-xs font-semibold" style={{ color: 'var(--success)' }}><i className="fa-solid fa-circle-check mr-1" />已通过</span>}
+                {verified && <span className="text-xs font-semibold" style={{ color: 'var(--success)' }}><i className="fa-solid fa-circle-check mr-1" />已通过</span>}
               </div>
 
-              {!captchaStarted && !captchaOk && (
+              {!verified && !captchaActive && (
                 <div className="flex flex-col items-center justify-center py-4">
                   <p className="text-xs mb-3 text-center" style={{ color: 'var(--text-light)' }}>
                     检测到多次登录失败，请完成安全验证
                   </p>
-                  <button type="button" className="btn btn-outline" onClick={() => setCaptchaStarted(true)}>
+                  <button type="button" className="btn btn-outline" onClick={triggerCaptcha}>
                     <i className="fa-solid fa-play" /> 开始验证
                   </button>
                 </div>
               )}
-
-              {captchaStarted && !captchaOk && (
-                <div ref={captchaContainerRef} />
-              )}
-
-              {captchaOk && (
+              {InlineVerify}
+              {verified && (
                 <div className="flex flex-col items-center justify-center py-4">
                   <i className="fa-solid fa-circle-check text-3xl mb-2" style={{ color: 'var(--success)' }} />
                   <p className="text-sm font-semibold" style={{ color: 'var(--success)' }}>验证已通过</p>
