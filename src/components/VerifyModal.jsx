@@ -305,8 +305,8 @@ export function useVerifyModal() {
   const phaseLabel = {
     loading: '正在评估安全等级...',
     quantum: '请完成安全验证',
-    transition: '验证完成，正在进行二次验证',
-    'turnstile-both': '正在进行二次验证',
+    transition: '验证中...',
+    'turnstile-both': '验证中...',
     turnstile: '请完成人机验证',
     done: '验证通过 ✓',
   };
@@ -325,7 +325,6 @@ export function useVerifyModal() {
             <h3 className="font-bold text-base" style={{ color: 'var(--text)' }}>
               <i className="fa-solid fa-shield-halved mr-2" style={{ color: 'var(--primary-dark)' }} />
               安全验证
-              {risk && <span style={{ fontSize: '.7rem', color: 'var(--text-light)', marginLeft: '0.5rem' }}>({risk === 'high' ? '高' : '低'}风险)</span>}
             </h3>
             <button onClick={handleClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.2rem' }}>
               <i className="fa-solid fa-xmark" />
