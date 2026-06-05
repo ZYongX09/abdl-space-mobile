@@ -196,6 +196,16 @@ export default function SettingsV2() {
       return next;
     });
   };
+  const [introFullAnim, setIntroFullAnim] = useState(() => {
+    try { return localStorage.getItem('abdl_intro_full_anim') !== 'false'; } catch { return true; }
+  });
+  const toggleIntroFullAnim = () => {
+    setIntroFullAnim(prev => {
+      const next = !prev;
+      try { localStorage.setItem('abdl_intro_full_anim', String(next)); } catch {}
+      return next;
+    });
+  };
 
   const colorfulLocked = theme === 'colorful';
   const handleToggleAutoTheme = () => {
@@ -272,6 +282,18 @@ export default function SettingsV2() {
             label="搜索包含敏感内容"
             desc="搜索结果显示敏感帖子"
             right={<MiToggle value={searchNsfw} onChange={toggleSearchNsfw} />}
+          />
+        </Group>
+      </div>
+
+      {/* ── 加载动画 ── */}
+      <div style={{ paddingTop: 12 }}>
+        <Group title="加载动画" anim={stagger(1.5)}>
+          <Item
+            icon="fa-solid fa-wand-magic-sparkles"
+            label="完整展示开场动画"
+            desc={introFullAnim ? '每次加载都播放完整动画' : '页面加载完毕后跳过动画'}
+            right={<MiToggle value={introFullAnim} onChange={toggleIntroFullAnim} />}
           />
         </Group>
       </div>
