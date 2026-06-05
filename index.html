@@ -12,6 +12,16 @@
     <script src="https://api.abdl-space.top/api/v1/captcha/embed.js" defer></script>
     <script>window.__ABDL_CAPTCHA_KEY = '%VITE_CAPTCHA_KEY%';</script>
     <script>window.__TURNSTILE_SITE_KEY = '%VITE_TURNSTILE_SITE_KEY%';</script>
+    <script>
+    (function(){
+      var _hmt = _hmt || [];
+      var s = document.createElement('script');
+      s.src = 'https://hm.baidu.com/hm.js?b6c5e7c67b663d3bad0c15f60b02b0df';
+      s.onerror = function() { try { sessionStorage.setItem('adblock_detected','1'); } catch(e){} };
+      s.onload = function() { try { sessionStorage.removeItem('adblock_detected'); } catch(e){} };
+      document.head.appendChild(s);
+    })();
+    </script>
   </head>
   <body>
     <div id="intro-placeholder" style="position:fixed;inset:0;z-index:99998;background:#000;display:flex;align-items:center;justify-content:center;transition:opacity 0.4s ease;">
