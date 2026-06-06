@@ -67,7 +67,7 @@ export default function AccountPrivacy() {
       <EmailSection user={user} toast={toast} />
 
       {/* 第三方账户绑定 */}
-      <NBWBindSection user={user} toast={toast} />
+      <NBWBindSection user={user} toast={toast} onUserChange={refreshUser} />
 
       {/* OAuth 授权管理 */}
       <OAuthTokensSection toast={toast} />
@@ -301,10 +301,13 @@ function EmailSection({ user, toast }) {
 }
 
 /* ===== NBW 绑定 ===== */
-function NBWBindSection({ user, toast }) {
+function NBWBindSection({ user, toast, onUserChange }) {
   const [nbwReady, setNbwReady] = useState(false);
   const [nbwUsername, setNbwUsername] = useState(null);
   const [binding, setBinding] = useState(false);
+  const [unbinding, setUnbinding] = useState(false);
+  const isBound = !!user?.nbw_uid;
+  const navigate = useNavigate();
 
   useEffect(() => {
     whenNBWReady().then(() => {
@@ -317,6 +320,33 @@ function NBWBindSection({ user, toast }) {
       setNbwUsername(user.nbw_username || null);
     }
   }, [user]);
+
+  const handleUnbind = async () => {
+    if (!confirm(`确定解绑「NewBabyWorld」账户${nbwUsername ? `（@${nbwUsername}）` : ''}？\n\n解绑后将无法使用该账户登录。`)) return;
+    setUnbinding(true);
+    try {
+      const API_BASE = import.meta.env.VITE_API_BASE || '';
+      const res = await fetch(`${API_BASE}/api/auth/nbw/unbind`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '解绑失败');
+      toast.success('已解绑 NewBabyWorld 账户');
+      if (typeof onUserChange === 'function') onUserChange();
+      else window.location.reload();
+    } catch (e) {
+      if (e.message && e.message.includes('设置密码或绑定并验证邮箱')) {
+        if (confirm('当前账户未设置密码，解绑后无法登录。\n\n是否前往设置密码？')) {
+          navigate('/forgot-password');
+        }
+      } else {
+        toast.error(e.message);
+      }
+    } finally {
+      setUnbinding(false);
+    }
+  };
 
   return (
     <div className="card mb-5">
@@ -334,10 +364,20 @@ function NBWBindSection({ user, toast }) {
             </div>
           </div>
         </div>
-        {user?.nbw_uid ? (
-          <span className="text-sm" style={{ color: 'var(--success)' }}>
-            <i className="fa-solid fa-check mr-1" />已绑定{nbwUsername ? ` · @${nbwUsername}` : ''}
-          </span>
+        {isBound ? (
+          <div className="flex items-center gap-2">
+            <span className="text-sm" style={{ color: 'var(--success)' }}>
+              <i className="fa-solid fa-check mr-1" />已绑定{nbwUsername ? ` · @${nbwUsername}` : ''}
+            </span>
+            <button
+              className="btn btn-outline btn-sm"
+              style={{ color: 'var(--danger)', borderColor: 'var(--danger)' }}
+              onClick={handleUnbind}
+              disabled={unbinding}
+            >
+              {unbinding ? <i className="fa-solid fa-spinner fa-spin" /> : '解绑'}
+            </button>
+          </div>
         ) : nbwReady ? (
           <button
             className="btn btn-outline btn-sm"
