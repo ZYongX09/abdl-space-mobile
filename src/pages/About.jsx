@@ -203,7 +203,31 @@ export default function AboutV2() {
             <i className="fa-solid fa-heart mr-2" style={{ color: 'var(--accent)' }} />
             支持我们
           </div>
-          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14 }}>如果 ABDL Space 对你有帮助，欢迎鼓励一下 🍼</div>
+          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10 }}>如果 ABDL Space 对你有帮助，欢迎鼓励一下 🍼</div>
+          {/* 爱发电官方认证提示 */}
+          <div
+            style={{
+              display: 'flex', alignItems: 'flex-start', gap: 8,
+              padding: '10px 12px', borderRadius: 10,
+              background: 'rgba(147, 51, 234, 0.08)',
+              border: '1px solid rgba(147, 51, 234, 0.25)',
+              marginBottom: 12,
+            }}
+          >
+            <i className="fa-solid fa-shield-halved" style={{ color: '#9333ea', fontSize: 13, marginTop: 1, flexShrink: 0 }} />
+            <div style={{ fontSize: 12, lineHeight: 1.6, color: 'var(--text-light)', flex: 1 }}>
+              ABDL Space 已通过爱发电平台官方创作者认证，请认准创作者
+              <a
+                href={externalLinkUrl('https://www.ifdian.net/a/ZYongX')}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: '#9333ea', textDecoration: 'underline', fontWeight: 700, marginLeft: 4 }}
+              >
+                @ZYongX
+              </a>
+              ，谨防仿冒
+            </div>
+          </div>
           <div style={{ display: 'flex', gap: 8 }}>
             {[
               { price: '￥5', label: '一片裤裤', color: 'var(--primary-dark)', url: 'https://ifdian.net/order/create?plan_id=a9a8a704508c11f1be9a52540025c377&product_type=0' },
