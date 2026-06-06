@@ -4,11 +4,19 @@ import { externalLinkUrl } from '../utils/externalLink';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 
-const VERSION = '0.3.0';
-const LAST_UPDATE = '2026-05-28';
-const BUILD_DATE = '2026-05-28';
+const VERSION = '0.3.1';
+const LAST_UPDATE = '2026-06-07';
+const BUILD_DATE = '2026-06-07';
 
 const CHANGELOG = [
+  {
+    version: '0.3.1',
+    date: '2026-06-07',
+    changes: [
+      '支持我们模块新增爱发电创作者认证提示',
+      '认准创作者 @ZYongX，谨防仿冒',
+    ],
+  },
   {
     version: '0.3.0',
     date: '2026-05-28',
