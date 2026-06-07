@@ -102,7 +102,7 @@ export function AuthProvider({ children }) {
       // 添加/更新已保存账户
       const saved = getSavedAccounts();
       const exists = saved.findIndex(a => a.id === u.id);
-      const entry = { id: u.id, username: u.username, avatar: u.avatar, role: u.role };
+      const entry = { id: u.id, username: u.username, avatar: u.avatar, role: u.role, token: data.token };
       if (exists >= 0) {
         saved[exists] = entry;
       } else {
@@ -141,7 +141,7 @@ export function AuthProvider({ children }) {
     const u = data.user;
 
     const saved = getSavedAccounts();
-    saved.push({ id: u.id, username: u.username, avatar: u.avatar, role: u.role });
+    saved.push({ id: u.id, username: u.username, avatar: u.avatar, role: u.role, token: data.token });
     saveAccounts(saved);
     setAccounts(saved);
     setActiveAccountId(u.id);
@@ -149,31 +149,32 @@ export function AuthProvider({ children }) {
     return data;
   }, []);
 
-  // 切换账户（通过后端切换活跃会话）
+  // 切换账户（用保存的 token 恢复会话）
   const switchAccount = useCallback(async (accountId) => {
     const saved = getSavedAccounts();
     const target = saved.find(a => a.id === accountId);
     if (!target) throw new Error('账户不存在');
+    if (!target.token) throw new Error('该账户需要重新登录（无保存的 token）');
 
-    // 调用后端切换会话
-    const res = await fetch(`${API_BASE}/api/auth/switch-account`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ target_user_id: accountId }),
+    // 用保存的 token 调 /me 端点，后端会同时设置 cookie
+    const res = await fetch(`${API_BASE}/api/auth/me`, {
+      headers: { 'Authorization': `Bearer ${target.token}` },
       credentials: 'include',
     });
-
     if (!res.ok) {
-      // 后端不支持切换，回退到重新登录提示
-      throw new Error('切换账户需要重新登录');
+      removeAccount(accountId);
+      throw new Error('该账户登录已过期，请重新登录');
     }
-
-    const data = await res.json();
-    const u = data.user || target;
-    setUser(u);
+    const u = await res.json();
     setActiveAccountId(u.id);
-    return data;
-  }, []);
+    setUser(u);
+    const idx = saved.findIndex(a => a.id === u.id);
+    if (idx >= 0) {
+      saved[idx] = { ...saved[idx], id: u.id, username: u.username, avatar: u.avatar, role: u.role };
+      saveAccounts(saved);
+      setAccounts(saved);
+    }
+  }, [removeAccount]);
 
   // 移除保存的账户
   const removeAccount = useCallback((accountId) => {
