@@ -29,7 +29,7 @@ export default function Home() {
     (async () => {
       try {
         setLoading(true);
-        const data = await diapersAPI.list({ search: search || undefined, brand: brand || undefined, sort });
+        const data = await diapersAPI.list({ search: search || undefined, brand: brand || undefined, sort, limit: 200 });
         setDiapers(data.diapers || []);
         setBaseScores(data.base_scores || { adult: 0, baby: 0 });
       } catch (e) {
@@ -44,7 +44,7 @@ export default function Home() {
   useEffect(() => {
     const timer = setInterval(async () => {
       try {
-        const data = await diapersAPI.list({ search: search || undefined, brand: brand || undefined, sort });
+        const data = await diapersAPI.list({ search: search || undefined, brand: brand || undefined, sort, limit: 200 });
         setBaseScores(data.base_scores || { adult: 0, baby: 0 });
       } catch {}
     }, 10000);
