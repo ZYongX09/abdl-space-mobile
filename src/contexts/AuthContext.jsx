@@ -149,6 +149,24 @@ export function AuthProvider({ children }) {
     return data;
   }, []);
 
+  // 移除保存的账户
+  const removeAccount = useCallback((accountId) => {
+    const saved = getSavedAccounts().filter(a => a.id !== accountId);
+    saveAccounts(saved);
+    setAccounts(saved);
+
+    // 如果移除的是当前账户，需要退出登录
+    if (user?.id === accountId) {
+      fetch(`${API_BASE}/api/auth/logout`, { method: 'POST', credentials: 'include' }).catch(() => {}).finally(() => {
+        if (window.__apiCache) window.__apiCache.clear();
+        setUser(null);
+        setActiveAccountId(null);
+        lsDel('abdl_currentUser');
+        window.location.href = '/login';
+      });
+    }
+  }, [user]);
+
   // 切换账户（用保存的 token 恢复会话）
   const switchAccount = useCallback(async (accountId) => {
     const saved = getSavedAccounts();
@@ -175,24 +193,6 @@ export function AuthProvider({ children }) {
       setAccounts(saved);
     }
   }, [removeAccount]);
-
-  // 移除保存的账户
-  const removeAccount = useCallback((accountId) => {
-    const saved = getSavedAccounts().filter(a => a.id !== accountId);
-    saveAccounts(saved);
-    setAccounts(saved);
-
-    // 如果移除的是当前账户，需要退出登录
-    if (user?.id === accountId) {
-      fetch(`${API_BASE}/api/auth/logout`, { method: 'POST', credentials: 'include' }).catch(() => {}).finally(() => {
-        if (window.__apiCache) window.__apiCache.clear();
-        setUser(null);
-        setActiveAccountId(null);
-        lsDel('abdl_currentUser');
-        window.location.href = '/login';
-      });
-    }
-  }, [user]);
 
   // 退出当前账户（不删除保存的账户）
   const logout = useCallback(async () => {
