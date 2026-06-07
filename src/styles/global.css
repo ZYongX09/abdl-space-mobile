@@ -1528,6 +1528,31 @@ body, .card, .hero-card, .btn, .form-control, .sidebar-link,
   font-size: 0.65rem;
 }
 
+/* ====== 公告帖子 ====== */
+.post-announcement {
+  border-left: 3px solid var(--primary);
+  background: linear-gradient(135deg, var(--bg-card) 0%, rgba(168, 216, 240, 0.06) 100%);
+}
+[data-theme="dark"] .post-announcement {
+  background: linear-gradient(135deg, var(--bg-card) 0%, rgba(168, 216, 240, 0.08) 100%);
+}
+[data-theme="colorful"] .post-announcement {
+  background: linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(168, 216, 240, 0.12) 100%);
+}
+.post-announcement-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 0.7rem; font-weight: 700;
+  color: var(--primary-dark);
+  margin-bottom: 8px;
+  padding: 2px 8px;
+  background: rgba(168, 216, 240, 0.15);
+  border-radius: 4px;
+  letter-spacing: 0.02em;
+}
+.post-announcement-tag i {
+  font-size: 0.65rem;
+}
+
 /* ====== 点赞按钮 ====== */
 .btn-icon {
   display: flex; align-items: center; gap: 4px;

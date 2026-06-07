@@ -209,10 +209,15 @@ export default function PostDetail() {
   return (
     <>
     <PageLayout hero={{ icon: 'fa-file-lines', title: '帖子详情' }}>
-      <div className={`card mb-5 ${post.pinned ? 'post-pinned' : ''}`}>
+      <div className={`card mb-5 ${post.pinned ? 'post-pinned' : ''} ${post.is_announcement ? 'post-announcement' : ''}`}>
         {post.pinned && (
           <div className="post-pinned-tag">
             <i className="fa-solid fa-thumbtack" /> 置顶
+          </div>
+        )}
+        {post.is_announcement && (
+          <div className="post-announcement-tag">
+            <i className="fa-solid fa-bullhorn" /> 公告
           </div>
         )}
         <div className="flex items-start gap-3 mb-4">

@@ -143,89 +143,15 @@ export default function ForumFeed() {
       ) : (
         <div className="space-y-4 miui-list-enter">
           {posts.map((post, i) => (
-            <div key={post.id} className={`card miui-hover-lift ${post.pinned ? 'post-pinned' : ''}`} style={{ padding: '1.25rem' }}>
-              {post.pinned && (
-                <div className="post-pinned-tag">
-                  <i className="fa-solid fa-thumbtack" /> 置顶
-                </div>
-              )}
-              {/* Line 1: avatar | username + follow + badge */}
-              <div className="flex items-center gap-3 mb-2">
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 overflow-hidden"
-                  style={{ background: 'var(--primary-light)', color: 'var(--primary-dark)' }}
-                >
-                  {post.user?.avatar
-                    ? <img src={post.user.avatar} alt="" className="w-full h-full rounded-full object-cover" />
-                    : post.user?.username?.[0]?.toUpperCase() || '?'
-                  }
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <Link to={`/user/${post.user?.id}`} className="font-semibold text-sm hover:underline whitespace-nowrap" style={{ color: 'var(--text)' }}>
-                      {post.user?.username || '匿名'}
-                    </Link>
-                    {user && post.user?.id && String(user.id) !== String(post.user.id) && (
-                      <button
-                        className={`btn btn-xs ${followMap[post.user.id] ? 'btn-outline' : 'btn-primary'}`}
-                        onClick={(e) => handleFollow(post.user.id, e)}
-                        style={{
-                          fontSize: '11px',
-                          padding: '1px 8px',
-                          lineHeight: '18px',
-                          ...(followMap[post.user.id] ? { borderColor: 'var(--border)', color: 'var(--text-light)' } : {}),
-                        }}
-                      >
-                        {followMap[post.user.id] ? '已关注' : '关注'}
-                      </button>
-                    )}
-                    {post.user?.role === 'admin' && <OfficialBadge className="flex-shrink-0" />}
-                  </div>
-                </div>
-              </div>
-              {/* Line 2: timestamp */}
-              <div className="text-xs mb-2" style={{ color: 'var(--text-muted)' }}>
-                {post.created_at ? new Date(post.created_at + 'Z').toLocaleString('zh-CN') : ''}
-              </div>
-              {/* Line 3: content */}
-              <Link to={`/forum/${post.id}`} className="block" style={{ color: 'var(--text)', textDecoration: 'none' }}>
-                <p className="whitespace-pre-wrap break-words"><RichContent text={post.content} /></p>
-              </Link>
-              {/* Line 4: images */}
-              {post.images && post.images.length > 0 && (
-                <ImageGrid images={post.images} />
-              )}
-              {/* NSFW tag */}
-              {post.has_nsfw === 1 && (
-                <div className="flex items-center gap-1.5 mt-2 text-xs" style={{ color: 'var(--warning)' }}>
-                  <i className="fa-solid fa-triangle-exclamation" />
-                  <span>该帖子包含敏感内容</span>
-                </div>
-              )}
-              {/* Line 5: actions */}
-              <div className="flex items-center gap-4 mt-3 post-actions">
-                <button
-                  className={`flex items-center gap-1.5 text-sm miui-like ${post.has_liked ? 'font-bold liked' : ''}`}
-                  style={{ color: post.has_liked ? 'var(--danger)' : 'var(--text-light)', background: 'none', border: 'none', cursor: 'pointer' }}
-                  onClick={() => handleLike(post.id)}
-                >
-                  <i className={`${post.has_liked ? 'fa-solid' : 'fa-regular'} fa-heart`} />
-                  {post.like_count || 0}
-                </button>
-                <Link to={`/forum/${post.id}`} className="flex items-center gap-1.5 text-sm" style={{ color: 'var(--text-light)', textDecoration: 'none' }}>
-                  <i className="fa-regular fa-comment" />
-                  {post.comment_count || 0}
-                </Link>
-                <button
-                  className="flex items-center gap-1.5 text-sm ml-auto"
-                  style={{ color: 'var(--danger)', background: 'none', border: 'none', cursor: 'pointer' }}
-                  onClick={() => setReportTarget({ type: 'post', id: post.id })}
-                  title="举报"
-                >
-                  <i className="fa-solid fa-shield-halved" />
-                </button>
-              </div>
-            </div>
+            <MobilePostCard
+              key={post.id}
+              post={post}
+              followMap={followMap}
+              currentUser={user}
+              onLike={handleLike}
+              onFollow={handleFollow}
+              onReport={setReportTarget}
+            />
           ))}
         </div>
       )}
@@ -239,5 +165,128 @@ export default function ForumFeed() {
       />
     )}
     </>
+  );
+}
+
+/** 移动端帖子卡片（带长文折叠 + 公告样式） */
+function MobilePostCard({ post, followMap, currentUser, onLike, onFollow, onReport }) {
+  const [expanded, setExpanded] = useState(false);
+  const COLLAPSE_CHARS = 200; // mobile 屏幕小，阈值低些
+  const shouldCollapse = !!post.content && post.content.length > COLLAPSE_CHARS;
+  const displayContent = shouldCollapse && !expanded
+    ? post.content.slice(0, COLLAPSE_CHARS)
+    : (post.content || '');
+
+  return (
+    <div
+      className={`card miui-hover-lift ${post.pinned ? 'post-pinned' : ''} ${post.is_announcement ? 'post-announcement' : ''}`}
+      style={{ padding: '1.25rem' }}
+    >
+      {post.pinned && (
+        <div className="post-pinned-tag">
+          <i className="fa-solid fa-thumbtack" /> 置顶
+        </div>
+      )}
+      {post.is_announcement && (
+        <div className="post-announcement-tag">
+          <i className="fa-solid fa-bullhorn" /> 公告
+        </div>
+      )}
+      {/* 头像 + 用户名 + 关注 + 官方徽章 */}
+      <div className="flex items-center gap-3 mb-2">
+        <div
+          className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 overflow-hidden"
+          style={{ background: 'var(--primary-light)', color: 'var(--primary-dark)' }}
+        >
+          {post.user?.avatar
+            ? <img src={post.user.avatar} alt="" className="w-full h-full rounded-full object-cover" />
+            : post.user?.username?.[0]?.toUpperCase() || '?'
+          }
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <Link to={`/user/${post.user?.id}`} className="font-semibold text-sm hover:underline whitespace-nowrap" style={{ color: 'var(--text)' }}>
+              {post.user?.username || '匿名'}
+            </Link>
+            {currentUser && post.user?.id && String(currentUser.id) !== String(post.user.id) && (
+              <button
+                className={`btn btn-xs ${followMap[post.user.id] ? 'btn-outline' : 'btn-primary'}`}
+                onClick={(e) => onFollow(post.user.id, e)}
+                style={{
+                  fontSize: '11px',
+                  padding: '1px 8px',
+                  lineHeight: '18px',
+                  ...(followMap[post.user.id] ? { borderColor: 'var(--border)', color: 'var(--text-light)' } : {}),
+                }}
+              >
+                {followMap[post.user.id] ? '已关注' : '关注'}
+              </button>
+            )}
+            {post.user?.role === 'admin' && <OfficialBadge className="flex-shrink-0" />}
+          </div>
+        </div>
+      </div>
+      {/* 时间戳 */}
+      <div className="text-xs mb-2" style={{ color: 'var(--text-muted)' }}>
+        {post.created_at ? new Date(post.created_at + 'Z').toLocaleString('zh-CN') : ''}
+      </div>
+      {/* 正文 — 带折叠 */}
+      <Link to={`/forum/${post.id}`} className="block" style={{ color: 'var(--text)', textDecoration: 'none' }}>
+        <p className="whitespace-pre-wrap break-words">
+          <RichContent text={displayContent} />
+          {shouldCollapse && !expanded && (
+            <span style={{ color: 'var(--text-muted)' }}>…</span>
+          )}
+        </p>
+      </Link>
+      {shouldCollapse && (
+        <button
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setExpanded(v => !v); }}
+          style={{
+            marginTop: 4, padding: 0, background: 'none', border: 'none',
+            color: 'var(--primary-dark)', fontSize: '0.8rem', fontWeight: 600,
+            cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px',
+            fontFamily: 'inherit',
+          }}
+        >
+          {expanded ? '收起' : '展开全部'}
+          <i className={`fa-solid fa-chevron-${expanded ? 'up' : 'down'}`} style={{ fontSize: '10px' }} />
+        </button>
+      )}
+      {/* 图片 */}
+      {post.images && post.images.length > 0 && (
+        <ImageGrid images={post.images} />
+      )}
+      {/* NSFW 提醒 */}
+      {post.has_nsfw === 1 && (
+        <div className="flex items-center gap-1.5 mt-2 text-xs" style={{ color: 'var(--warning)' }}>
+          <i className="fa-solid fa-triangle-exclamation" />
+          <span>该帖子包含敏感内容</span>
+        </div>
+      )}
+      {/* 操作栏 */}
+      <div className="flex items-center gap-4 mt-3 post-actions">
+        <button
+          className={`flex items-center gap-1.5 text-sm miui-like ${post.has_liked ? 'font-bold liked' : ''}`}
+          style={{ color: post.has_liked ? 'var(--danger)' : 'var(--text-light)', background: 'none', border: 'none', cursor: 'pointer' }}
+          onClick={() => onLike(post.id)}
+        >
+          <i className={`${post.has_liked ? 'fa-solid' : 'fa-regular'} fa-heart`} />
+          {post.like_count || 0}
+        </button>
+        <Link to={`/forum/${post.id}`} className="flex items-center gap-1.5 text-sm" style={{ color: 'var(--text-light)', textDecoration: 'none' }}>
+          <i className="fa-regular fa-comment" />
+          {post.comment_count || 0}
+        </Link>
+        <button
+          className="flex items-center gap-1.5 text-sm ml-auto"
+          style={{ color: 'var(--danger)', background: 'none', border: 'none', cursor: 'pointer' }}
+          onClick={() => onReport({ type: 'post', id: post.id })}
+          title="举报"
+        >
+          <i className="fa-solid fa-shield-halved" />
+        </button>
+      </div>
+    </div>
   );
 }
