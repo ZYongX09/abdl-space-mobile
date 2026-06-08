@@ -573,11 +573,11 @@ function InfoCard({ user }) {
   if (user.style_preference) {
     user.style_preference.split(/[,，、]/).forEach((tag, i) => {
       const colors = [
-        { bg: '#FFE8EE', color: '#D4627A' },
-        { bg: '#E0F0FF', color: '#4A8DB7' },
-        { bg: '#E8F8E8', color: '#5AA85A' },
-        { bg: '#FFF3E0', color: '#C8883A' },
-        { bg: '#F0E8FF', color: '#8B6BB5' },
+        { bg: 'var(--like-soft)', color: 'var(--like)' },
+        { bg: 'var(--post-soft)', color: 'var(--post)' },
+        { bg: 'var(--checkin-soft)', color: 'var(--checkin)' },
+        { bg: 'var(--points-soft)', color: 'var(--points)' },
+        { bg: 'var(--rating-soft)', color: 'var(--rating)' },
       ];
       const c = colors[i % colors.length];
       tags.push({ text: tag.trim(), type: 'colored', bg: c.bg, color: c.color });
@@ -645,11 +645,11 @@ function PostCard({ post, onClick, index = 0 }) {
 
   // 标签颜色映射
   const tagColors = {
-    '开发': { bg: '#E0F0FF', color: '#4A8DB7' },
-    '分享': { bg: '#FFE8EE', color: '#D4627A' },
-    '评测': { bg: '#FFF3E0', color: '#C8883A' },
-    '求助': { bg: '#F0E8FF', color: '#8B6BB5' },
-    '日常': { bg: '#E8F8E8', color: '#5AA85A' },
+    '开发': { bg: 'var(--post-soft)', color: 'var(--post)' },
+    '分享': { bg: 'var(--like-soft)', color: 'var(--like)' },
+    '评测': { bg: 'var(--points-soft)', color: 'var(--points)' },
+    '求助': { bg: 'var(--rating-soft)', color: 'var(--rating)' },
+    '日常': { bg: 'var(--checkin-soft)', color: 'var(--checkin)' },
   };
 
   return (
@@ -1195,8 +1195,8 @@ export default function ProfilePageV2() {
                 alignItems: 'center',
                 gap: '12px',
                 padding: '14px 16px',
-                background: 'linear-gradient(135deg, #F59E0B12, #F59E0B06)',
-                border: '1px solid #F59E0B20',
+                background: 'linear-gradient(135deg, var(--points-soft), var(--points-softer))',
+                border: '1px solid var(--points-border)',
                 borderRadius: '14px',
                 cursor: 'pointer',
               }}
@@ -1205,17 +1205,17 @@ export default function ProfilePageV2() {
                 width: '40px',
                 height: '40px',
                 borderRadius: '12px',
-                background: '#F59E0B20',
+                background: 'var(--points-soft)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
               }}>
-                <i className="fa-solid fa-coins" style={{ fontSize: '18px', color: '#F59E0B' }} />
+                <i className="fa-solid fa-coins" style={{ fontSize: '18px', color: 'var(--points)' }} />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '2px' }}>积分</div>
-                <div style={{ fontSize: '18px', fontWeight: '700', color: '#F59E0B', fontFeatureSettings: 'tnum' }}>
+                <div style={{ fontSize: '18px', fontWeight: '700', color: 'var(--points)', fontFeatureSettings: 'tnum' }}>
                   {pointsBalance ?? '--'}
                 </div>
               </div>
@@ -1236,10 +1236,10 @@ export default function ProfilePageV2() {
             marginTop: '12px',
           }}>
             {[
-              { icon: 'fa-coins', label: '积分明细', path: '/points', color: '#F59E0B' },
-              { icon: 'fa-star', label: '经验值', path: '/points', color: '#8B5CF6' },
-              { icon: 'fa-user-plus', label: '邀请好友', path: '/invite', color: '#10B981' },
-              { icon: 'fa-award', label: '徽章', path: '/profile', color: '#3B82F6' },
+              { icon: 'fa-coins', label: '积分明细', path: '/points', color: 'var(--points)' },
+              { icon: 'fa-star', label: '经验值', path: '/points', color: 'var(--rating)' },
+              { icon: 'fa-user-plus', label: '邀请好友', path: '/invite', color: 'var(--invite)' },
+              { icon: 'fa-award', label: '徽章', path: '/profile', color: 'var(--post)' },
             ].map((item, i) => (
               <button
                 key={i}
