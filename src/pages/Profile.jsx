@@ -828,6 +828,7 @@ export default function ProfilePageV2() {
   const [posts, setPosts] = useState([]);
   const [postsLoading, setPostsLoading] = useState(false);
   const [counts, setCounts] = useState({ posts: 0, followers: 0, following: 0, worn: 0 });
+  const [pointsBalance, setPointsBalance] = useState(null);
   const [activeTab, setActiveTab] = useState('posts');
   const [wornDiapers, setWornDiapers] = useState([]);
   const [wornLoading, setWornLoading] = useState(false);
@@ -848,7 +849,22 @@ export default function ProfilePageV2() {
         setLoading(false);
       }
     })();
-  }, [targetId]);
+    // 加载积分余额（仅自己）
+    if (isSelf) {
+      (async () => {
+        try {
+          const token = localStorage.getItem('token');
+          const res = await fetch(`/api/users/${targetId}/points`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (res.ok) {
+            const json = await res.json();
+            setPointsBalance(json.balance);
+          }
+        } catch {}
+      })();
+    }
+  }, [targetId, isSelf]);
 
   // 加载帖子
   useEffect(() => {
@@ -1158,35 +1174,109 @@ export default function ProfilePageV2() {
 
       </div>
 
-      {/* 2.5 等级和签到 */}
+      {/* 2.5 等级 · 积分 · 功能入口 */}
       <div style={{ padding: '0 4px', width: '100%' }}>
+        {/* 等级条 */}
         <LevelBadge userId={targetId} />
-        {isSelf && <div style={{ marginTop: '12px' }}><CheckInButton /></div>}
+
+        {/* 积分概览 + 签到按钮（仅自己） */}
         {isSelf && (
-          <div style={{ marginTop: '12px' }}>
-            <PointsCard userId={targetId} />
-            <div style={{ marginTop: '10px', textAlign: 'center' }}>
-              <button
-                onClick={() => navigate('/points')}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '8px 20px',
-                  background: 'transparent',
-                  border: '1px solid var(--border)',
-                  borderRadius: '20px',
-                  fontSize: '13px',
-                  color: 'var(--text-secondary)',
-                  cursor: 'pointer',
-                }}
-              >
-                <i className="fa-solid fa-coins" style={{ fontSize: '12px' }} />
-                查看积分明细
-              </button>
+          <div style={{
+            display: 'flex',
+            gap: '10px',
+            marginTop: '12px',
+          }}>
+            {/* 积分概览卡片 */}
+            <div
+              onClick={() => navigate('/points')}
+              style={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '14px 16px',
+                background: 'linear-gradient(135deg, #F59E0B12, #F59E0B06)',
+                border: '1px solid #F59E0B20',
+                borderRadius: '14px',
+                cursor: 'pointer',
+              }}
+            >
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '12px',
+                background: '#F59E0B20',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}>
+                <i className="fa-solid fa-coins" style={{ fontSize: '18px', color: '#F59E0B' }} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '2px' }}>积分</div>
+                <div style={{ fontSize: '18px', fontWeight: '700', color: '#F59E0B', fontFeatureSettings: 'tnum' }}>
+                  {pointsBalance ?? '--'}
+                </div>
+              </div>
+              <i className="fa-solid fa-chevron-right" style={{ fontSize: '12px', color: 'var(--text-muted)' }} />
             </div>
+
+            {/* 签到按钮（精简版） */}
+            <CheckInButton compact />
           </div>
         )}
+
+        {/* 功能入口网格 */}
+        {isSelf && (
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '10px',
+            marginTop: '12px',
+          }}>
+            {[
+              { icon: 'fa-coins', label: '积分明细', path: '/points', color: '#F59E0B' },
+              { icon: 'fa-star', label: '经验值', path: '/points', color: '#8B5CF6' },
+              { icon: 'fa-user-plus', label: '邀请好友', path: '/invite', color: '#10B981' },
+              { icon: 'fa-award', label: '徽章', path: '/profile', color: '#3B82F6' },
+            ].map((item, i) => (
+              <button
+                key={i}
+                onClick={() => navigate(item.path)}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '14px 4px',
+                  background: `${item.color}08`,
+                  border: `1px solid ${item.color}15`,
+                  borderRadius: '14px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <div style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '10px',
+                  background: `${item.color}18`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                  <i className={`fa-solid ${item.icon}`} style={{ fontSize: '15px', color: item.color }} />
+                </div>
+                <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '500' }}>
+                  {item.label}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* 徽章画廊 */}
         <div style={{ marginTop: '12px' }}>
           <BadgeGallery userId={targetId} editable={isSelf} />
         </div>
