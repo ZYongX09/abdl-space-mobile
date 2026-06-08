@@ -37,6 +37,8 @@ const TermsOfService = lazy(() => import('./pages/TermsOfService'))
 const CookiePolicy = lazy(() => import('./pages/CookiePolicy'))
 const DiaperWiki = lazy(() => import('./pages/DiaperWiki'))
 const DiaperWikiList = lazy(() => import('./pages/DiaperWikiList'))
+const PointsPage = lazy(() => import('./pages/PointsPage'))
+const InvitePage = lazy(() => import('./pages/InvitePage'))
 
 const ROUTE_TITLES = {
   '/': '广场',
@@ -59,6 +61,8 @@ const ROUTE_TITLES = {
   '/privacy': '隐私政策',
   '/terms': '用户协议',
   '/cookies': 'Cookie 政策',
+  '/points': '积分',
+  '/invite': '邀请码',
 }
 
 function getTitle(pathname) {
@@ -152,6 +156,8 @@ export default function App() {
                 <Route path="/cookies" element={<CookiePolicy />} />
                 <Route path="/minor-protection" element={<MinorProtection />} />
                 <Route path="/external" element={<ExternalLink />} />
+                <Route path="/points" element={<PointsPage />} />
+                <Route path="/invite" element={<InvitePage />} />
                 <Route path="/oauth/*" element={<OAuthRedirect />} />
               </Routes>
             </Suspense>
