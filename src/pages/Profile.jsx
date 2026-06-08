@@ -20,6 +20,10 @@ import { forumAPI, followsAPI, authAPI, usersAPI } from '../api';
 import OfficialBadge from '../components/OfficialBadge';
 import NsfwGuard from '../components/NsfwGuard';
 import { LoadingSkeleton } from '../components/Feedback';
+import LevelBadge from '../components/LevelBadge';
+import CheckInButton from '../components/CheckInButton';
+import PointsCard from '../components/PointsCard';
+import BadgeGallery from '../components/BadgeGallery';
 
 // ============================================================
 // MIUI 风格动画
@@ -1152,6 +1156,40 @@ export default function ProfilePageV2() {
           />
         </div>
 
+      </div>
+
+      {/* 2.5 等级和签到 */}
+      <div style={{ padding: '0 4px', width: '100%' }}>
+        <LevelBadge userId={targetId} />
+        {isSelf && <div style={{ marginTop: '12px' }}><CheckInButton /></div>}
+        {isSelf && (
+          <div style={{ marginTop: '12px' }}>
+            <PointsCard userId={targetId} />
+            <div style={{ marginTop: '10px', textAlign: 'center' }}>
+              <button
+                onClick={() => navigate('/points')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px 20px',
+                  background: 'transparent',
+                  border: '1px solid var(--border)',
+                  borderRadius: '20px',
+                  fontSize: '13px',
+                  color: 'var(--text-secondary)',
+                  cursor: 'pointer',
+                }}
+              >
+                <i className="fa-solid fa-coins" style={{ fontSize: '12px' }} />
+                查看积分明细
+              </button>
+            </div>
+          </div>
+        )}
+        <div style={{ marginTop: '12px' }}>
+          <BadgeGallery userId={targetId} editable={isSelf} />
+        </div>
       </div>
 
       {/* 3. 简介卡片 */}
