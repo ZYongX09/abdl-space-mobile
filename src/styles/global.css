@@ -77,6 +77,11 @@
   --muted-bg: rgba(156, 163, 175, 0.12);
   --earn: #10B981;
   --spend: #EF4444;
+
+  /* 内测金 */
+  --beta-primary: #FFB347;
+  --beta-primary-dark: #FF8C42;
+  --beta-glow: rgba(255, 179, 71, 0.3);
 }
 
 /* 深色主题 */
@@ -146,6 +151,11 @@
   --muted-bg: rgba(156, 163, 175, 0.18);
   --earn: #34D399;
   --spend: #F87171;
+
+  /* 内测金（深色） */
+  --beta-primary: #D4A574;
+  --beta-primary-dark: #B8860B;
+  --beta-glow: rgba(212, 165, 116, 0.3);
 }
 
 /* 多彩主题 */
@@ -215,6 +225,11 @@
   --muted-bg: rgba(122, 133, 149, 0.16);
   --earn: #4FB87A;
   --spend: #D67A7A;
+
+  /* 内测金（多彩） */
+  --beta-primary: #FFD580;
+  --beta-primary-dark: #FFA940;
+  --beta-glow: rgba(255, 213, 128, 0.4);
 }
 
 /* 多彩主题 — 动态渐变背景 */
@@ -3096,4 +3111,27 @@ body, .card, .hero-card, .btn, .form-control, .sidebar-link,
     animation: none !important;
   }
   .miui-ripple::after { display: none; }
+}
+
+/* ============================================================
+   创始成员计划 / 内测预注册 — 专用样式
+   ============================================================ */
+
+.miui-float {
+  animation: miuiFloat 3s ease-in-out infinite;
+}
+@keyframes miuiFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.beta-footer-logo {
+  display: inline-block;
+  transition: opacity 0.3s ease;
+}
+[data-theme="dark"] .beta-footer-logo {
+  filter: brightness(0) invert(1);
+}
+[data-theme="colorful"] .beta-footer-logo {
+  opacity: 0.9;
 }

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import PageLayout from '../components/PageLayout';
 import VerificationInput from '../components/VerificationInput';
@@ -10,6 +10,7 @@ import { useInlineVerify } from '../components/useInlineVerify';
 
 export default function Register() {
   const location = useLocation();
+  // 支持 location.state 和 sessionStorage 两种来源（仅读取一次）
   const [storedNBW] = useState(() => {
     try {
       const d = JSON.parse(sessionStorage.getItem('nbw_register_data') || 'null');
@@ -32,20 +33,22 @@ export default function Register() {
   const [cooldown, setCooldown] = useState(0);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
+  const [agreeMinor, setAgreeMinor] = useState(false);
   const [loading, setLoading] = useState(false);
-  const regTokenRef = useRef(null);
-  const sendCodeTokenRef = useRef(null);
   const { register, saveConsent } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
-  const { trigger: triggerRegVerify, InlineVerify: RegInlineVerify, verified: regVerified, active: regActive } = useInlineVerify();
-  const { trigger: triggerSendCodeVerify, InlineVerify: SendCodeInlineVerify, verified: sendCodeVerified, active: sendCodeActive } = useInlineVerify();
+  // 从 useInlineVerify 解构出 tokenRef（之前用独立 useRef 永远是 null）
+  const { trigger: triggerRegVerify, InlineVerify: RegInlineVerify, verified: regVerified, active: regActive, tokenRef: regTokenRef } = useInlineVerify();
+  const { trigger: triggerSendCodeVerify, InlineVerify: SendCodeInlineVerify, verified: sendCodeVerified, active: sendCodeActive, tokenRef: sendCodeTokenRef } = useInlineVerify();
 
   useEffect(() => {
     if (cooldown <= 0) return;
     const t = setTimeout(() => setCooldown(v => v - 1), 1000);
     return () => clearTimeout(t);
   }, [cooldown]);
+
+
 
   const handleSendCode = useCallback(async () => {
     if (!email.trim()) { toast.error('请输入邮箱'); return; }
@@ -74,8 +77,9 @@ export default function Register() {
     if (!email.includes('@')) { toast.error('请输入合法邮箱'); return; }
     if (password.length < 8) { toast.error('密码至少 8 位'); return; }
     if (password !== confirm) { toast.error('两次密码不一致'); return; }
-    if (!agreeTerms || !agreePrivacy) { toast.error('请阅读并同意用户协议和隐私政策'); return; }
+    if (!agreeTerms || !agreePrivacy || !agreeMinor) { toast.error('请阅读并同意用户协议、隐私政策和未成年人个人信息保护政策'); return; }
 
+    // 普通注册（NBW 也需要邮箱验证和安全验证）
     if (!codeSent || code.length < 6) { toast.error('请先获取并输入验证码'); return; }
     if (!regVerified) { toast.error('请完成安全验证'); return; }
     try {
@@ -93,7 +97,7 @@ export default function Register() {
     finally { setLoading(false); }
   };
 
-  const allReady = agreeTerms && agreePrivacy && regVerified && codeSent && code.length >= 6;
+  const allReady = agreeTerms && agreePrivacy && agreeMinor && regVerified && codeSent && code.length >= 6;
 
   return (
     <>
@@ -122,6 +126,7 @@ export default function Register() {
                   {loading ? <i className="fa-solid fa-spinner fa-spin" /> : cooldown > 0 ? `${cooldown}s` : codeSent ? '重新发送' : '发送验证码'}
                 </button>
               </div>
+
             </div>
 
             {sendCodeCount >= 2 && !sendCodeCaptchaOk && (
@@ -131,11 +136,9 @@ export default function Register() {
                 </label>
                 <div className="text-center">
                   <p className="text-xs mb-2" style={{ color: 'var(--text-muted)' }}>频繁获取验证码需要安全验证</p>
-                  {!sendCodeActive && (
-                    <button type="button" className="btn btn-outline btn-sm" onClick={triggerSendCodeVerify}>
-                      <i className="fa-solid fa-play" /> 开始验证
-                    </button>
-                  )}
+                  <button type="button" className="btn btn-outline btn-sm" onClick={triggerSendCodeVerify}>
+                    <i className="fa-solid fa-play" /> 开始验证
+                  </button>
                 </div>
                 {SendCodeInlineVerify}
               </div>
@@ -215,6 +218,12 @@ export default function Register() {
                 <input type="checkbox" checked={agreePrivacy} onChange={e => setAgreePrivacy(e.target.checked)} className="mt-0.5 w-4 h-4 rounded cursor-pointer accent-[var(--primary-dark)]" />
                 <span className="text-xs leading-relaxed" style={{ color: 'var(--text-light)' }}>
                   我已阅读并同意 <Link to="/privacy" target="_blank" style={{ color: 'var(--link-color)' }}>隐私政策</Link>
+                </span>
+              </label>
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input type="checkbox" checked={agreeMinor} onChange={e => setAgreeMinor(e.target.checked)} className="mt-0.5 w-4 h-4 rounded cursor-pointer accent-[var(--primary-dark)]" />
+                <span className="text-xs leading-relaxed" style={{ color: 'var(--text-light)' }}>
+                  我已阅读并同意 <Link to="/privacy" target="_blank" style={{ color: 'var(--link-color)' }}>未成年人个人信息保护政策</Link>
                 </span>
               </label>
             </div>

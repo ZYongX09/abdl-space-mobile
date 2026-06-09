@@ -10,6 +10,7 @@ import { useToast } from '../contexts/ToastContext';
 import { useVerifyModal } from '../components/VerifyModal';
 import RichContent from '../components/RichContent';
 import OfficialBadge from '../components/OfficialBadge';
+import BetaBadge from '../components/BetaBadge';
 import ReportModal from '../components/ReportModal';
 
 export default function PostDetail() {
@@ -246,6 +247,7 @@ export default function PostDetail() {
                 </button>
               )}
               {post.user?.role === 'admin' && <OfficialBadge className="flex-shrink-0" />}
+              {post.user?.is_beta_user && <BetaBadge size="sm" className="flex-shrink-0" />}
             </div>
             <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
               {post.created_at ? new Date(post.created_at + 'Z').toLocaleString('zh-CN') : ''}
@@ -358,6 +360,7 @@ export default function PostDetail() {
                 </div>
                 <span className="text-sm font-semibold" style={{ color: 'var(--text)' }}>{c.user?.username || '匿名'}</span>
                 {c.user?.role === 'admin' && <OfficialBadge className="ml-1.5" />}
+                {c.user?.is_beta_user && <BetaBadge size="sm" className="ml-1.5" />}
                 <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{new Date(c.created_at + 'Z').toLocaleString('zh-CN')}</span>
               </div>
               <p className="text-sm whitespace-pre-wrap" style={{ color: 'var(--text)' }}><RichContent text={c.content} /></p>

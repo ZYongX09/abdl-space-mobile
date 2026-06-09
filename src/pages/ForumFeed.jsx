@@ -7,6 +7,7 @@ import ImageGrid from '../components/ImageGrid';
 import PullToRefresh from '../components/PullToRefresh';
 import RichContent from '../components/RichContent';
 import OfficialBadge from '../components/OfficialBadge';
+import BetaBadge from '../components/BetaBadge';
 import ReportModal from '../components/ReportModal';
 import { forumAPI, followsAPI } from '../api';
 import { useAuth } from '../contexts/AuthContext';
@@ -223,6 +224,7 @@ function MobilePostCard({ post, followMap, currentUser, onLike, onFollow, onRepo
               </button>
             )}
             {post.user?.role === 'admin' && <OfficialBadge className="flex-shrink-0" />}
+            {post.user?.is_beta_user && <BetaBadge size="sm" className="flex-shrink-0" />}
           </div>
         </div>
       </div>

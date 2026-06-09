@@ -19,6 +19,7 @@ const Rankings = lazy(() => import('./pages/Rankings'))
 const Recommendations = lazy(() => import('./pages/Recommendations'))
 const Login = lazy(() => import('./pages/Login'))
 const Register = lazy(() => import('./pages/Register'))
+const BetaRegister = lazy(() => import('./pages/BetaRegister'))
 const NBWCallback = lazy(() => import('./pages/NBWCallback'))
 const Profile = lazy(() => import('./pages/Profile'))
 const Settings = lazy(() => import('./pages/Settings'))
@@ -48,6 +49,7 @@ const ROUTE_TITLES = {
   '/profile': '个人中心',
   '/login': '登录',
   '/register': '注册',
+  '/beta-register': '创始成员计划',
   '/settings': '设置',
   '/about': '关于',
   '/messages': '私信',
@@ -136,6 +138,7 @@ export default function App() {
                 <Route path="/recommend" element={<Recommendations />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/beta-register" element={<BetaRegister />} />
                 <Route path="/auth/nbw/callback" element={<NBWCallback />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/profile/:id" element={<Profile />} />

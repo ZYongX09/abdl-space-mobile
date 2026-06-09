@@ -141,7 +141,45 @@ export function AuthProvider({ children }) {
     const u = data.user;
 
     const saved = getSavedAccounts();
-    saved.push({ id: u.id, username: u.username, avatar: u.avatar, role: u.role, token: data.token });
+    saved.push({
+      id: u.id,
+      username: u.username,
+      avatar: u.avatar,
+      role: u.role,
+      is_beta_user: u.is_beta_user,
+      token: data.token,
+    });
+    saveAccounts(saved);
+    setAccounts(saved);
+    setActiveAccountId(u.id);
+    setUser(u);
+    return data;
+  }, []);
+
+  // 内测预注册（调用 /api/auth/beta-register，后端会额外写入 is_beta_user / beta_joined_at）
+  const betaRegister = useCallback(async ({ username, email, password, code, captchaToken, inviteCode }) => {
+    const headers = { 'Content-Type': 'application/json' };
+    if (captchaToken) headers['X-Captcha-Token'] = captchaToken;
+    const res = await fetch(`${API_BASE}/api/auth/beta-register`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ email, password, username, code, invite_code: inviteCode }),
+      credentials: 'include',
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || '注册失败');
+
+    const u = data.user;
+
+    const saved = getSavedAccounts();
+    saved.push({
+      id: u.id,
+      username: u.username,
+      avatar: u.avatar,
+      role: u.role,
+      is_beta_user: u.is_beta_user,
+      token: data.token,
+    });
     saveAccounts(saved);
     setAccounts(saved);
     setActiveAccountId(u.id);
@@ -162,6 +200,10 @@ export function AuthProvider({ children }) {
         setUser(null);
         setActiveAccountId(null);
         lsDel('abdl_currentUser');
+        // 如果还有其他保存的账户，跳转登录页让用户选择
+        if (saved.length > 0) {
+          toast.info('请重新登录其他账户');
+        }
         window.location.href = '/login';
       });
     }
@@ -180,12 +222,14 @@ export function AuthProvider({ children }) {
       credentials: 'include',
     });
     if (!res.ok) {
+      // token 失效，移除该账户
       removeAccount(accountId);
       throw new Error('该账户登录已过期，请重新登录');
     }
     const u = await res.json();
     setActiveAccountId(u.id);
     setUser(u);
+    // 更新保存的信息（token 保留）
     const idx = saved.findIndex(a => a.id === u.id);
     if (idx >= 0) {
       saved[idx] = { ...saved[idx], id: u.id, username: u.username, avatar: u.avatar, role: u.role };
@@ -198,9 +242,7 @@ export function AuthProvider({ children }) {
   const logout = useCallback(async () => {
     // 清除后端 cookie（确保请求完成）
     try {
-      const res = await fetch(`${API_BASE}/api/auth/logout`, { method: 'POST', credentials: 'include' });
-      // 等待浏览器处理 Set-Cookie
-      await new Promise(r => setTimeout(r, 100));
+      await fetch(`${API_BASE}/api/auth/logout`, { method: 'POST', credentials: 'include' });
     } catch {}
     // 清除内存缓存
     if (window.__apiCache) window.__apiCache.clear();
@@ -321,7 +363,7 @@ export function AuthProvider({ children }) {
 
     <AuthContext.Provider value={{
       user, loading, accounts,
-      login, register, logout, logoutAll,
+      login, register, betaRegister, logout, logoutAll,
       switchAccount, removeAccount, updateProfile,
       getConsentStatus, saveConsent, withdrawConsent,
       refreshUser,

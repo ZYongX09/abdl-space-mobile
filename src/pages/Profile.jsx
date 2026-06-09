@@ -18,6 +18,7 @@ import { useMobileHeaderActions } from '../contexts/MobileHeaderContext';
 import { useToast } from '../contexts/ToastContext';
 import { forumAPI, followsAPI, authAPI, usersAPI } from '../api';
 import OfficialBadge from '../components/OfficialBadge';
+import BetaBadge from '../components/BetaBadge';
 import NsfwGuard from '../components/NsfwGuard';
 import { LoadingSkeleton } from '../components/Feedback';
 import LevelBadge from '../components/LevelBadge';
@@ -996,6 +997,7 @@ export default function ProfilePageV2() {
               <div style={{ ...S.desktopUsername, ...(isSelf ? { cursor: 'pointer' } : {}) }} onClick={isSelf ? () => navigate('/account') : undefined}>
                 <span>{displayUser.username}</span>
                 {displayUser.role === 'admin' && <OfficialBadge />}
+                {displayUser.is_beta_user && <BetaBadge size="md" className="ml-1.5" />}
                 {isSelf && <i className="fa-solid fa-pen" style={{ fontSize: '11px', color: 'var(--text-muted)' }} />}
               </div>
               <div style={{ ...S.desktopBio, ...(isSelf ? { cursor: 'pointer' } : {}) }} onClick={isSelf ? () => navigate('/account') : undefined}>
@@ -1148,6 +1150,7 @@ export default function ProfilePageV2() {
         >
           <span>{displayUser.username}</span>
           {displayUser.role === 'admin' && <OfficialBadge />}
+          {displayUser.is_beta_user && <BetaBadge size="md" className="ml-1.5" />}
           {isSelf && <i className="fa-solid fa-pen" style={{ fontSize: '11px', color: 'var(--text-muted)', marginLeft: '6px' }} />}
         </div>
 
