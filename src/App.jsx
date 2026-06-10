@@ -124,6 +124,19 @@ export default function App() {
     <RedirectNotice />
     <AdBlockNotice />
     <div className="app-layout">
+      {/* 独立布局页面 — 无导航/footer */}
+      {pathname === '/beta-register' ? (
+        <div style={{ minHeight: '100vh', padding: '20px 16px', overflowY: 'auto' }} className="page-transition-enter">
+          <ErrorBoundary>
+            <Suspense fallback={<Loading />}>
+              <Routes>
+                <Route path="/beta-register" element={<BetaRegister />} />
+              </Routes>
+            </Suspense>
+          </ErrorBoundary>
+        </div>
+      ) : (
+      <>
       <MobileHeaderLayout />
       <AppMainContent>
         <div className="container mx-auto px-4 py-4 max-w-[720px]">
@@ -138,7 +151,6 @@ export default function App() {
                 <Route path="/recommend" element={<Recommendations />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                <Route path="/beta-register" element={<BetaRegister />} />
                 <Route path="/auth/nbw/callback" element={<NBWCallback />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/profile/:id" element={<Profile />} />
@@ -180,6 +192,8 @@ export default function App() {
         </footer>
       </AppMainContent>
       <MobileBottomNav />
+      </>
+      )}
       <ToastPopup />
     </div>
     </MobileHeaderProvider>
