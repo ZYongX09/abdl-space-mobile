@@ -1,6 +1,25 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { createHtmlPlugin } from 'vite-plugin-html'
+import { copyFileSync, mkdirSync, readdirSync, statSync } from 'fs'
+import { join } from 'path'
+
+function copyDirSync(src, dest) {
+  try {
+    mkdirSync(dest, { recursive: true })
+    for (const entry of readdirSync(src)) {
+      const srcPath = join(src, entry)
+      const destPath = join(dest, entry)
+      if (statSync(srcPath).isDirectory()) {
+        copyDirSync(srcPath, destPath)
+      } else {
+        copyFileSync(srcPath, destPath)
+      }
+    }
+  } catch (e) {
+    if (e.code !== 'ENOENT') throw e
+  }
+}
 
 export default defineConfig({
   plugins: [
@@ -12,6 +31,17 @@ export default defineConfig({
         },
       },
     }),
+    {
+      name: 'copy-functions',
+      closeBundle() {
+        try {
+          copyDirSync('functions', 'dist/functions')
+          console.log('[copy-functions] Copied functions/ to dist/functions/')
+        } catch (e) {
+          if (e.code !== 'ENOENT') console.error('[copy-functions] Error:', e.message)
+        }
+      },
+    },
   ],
   server: {
     port: 5174,
