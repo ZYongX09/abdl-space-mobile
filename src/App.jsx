@@ -126,7 +126,7 @@ export default function App() {
     <div className="app-layout">
       {/* 独立布局页面 — 无导航/footer */}
       {pathname === '/beta-register' ? (
-        <div style={{ minHeight: '100vh', padding: '20px 16px', overflowY: 'auto' }} className="page-transition-enter">
+        <div style={{ width: '100%', minHeight: '100vh', padding: '20px 16px', overflowY: 'auto' }} className="page-transition-enter">
           <ErrorBoundary>
             <Suspense fallback={<Loading />}>
               <Routes>
