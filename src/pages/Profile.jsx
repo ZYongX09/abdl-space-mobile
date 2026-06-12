@@ -1178,7 +1178,7 @@ export default function ProfilePageV2() {
       </div>
 
       {/* 2.5 等级 · 积分 · 功能入口 */}
-      <div style={{ padding: '0 16px', width: '100%' }}>
+      <div style={{ padding: '16px 16px 0', width: '100%' }}>
         {/* 等级条 */}
         <LevelBadge userId={targetId} />
 

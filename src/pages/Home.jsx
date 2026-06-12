@@ -48,7 +48,7 @@ export default function Home() {
   }
 
   return (
-    <div className="p-4">
+    <div className="px-3 py-4">
       {/* 搜索栏 */}
       <div className="mb-4">
         <div className="relative">
@@ -109,7 +109,7 @@ export default function Home() {
               key={d.id}
               to={`/diaper/${d.id}`}
               className="block card"
-              style={{ padding: '14px 16px', textDecoration: 'none' }}
+              style={{ padding: '12px 14px', textDecoration: 'none' }}
             >
               <div className="flex items-center gap-3">
                 {d.images?.length > 0 && (

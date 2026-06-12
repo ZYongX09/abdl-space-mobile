@@ -54,35 +54,40 @@ export default function PointsCard({ userId }) {
 
   return (
     <div style={{
-      padding: '24px',
+      padding: '18px',
       background: 'linear-gradient(135deg, var(--points-soft), var(--points-softer))',
       border: '1px solid var(--points-border)',
       borderRadius: '16px',
     }}>
       <div style={{
         display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        marginBottom: '16px',
+        alignItems: 'center',
+        gap: '10px',
+        marginBottom: '14px',
       }}>
+        <div style={{
+          width: '40px',
+          height: '40px',
+          borderRadius: '12px',
+          background: 'var(--points-soft)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+        }}>
+          <i className="fa-solid fa-wallet" style={{ fontSize: '18px', color: 'var(--points)' }} />
+        </div>
         <div>
           <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            marginBottom: '8px',
+            fontSize: '11px',
+            color: 'var(--text-secondary)',
+            fontWeight: '600',
+            marginBottom: '2px',
           }}>
-            <i className="fa-solid fa-coins" style={{ color: 'var(--points)', fontSize: '14px' }} />
-            <span style={{
-              fontSize: '13px',
-              color: 'var(--text-secondary)',
-              fontWeight: '600',
-            }}>
-              积分余额
-            </span>
+            积分余额
           </div>
           <div style={{
-            fontSize: '32px',
+            fontSize: '28px',
             fontWeight: '700',
             color: 'var(--points)',
             lineHeight: 1,
@@ -91,32 +96,21 @@ export default function PointsCard({ userId }) {
             {data.balance.toLocaleString()}
           </div>
         </div>
-        <div style={{
-          width: '48px',
-          height: '48px',
-          borderRadius: '14px',
-          background: 'var(--points-soft)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-          <i className="fa-solid fa-wallet" style={{ fontSize: '20px', color: 'var(--points)' }} />
-        </div>
       </div>
 
       <div style={{
         display: 'flex',
-        gap: '20px',
+        gap: '16px',
         fontSize: '12px',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
           <i className="fa-solid fa-arrow-trend-up" style={{ fontSize: '10px', color: 'var(--earn)' }} />
           <span style={{ color: 'var(--text-secondary)' }}>累计获得</span>
           <span style={{ color: 'var(--earn)', fontWeight: '600' }}>
             +{data.total_earned.toLocaleString()}
           </span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
           <i className="fa-solid fa-arrow-trend-down" style={{ fontSize: '10px', color: 'var(--spend)' }} />
           <span style={{ color: 'var(--text-secondary)' }}>累计消耗</span>
           <span style={{ color: 'var(--spend)', fontWeight: '600' }}>
