@@ -165,7 +165,7 @@ export default function HomeV3() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--text)' }}>
+    <div className="homev3-page" style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--text)' }}>
       {/* ═══════════ Top Nav Bar ═══════════ */}
       {/* X: height 53px, sticky, border-bottom 1px rgb(47,51,54) */}
       <div style={{
@@ -290,9 +290,6 @@ export default function HomeV3() {
                     </span>
                     {post.user?.role === 'admin' && <OfficialBadge />}
                     {post.user?.is_beta_user && <BetaBadge size="sm" />}
-                    <span style={{ fontSize: 15, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      @{post.user?.username || 'anon'}
-                    </span>
                     <span style={{ fontSize: 15, color: 'var(--text-muted)' }}>·</span>
                     <span style={{ fontSize: 15, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
                       {timeAgo(post.created_at)}
@@ -317,7 +314,7 @@ export default function HomeV3() {
 
                   {/* Text */}
                   <div style={{ fontSize: 15, lineHeight: '20px', color: 'var(--text)', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                    <RichContent content={post.content || ''} />
+                    <RichContent text={post.content || ''} />
                   </div>
 
                   {/* Images */}
@@ -373,29 +370,6 @@ export default function HomeV3() {
                     >
                       {Icons.like(post.has_liked)}
                       <span>{post.like_count || ''}</span>
-                    </button>
-
-                    {/* Views / Share */}
-                    <button
-                      onClick={(e) => { e.stopPropagation(); }}
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: 4,
-                        color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer',
-                        fontSize: 13, padding: 8, borderRadius: 9999,
-                      }}
-                    >
-                      {Icons.views()}
-                    </button>
-
-                    <button
-                      onClick={(e) => { e.stopPropagation(); }}
-                      style={{
-                        display: 'flex', alignItems: 'center',
-                        color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer',
-                        padding: 8, borderRadius: 9999,
-                      }}
-                    >
-                      {Icons.share()}
                     </button>
                   </div>
                 </div>
