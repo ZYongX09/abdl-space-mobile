@@ -39,6 +39,7 @@ const NotificationsPage = lazy(() => import('./pages/NotificationsPage'))
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
 const BetaRegister = lazy(() => import('./pages/BetaRegister'))
 const AccountPrivacy = lazy(() => import('./pages/AccountPrivacy'))
+const BetaRegister = lazy(() => import('./pages/BetaRegister'))
 const AdminPage = lazy(() => import('./pages/AdminPage'))
 const PointsPage = lazy(() => import('./pages/PointsPage'))
 const InvitePage = lazy(() => import('./pages/InvitePage'))
@@ -133,19 +134,6 @@ export default function App() {
     <NotificationProvider>
     <NsfwProvider>
     <div className="app-layout">
-      {/* 独立布局页面 — 无导航/footer */}
-      {pathname === '/beta-register' ? (
-        <div style={{ width: '100%', minHeight: '100vh', padding: '20px 16px', overflowY: 'auto' }} className="page-transition-enter">
-          <ErrorBoundary>
-            <Suspense fallback={<Loading />}>
-              <Routes>
-                <Route path="/beta-register" element={<BetaRegister />} />
-              </Routes>
-            </Suspense>
-          </ErrorBoundary>
-        </div>
-      ) : (
-      <>
       <MobileHeaderLayout />
       <AppMainContent>
         <div className="container mx-auto px-3 py-4 max-w-[720px]">
@@ -169,6 +157,7 @@ export default function App() {
                 <Route path="/terms" element={<TermsOfService />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/beta-register" element={<BetaRegister />} />
                 <Route path="/auth/nbw/callback" element={<NBWCallback />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/profile/:id" element={<Profile />} />
@@ -203,8 +192,6 @@ export default function App() {
         </footer>
       </AppMainContent>
       <MobileBottomNav />
-      </>
-      )}
       <ToastPopup />
     </div>
     </NsfwProvider>

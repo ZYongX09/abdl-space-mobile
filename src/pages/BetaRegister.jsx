@@ -216,6 +216,44 @@ export default function BetaRegister() {
   // ============ 注册表单 ============
   return (
     <PageLayout hero={null}>
+      {/* 移动端遮罩提示 — 跳转主站 */}
+      <div style={{
+        background: 'linear-gradient(135deg, var(--primary-light), var(--accent-light, rgba(255,183,197,0.15)))',
+        border: '1px solid var(--primary)',
+        borderRadius: '12px',
+        padding: '14px 16px',
+        marginBottom: '16px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+      }}>
+        <i className="fa-solid fa-circle-info" style={{ color: 'var(--primary-dark)', fontSize: '18px', flexShrink: 0 }} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text)', marginBottom: '2px' }}>
+            此页面在移动端可能存在显示问题
+          </div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+            建议前往桌面版完成注册
+          </div>
+        </div>
+        <a
+          href="https://abdl-space.top/beta-register"
+          style={{
+            flexShrink: 0,
+            padding: '8px 14px',
+            background: 'var(--primary)',
+            color: '#fff',
+            borderRadius: '8px',
+            fontSize: '12px',
+            fontWeight: 600,
+            textDecoration: 'none',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          前往桌面版 <i className="fa-solid fa-arrow-right" style={{ fontSize: '10px', marginLeft: '4px' }} />
+        </a>
+      </div>
+
       <div className="max-w-md mx-auto">
         {/* Hero 区 */}
         <div className="text-center mb-6 miui-card-in">
