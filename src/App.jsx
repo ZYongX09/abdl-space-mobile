@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
@@ -17,9 +17,7 @@ import ScrollProgress from './components/ScrollProgress';
 import ErrorBoundary from './components/ErrorBoundary';
 import { useExternalLinkInterceptor } from './hooks/useExternalLinkInterceptor';
 
-// 路由级懒加载 — 首屏只加载 HomeV2
-const HomeV2 = lazy(() => import('./pages/HomeV2'));
-const Search = lazy(() => import('./pages/Search'));
+// 路由级懒加载
 const ForumFeed = lazy(() => import('./pages/ForumFeed'));
 const PostDetail = lazy(() => import('./pages/PostDetail'));
 const Home = lazy(() => import('./pages/Home'));
@@ -46,17 +44,12 @@ const NotificationsPage = lazy(() => import('./pages/NotificationsPage'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const BetaRegister = lazy(() => import('./pages/BetaRegister'));
 const AccountPrivacy = lazy(() => import('./pages/AccountPrivacy'));
-const ProfilePageV2 = lazy(() => import('./pages/ProfilePageV2'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
-const CaptchaApiPage = lazy(() => import('./pages/CaptchaApiPage'));
 const PointsPage = lazy(() => import('./pages/PointsPage'));
 const InvitePage = lazy(() => import('./pages/InvitePage'));
-const OAuthAuthorize = lazy(() => import('./pages/OAuthAuthorize'));
-const OAuthClientsPage = lazy(() => import('./pages/OAuthClientsPage'));
 const ExternalLink = lazy(() => import('./pages/ExternalLink'));
 const CreatePost = lazy(() => import('./pages/CreatePost'));
 const BugDashboard = lazy(() => import('./pages/BugDashboard'));
-const FollowersPage = lazy(() => import('./pages/FollowersPage'));
 
 function PageFallback() {
   return (
@@ -88,10 +81,6 @@ const ROUTE_TITLES = {
   '/settings': '设置 — ABDL Space',
   '/create-post': '发帖 — ABDL Space',
   '/bugs': 'Bug 追踪面板 — ABDL Space',
-  '/captcha-api': 'Captcha API — ABDL Space',
-  '/oauth/authorize': 'OAuth 授权 — ABDL Space',
-  '/oauth-clients': '应用管理 — ABDL Space',
-  '/auth/nbw/choose': '关联账户 — ABDL Space',
   '/points': '积分 — ABDL Space',
   '/invite': '邀请码 — ABDL Space',
 };
@@ -120,21 +109,6 @@ function MobileHeaderLayout() {
   const { actions, leftActions } = useMobileHeaderActions();
   const title = getTitle(pathname).split(' — ')[0] || 'ABDL Space';
   return <MobileHeader title={title} actions={actions} leftActions={leftActions} />;
-}
-
-function AdminOnlyProfile() {
-  const { user } = useAuth();
-  if (!user || user.role !== 'admin') {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: 'var(--text-muted)' }}>
-        <div style={{ textAlign: 'center' }}>
-          <i className="fa-solid fa-lock" style={{ fontSize: '36px', marginBottom: '12px', opacity: 0.3, display: 'block' }} />
-          <p>仅管理员可访问</p>
-        </div>
-      </div>
-    );
-  }
-  return <Profile />;
 }
 
 export default function App() {
@@ -186,9 +160,7 @@ export default function App() {
           <ErrorBoundary>
             <Suspense fallback={<PageFallback />}>
               <Routes>
-                <Route path="/" element={<HomeV2 />} />
-                <Route path="/search" element={<Search />} />
-                <Route path="/search" element={<Search />} />
+                <Route path="/" element={<ForumFeed />} />
                 <Route path="/forum/:id" element={<PostDetail />} />
                 <Route path="/diapers" element={<Home />} />
                 <Route path="/diaper/:id" element={<DiaperDetail />} />
@@ -206,22 +178,15 @@ export default function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/auth/nbw/callback" element={<NBWCallback />} />
-                <Route path="/profile" element={<ProfilePageV2 />} />
-                <Route path="/profile/:id" element={<ProfilePageV2 />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/profile/:id" element={<Profile />} />
                 <Route path="/settings" element={<Settings />} />
-                <Route path="/user/:id" element={<ProfilePageV2 />} />
-                <Route path="/user/:id/followers" element={<FollowersPage />} />
-                <Route path="/user/:id/following" element={<FollowersPage />} />
+                <Route path="/user/:id" element={<Profile />} />
                 <Route path="/messages" element={<MessagesPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/admin" element={<AdminPage />} />
-                <Route path="/captcha-api" element={<CaptchaApiPage />} />
-                <Route path="/oauth/authorize" element={<OAuthAuthorize />} />
-                <Route path="/oauth-clients" element={<OAuthClientsPage />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/account" element={<AccountPrivacy />} />
-                <Route path="/profile-legacy" element={<AdminOnlyProfile />} />
-                <Route path="/profile-legacy/:id" element={<AdminOnlyProfile />} />
                 <Route path="/external" element={<ExternalLink />} />
                 <Route path="/create-post" element={<CreatePost />} />
                 <Route path="/bugs" element={<BugDashboard />} />

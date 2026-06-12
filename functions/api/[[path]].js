@@ -41,6 +41,11 @@ export async function onRequest(context) {
   headers.set('X-Forwarded-Host', url.host);
   headers.set('X-Forwarded-Proto', url.protocol.replace(':', ''));
 
+  // 补 Origin — 同源请求浏览器不发 Origin，后端需要它判断移动端来源
+  if (!headers.has('Origin')) {
+    headers.set('Origin', `${url.protocol}//${url.host}`);
+  }
+
   // 构造 fetch
   const init = {
     method: request.method,
