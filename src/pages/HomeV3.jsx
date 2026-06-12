@@ -164,14 +164,6 @@ export default function HomeV3() {
     } catch (e) { toast.error(e.message); }
   };
 
-  const navItems = [
-    { key: 'home', icon: (a) => Icons.home(a), label: '主页', to: '/homev3' },
-    { key: 'search', icon: () => Icons.search(), label: '搜索', to: '/search' },
-    { key: 'grok', icon: () => Icons.grok(), label: 'Grok', to: '/recommend' },
-    { key: 'notifications', icon: () => Icons.notifications(), label: '通知', to: '/notifications' },
-    { key: 'messages', icon: () => Icons.messages(), label: '私信', to: '/messages' },
-  ];
-
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--text)' }}>
       {/* ═══════════ Top Nav Bar ═══════════ */}
@@ -435,30 +427,6 @@ export default function HomeV3() {
         </div>
       )}
 
-      {/* ═══════════ Bottom Nav Bar ═══════════ */}
-      {/* X: height 53px, fixed bottom, 5 icons */}
-      <nav style={{
-        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100,
-        background: 'var(--bg)', borderTop: '1px solid var(--border)',
-        height: 53,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-around',
-        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-      }}>
-        {navItems.map(item => (
-          <Link
-            key={item.key}
-            to={item.to}
-            style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              width: 48, height: 48, borderRadius: '50%',
-              color: 'var(--text)', textDecoration: 'none',
-            }}
-          >
-            {item.icon(item.key === 'home')}
-          </Link>
-        ))}
-      </nav>
-
       {/* ═══════════ Floating Compose Button ═══════════ */}
       {/* X: 56px circle, blue bg, bottom-right, above nav bar */}
       {user && (
@@ -478,9 +446,6 @@ export default function HomeV3() {
           {Icons.compose()}
         </Link>
       )}
-
-      {/* Spacer for fixed bottom nav */}
-      <div style={{ height: 'calc(53px + env(safe-area-inset-bottom, 0px))' }} />
     </div>
   );
 }
