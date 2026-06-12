@@ -5,14 +5,14 @@ import { useNsfw } from '../contexts/NsfwContext';
 const API_BASE = import.meta.env.VITE_API_BASE || '';
 
 // Cloudflare Workers 免费版限制
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 const ALLOWED_EXTS = ALLOWED_TYPES.map(t => t.split('/')[1].toUpperCase()).join(', ');
 const UPLOAD_TIMEOUT = 30000; // 30秒超时
 
 function validateFile(file) {
   if (!ALLOWED_TYPES.includes(file.type)) return `不支持 ${file.name}，仅允许 ${ALLOWED_EXTS}`;
-  if (file.size > MAX_FILE_SIZE) return `${file.name} 超过 5MB 限制`;
+  if (file.size > MAX_FILE_SIZE) return `${file.name} 超过 20MB 限制`;
   return null;
 }
 

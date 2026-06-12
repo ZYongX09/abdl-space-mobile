@@ -148,7 +148,7 @@ export default function App() {
       <>
       <MobileHeaderLayout />
       <AppMainContent>
-        <div className="container mx-auto px-4 py-4 max-w-[720px]">
+        <div className="container mx-auto px-3 py-4 max-w-[720px]">
           <ErrorBoundary>
             <Suspense fallback={<Loading />}>
               <Routes>

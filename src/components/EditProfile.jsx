@@ -52,7 +52,7 @@ export default function EditProfile({ onClose }) {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) { toast.error('请选择图片文件'); return; }
-    if (file.size > 5 * 1024 * 1024) { toast.error('图片不能超过 5MB'); return; }
+    if (file.size > 20 * 1024 * 1024) { toast.error('图片不能超过 20MB'); return; }
     setAvatarUploading(true);
     try {
       if (!modelReady) {

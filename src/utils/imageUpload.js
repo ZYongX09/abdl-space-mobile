@@ -5,12 +5,12 @@ const API_BASE = import.meta.env.VITE_API_BASE || '';
  */
 export async function uploadImage(file) {
   const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-  const MAX_SIZE = 10 * 1024 * 1024;
+  const MAX_SIZE = 20 * 1024 * 1024;
   if (!ALLOWED_TYPES.includes(file.type)) {
     throw new Error('仅支持 JPG/PNG/GIF/WebP 格式');
   }
   if (file.size > MAX_SIZE) {
-    throw new Error('图片大小不能超过 10MB');
+    throw new Error('图片大小不能超过 20MB');
   }
 
   const formData = new FormData()
