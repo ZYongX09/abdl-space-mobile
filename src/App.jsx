@@ -39,8 +39,8 @@ const NotificationsPage = lazy(() => import('./pages/NotificationsPage'))
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
 const BetaRegister = lazy(() => import('./pages/BetaRegister'))
 const AccountPrivacy = lazy(() => import('./pages/AccountPrivacy'))
-const BetaRegister = lazy(() => import('./pages/BetaRegister'))
 const AdminPage = lazy(() => import('./pages/AdminPage'))
+const HomeV3 = lazy(() => import('./pages/HomeV3'))
 const PointsPage = lazy(() => import('./pages/PointsPage'))
 const InvitePage = lazy(() => import('./pages/InvitePage'))
 const ExternalLink = lazy(() => import('./pages/ExternalLink'))
@@ -79,6 +79,7 @@ const ROUTE_TITLES = {
   '/points': '积分',
   '/invite': '邀请码',
   '/external': '外部链接',
+  '/homev3': '首页',
 }
 
 function getTitle(pathname) {
@@ -141,6 +142,7 @@ export default function App() {
             <Suspense fallback={<Loading />}>
               <Routes>
                 <Route path="/" element={<ForumFeed />} />
+                <Route path="/homev3" element={<HomeV3 />} />
                 <Route path="/forum/:id" element={<PostDetail />} />
                 <Route path="/diapers" element={<Home />} />
                 <Route path="/diaper/:id" element={<DiaperDetail />} />
