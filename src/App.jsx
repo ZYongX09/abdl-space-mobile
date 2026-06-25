@@ -46,6 +46,7 @@ const InvitePage = lazy(() => import('./pages/InvitePage'))
 const ExternalLink = lazy(() => import('./pages/ExternalLink'))
 const CreatePost = lazy(() => import('./pages/CreatePost'))
 const BugDashboard = lazy(() => import('./pages/BugDashboard'))
+const AppDownload = lazy(() => import('./pages/AppDownload'))
 
 function Loading() {
   return (
@@ -69,6 +70,7 @@ const ROUTE_TITLES = {
   '/beta-register': '创始成员计划',
   '/settings': '设置',
   '/about': '关于',
+  '/app': '下载客户端',
   '/messages': '私信',
   '/notifications': '通知',
   '/admin': '管理后台',
@@ -153,6 +155,7 @@ export default function App() {
                 <Route path="/diaper-wiki" element={<DiaperWikiList />} />
                 <Route path="/diaper-wiki/:id" element={<DiaperWiki />} />
                 <Route path="/about" element={<About />} />
+                <Route path="/app" element={<AppDownload />} />
                 <Route path="/cookies" element={<CookiePolicy />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/minor-protection" element={<MinorProtection />} />
