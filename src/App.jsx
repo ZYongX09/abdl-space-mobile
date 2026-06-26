@@ -10,6 +10,7 @@ import MobileBottomNav from './components/MobileBottomNav'
 import ToastPopup from './components/ToastPopup'
 import ErrorBoundary from './components/ErrorBoundary'
 import RedirectNotice from './components/RedirectNotice'
+import AppDownloadBanner from './components/AppDownloadBanner'
 import AdBlockNotice from './components/AdBlockNotice'
 import { useExternalLinkInterceptor } from './hooks/useExternalLinkInterceptor'
 
@@ -133,6 +134,7 @@ export default function App() {
   return (
     <MobileHeaderProvider>
     <RedirectNotice />
+    <AppDownloadBanner />
     <AdBlockNotice />
     <NotificationProvider>
     <NsfwProvider>

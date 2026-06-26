@@ -72,3 +72,78 @@
 .redirect-banner-close:hover {
   background: rgba(255, 255, 255, 0.3);
 }
+
+/* ===== AppDownloadBanner — Top Download Notice ===== */
+.app-download-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #1a2332, #0a1628);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  animation: bannerSlide 0.3s ease;
+}
+
+.app-download-banner-icon {
+  font-size: 18px;
+  color: #89CFF0;
+}
+
+.app-download-banner-text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-download-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.app-download-banner-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #89CFF0, #6AAEC8);
+  color: #fff;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+.app-download-banner-link:hover {
+  background: linear-gradient(135deg, #a0ddf5, #7ec1d8);
+}
+
+.app-download-banner-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+.app-download-banner-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
