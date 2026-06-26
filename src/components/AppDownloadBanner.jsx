@@ -10,10 +10,6 @@ export default function AppDownloadBanner() {
     const path = window.location.pathname;
     if (path === '/app' || path.startsWith('/oauth/') || path.startsWith('/auth/')) return;
 
-    const ua = navigator.userAgent;
-    const isAndroid = /Android/i.test(ua);
-    if (!isAndroid) return;
-
     setShow(true);
   }, []);
 
