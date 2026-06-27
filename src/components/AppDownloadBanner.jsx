@@ -25,7 +25,7 @@ export default function AppDownloadBanner() {
       <div className="app-download-banner-icon">
         <i className="fa-brands fa-android" />
       </div>
-      <span className="app-download-banner-text">下载 ABDL Space App，体验更佳</span>
+      <span className="app-download-banner-text">ABDL Space APP 开放内测！</span>
       <div className="app-download-banner-actions">
         <a href="/app" className="app-download-banner-link">
           下载 <i className="fa-solid fa-arrow-down" />
