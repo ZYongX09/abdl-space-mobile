@@ -76,6 +76,11 @@ export default function AppDownload() {
         <div className="app-download-hero-grid">
           {/* 左：文案 + 下载按钮 */}
           <div className="app-download-hero-text">
+            <img
+              src="/app-icon.png"
+              alt="ABDL Space"
+              style={{ width: 80, height: 80, borderRadius: 20, marginBottom: 16, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}
+            />
             <h2 className="app-download-title">
               随时随地，<br />感受温暖陪伴
             </h2>
