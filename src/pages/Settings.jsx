@@ -335,26 +335,36 @@ export default function SettingsV2() {
       )}
 
       {/* ── 推送通知 ── */}
-      {user && pushSupported && (
+      {user && (
         <div style={{ paddingTop: 12 }}>
           <Group title="推送通知" anim={stagger(3.5)}>
             <Item
               icon="fa-solid fa-bell"
               label={pushSubscribed ? '推送通知已开启' : '推送通知'}
-              desc={pushSubscribed ? '接收点赞、评论、私信等通知' : 'iOS 用户需先添加到主屏幕'}
+              desc={
+                !pushSupported
+                  ? '请先将网站添加到主屏幕以启用推送'
+                  : pushSubscribed
+                    ? '接收点赞、评论、私信等通知'
+                    : '开启后可接收点赞、评论、私信等通知'
+              }
               right={
-                <MiToggle
-                  value={pushSubscribed}
-                  onChange={async (val) => {
-                    if (val) {
-                      const ok = await subscribeToPush();
-                      if (ok) toast.success('推送通知已开启');
-                    } else {
-                      const ok = await unsubscribeFromPush();
-                      if (ok) toast.info('推送通知已关闭');
-                    }
-                  }}
-                />
+                pushSupported ? (
+                  <MiToggle
+                    value={pushSubscribed}
+                    onChange={async (val) => {
+                      if (val) {
+                        const ok = await subscribeToPush();
+                        if (ok) toast.success('推送通知已开启');
+                      } else {
+                        const ok = await unsubscribeFromPush();
+                        if (ok) toast.info('推送通知已关闭');
+                      }
+                    }}
+                  />
+                ) : (
+                  <i className="fa-solid fa-circle-info" style={{ color: 'var(--text-muted)', fontSize: 14 }} />
+                )
               }
             />
           </Group>
