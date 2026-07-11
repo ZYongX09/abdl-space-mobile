@@ -4,6 +4,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { useNsfw } from '../contexts/NsfwContext';
+import { useNotifications } from '../contexts/NotificationContext';
 
 /* ── 入场动画 ── */
 function useStagger(total) {
@@ -186,6 +187,7 @@ export default function SettingsV2() {
   const { user } = useAuth();
   const toast = useToast();
   const { blurEnabled, toggleBlur } = useNsfw();
+  const { pushSupported, pushSubscribed, subscribeToPush, unsubscribeFromPush } = useNotifications();
   const [searchNsfw, setSearchNsfw] = useState(() => {
     try { return localStorage.getItem('abdl_search_nsfw') === 'true'; } catch { return false; }
   });
@@ -327,6 +329,33 @@ export default function SettingsV2() {
               label="账户与隐私"
               desc="个人资料、邮箱、密码"
               onClick={() => navigate('/account')}
+            />
+          </Group>
+        </div>
+      )}
+
+      {/* ── 推送通知 ── */}
+      {user && pushSupported && (
+        <div style={{ paddingTop: 12 }}>
+          <Group title="推送通知" anim={stagger(3.5)}>
+            <Item
+              icon="fa-solid fa-bell"
+              label={pushSubscribed ? '推送通知已开启' : '推送通知'}
+              desc={pushSubscribed ? '接收点赞、评论、私信等通知' : 'iOS 用户需先添加到主屏幕'}
+              right={
+                <MiToggle
+                  value={pushSubscribed}
+                  onChange={async (val) => {
+                    if (val) {
+                      const ok = await subscribeToPush();
+                      if (ok) toast.success('推送通知已开启');
+                    } else {
+                      const ok = await unsubscribeFromPush();
+                      if (ok) toast.info('推送通知已关闭');
+                    }
+                  }}
+                />
+              }
             />
           </Group>
         </div>

@@ -1,6 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { Routes, Route, useLocation, useSearchParams } from 'react-router-dom'
-import { useAuth } from './contexts/AuthContext'
 import { NotificationProvider } from './contexts/NotificationContext'
 import { NsfwProvider } from './contexts/NsfwContext'
 import { initNBWConfig } from './utils/nbwOAuth'
@@ -48,6 +47,7 @@ const ExternalLink = lazy(() => import('./pages/ExternalLink'))
 const CreatePost = lazy(() => import('./pages/CreatePost'))
 const BugDashboard = lazy(() => import('./pages/BugDashboard'))
 const AppDownload = lazy(() => import('./pages/AppDownload'))
+const NotificationAdmin = lazy(() => import('./pages/NotificationAdmin'))
 
 function Loading() {
   return (
@@ -75,6 +75,7 @@ const ROUTE_TITLES = {
   '/messages': '私信',
   '/notifications': '通知',
   '/admin': '管理后台',
+  '/admin/notifications': '推送管理',
   '/create-post': '发帖',
   '/account': '账户与隐私',
   '/forgot-password': '找回密码',
@@ -173,6 +174,7 @@ export default function App() {
                 <Route path="/messages" element={<MessagesPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/admin" element={<AdminPage />} />
+                <Route path="/admin/notifications" element={<NotificationAdmin />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/account" element={<AccountPrivacy />} />
                 <Route path="/external" element={<ExternalLink />} />
