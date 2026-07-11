@@ -5,6 +5,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { isNBWConfigured, startNBWOAuth } from '../utils/nbwOAuth';
 import { useInlineVerify } from '../components/useInlineVerify';
+import { isWebAuthnSupported, isPWA, authenticateWithPasskey, getMyCredentials } from '../utils/webauthn';
+import BiometricPrompt from '../components/BiometricPrompt';
 
 const FAIL_THRESHOLD = 2;
 const NBW_LOGO = 'https://img.abdl-space.top/file/nbwlogo.png';
@@ -28,6 +30,33 @@ export default function Login() {
   const canSubmit = !loading && (!needCaptcha || verified);
   const nbwConfigured = isNBWConfigured();
 
+  const isPWA = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+  const webauthnSupported = isWebAuthnSupported();
+  const showBiometricLogin = isPWA && webauthnSupported;
+  const [showBiometricPrompt, setShowBiometricPrompt] = useState(false);
+  const [webauthnLoading, setWebauthnLoading] = useState(false);
+
+  // 宝宝安全识别登录
+  const handleWebAuthnLogin = async () => {
+    if (!login.trim()) { toast.error('请先填写用户名/邮箱'); return; }
+    try {
+      setWebauthnLoading(true);
+      const result = await authenticateWithPasskey(login.trim());
+      if (result.verified && result.token) {
+        // 登录成功，更新 auth 状态
+        saveConsent({ privacy: true, userId: result.user?.id });
+        toast.success('登录成功');
+        navigate(location.state?.from || '/');
+      } else {
+        toast.error(result.error || '验证失败');
+      }
+    } catch (e) {
+      toast.error('验证失败：' + (e.message || '未知错误'));
+    } finally {
+      setWebauthnLoading(false);
+    }
+  };
+
 
 
   const handleSubmit = async (e) => {
@@ -49,6 +78,17 @@ export default function Login() {
       });
       saveConsent({ privacy: true, userId: result?.user?.id });
       toast.success('登录成功');
+
+      // PWA 模式下检查是否需要推荐设置宝宝安全识别
+      if (showBiometricLogin && result?.user?.id) {
+        try {
+          const { credentials } = await getMyCredentials();
+          if (!credentials || credentials.length === 0) {
+            setShowBiometricPrompt(true);
+          }
+        } catch {}
+      }
+
       navigate(location.state?.from || '/');
     } catch (e) {
       toast.error(e.message);
@@ -62,6 +102,25 @@ export default function Login() {
   return (
     <PageLayout hero={{ icon: 'fa-right-to-bracket', title: '登录', subtitle: '欢迎回到 ABDL Space' }}>
       <div className="card max-w-md mx-auto">
+        {/* 宝宝安全识别登录按钮（仅 PWA + 支持 WebAuthn 时显示） */}
+        {showBiometricLogin && (
+          <>
+            <button
+              className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-lg transition-all hover:opacity-80"
+              style={{ background: 'var(--primary)', color: 'white', cursor: 'pointer', boxShadow: '0 2px 8px rgba(168,216,240,0.3)' }}
+              onClick={handleWebAuthnLogin}
+              disabled={webauthnLoading}
+            >
+              <i className={`fa-solid ${webauthnLoading ? 'fa-spinner fa-spin' : 'fa-fingerprint'}`} />
+              <span className="text-sm font-medium">{webauthnLoading ? '验证中...' : '宝宝安全识别登录'}</span>
+            </button>
+            <div className="flex items-center gap-3 my-5">
+              <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
+              <span className="text-xs" style={{ color: 'var(--text-muted)' }}>或使用账号密码登录</span>
+              <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
+            </div>
+          </>
+        )}
         {/* NewBabyWorld 第三方登录 */}
         {nbwConfigured ? (
           <>
@@ -191,6 +250,27 @@ export default function Login() {
           <Link to="/forgot-password" style={{ color: 'var(--link-color)' }}>忘记密码？</Link>
         </p>
       </div>
+
+      {/* 宝宝安全识别设置推荐弹窗 */}
+      {showBiometricPrompt && (
+        <BiometricPrompt
+          onSetup={async () => {
+            setShowBiometricPrompt(false);
+            try {
+              const { registerPasskey } = await import('../utils/webauthn');
+              const result = await registerPasskey();
+              if (result.verified) {
+                toast.success('宝宝安全识别已设置');
+              } else {
+                toast.error('设置失败，请重试');
+              }
+            } catch (e) {
+              toast.error('设置失败：' + (e.message || '未知错误'));
+            }
+          }}
+          onDismiss={() => setShowBiometricPrompt(false)}
+        />
+      )}
     </PageLayout>
   );
 }

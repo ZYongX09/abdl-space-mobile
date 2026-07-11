@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { useNsfw } from '../contexts/NsfwContext';
 import { useNotifications } from '../contexts/NotificationContext';
+import { isWebAuthnSupported, isPWA, registerPasskey, getMyCredentials, deleteCredential } from '../utils/webauthn';
 
 /* ── 入场动画 ── */
 function useStagger(total) {
@@ -220,6 +221,49 @@ export default function SettingsV2() {
 
   const stagger = useStagger(10);
 
+  // 宝宝安全识别
+  const isPWA = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+  const webauthnSupported = isWebAuthnSupported();
+  const showBiometric = isPWA && webauthnSupported;
+  const [biometricCredentials, setBiometricCredentials] = useState([]);
+  const [biometricLoading, setBiometricLoading] = useState(false);
+
+  useEffect(() => {
+    if (showBiometric && user) {
+      getMyCredentials().then(({ credentials }) => {
+        setBiometricCredentials(credentials || []);
+      }).catch(() => {});
+    }
+  }, [showBiometric, user]);
+
+  const handleRegisterBiometric = async () => {
+    try {
+      setBiometricLoading(true);
+      const result = await registerPasskey();
+      if (result.verified) {
+        toast.success('宝宝安全识别已添加');
+        const { credentials } = await getMyCredentials();
+        setBiometricCredentials(credentials || []);
+      } else {
+        toast.error('添加失败，请重试');
+      }
+    } catch (e) {
+      toast.error('添加失败：' + (e.message || '未知错误'));
+    } finally {
+      setBiometricLoading(false);
+    }
+  };
+
+  const handleDeleteBiometric = async (id) => {
+    try {
+      await deleteCredential(id);
+      toast.info('已删除');
+      setBiometricCredentials(prev => prev.filter(c => c.id !== id));
+    } catch (e) {
+      toast.error('删除失败');
+    }
+  };
+
   return (
     <div style={{ background: 'var(--bg)', minHeight: '100vh', paddingBottom: 20 }}>
       <style>{`
@@ -367,6 +411,47 @@ export default function SettingsV2() {
                 )
               }
             />
+          </Group>
+        </div>
+      )}
+
+      {/* ── 宝宝安全识别 ── */}
+      {user && showBiometric && (
+        <div style={{ paddingTop: 12 }}>
+          <Group title="宝宝安全识别" anim={stagger(3.8)}>
+            {biometricCredentials.length === 0 ? (
+              <Item
+                icon="fa-solid fa-fingerprint"
+                label="添加安全识别"
+                desc="使用 Face ID 或指纹快速登录"
+                onClick={handleRegisterBiometric}
+              />
+            ) : (
+              <>
+                {biometricCredentials.map(cred => (
+                  <Item
+                    key={cred.id}
+                    icon="fa-solid fa-mobile-screen"
+                    label={cred.nickname || cred.device_type || '已注册设备'}
+                    desc={`添加于 ${new Date(cred.created_at * 1000).toLocaleDateString('zh-CN')}`}
+                    right={
+                      <button
+                        onClick={() => handleDeleteBiometric(cred.id)}
+                        style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: 13 }}
+                      >
+                        删除
+                      </button>
+                    }
+                  />
+                ))}
+                <Item
+                  icon="fa-solid fa-plus"
+                  label="添加新设备"
+                  desc="注册新的安全识别"
+                  onClick={handleRegisterBiometric}
+                />
+              </>
+            )}
           </Group>
         </div>
       )}
