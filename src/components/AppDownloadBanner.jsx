@@ -4,6 +4,9 @@ export default function AppDownloadBanner() {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
+    // PWA 模式下不显示下载横幅
+    if (window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches) return;
+
     const dismissed = sessionStorage.getItem('app_download_banner_dismissed');
     if (dismissed) return;
 
