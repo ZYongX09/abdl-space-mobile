@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { useNsfw } from '../contexts/NsfwContext';
 import { useNotifications } from '../contexts/NotificationContext';
-import { isWebAuthnSupported, isPWA, registerPasskey, getMyCredentials, deleteCredential } from '../utils/webauthn';
+import { isPWA, registerPasskey, getMyCredentials, deleteCredential } from '../utils/webauthn';
 
 /* ── 入场动画 ── */
 function useStagger(total) {
@@ -223,11 +223,10 @@ export default function SettingsV2() {
 
   // 宝宝安全识别
   const isPWA = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-  const webauthnSupported = isWebAuthnSupported();
-  const showBiometric = isPWA && webauthnSupported;
-
-  // 调试信息
-  console.log('[Biometric]', { isPWA, webauthnSupported, showBiometric, standalone: window.navigator.standalone, displayMode: window.matchMedia('(display-mode: standalone)').matches, hasCredentials: !!window.navigator.credentials, hasPublicKeyCredential: typeof window.PublicKeyCredential !== 'undefined' });
+  // PWA 模式下始终显示安全识别选项，让实际调用时暴露具体错误
+  const showBiometric = isPWA;
+  const [biometricCredentials, setBiometricCredentials] = useState([]);
+  const [biometricLoading, setBiometricLoading] = useState(false);
   const [biometricCredentials, setBiometricCredentials] = useState([]);
   const [biometricLoading, setBiometricLoading] = useState(false);
 
