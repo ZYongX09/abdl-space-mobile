@@ -8,16 +8,11 @@ import {
 const API_BASE = import.meta.env.VITE_API_BASE ?? ''
 
 export function isWebAuthnSupported() {
-  // 基础检查
-  if (!browserSupportsWebAuthn()) return false
+  // 最基本的检查：navigator.credentials 是否存在
+  if (!window.navigator.credentials) return false
 
-  // 检查 PublicKeyCredential 是否真正可用（不只是存在）
+  // 检查 PublicKeyCredential 是否存在
   if (typeof window.PublicKeyCredential === 'undefined') return false
-
-  // 检查是否支持必需的方法
-  if (typeof window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable !== 'function') {
-    return false
-  }
 
   return true
 }

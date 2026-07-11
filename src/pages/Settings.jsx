@@ -225,6 +225,9 @@ export default function SettingsV2() {
   const isPWA = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
   const webauthnSupported = isWebAuthnSupported();
   const showBiometric = isPWA && webauthnSupported;
+
+  // 调试信息
+  console.log('[Biometric]', { isPWA, webauthnSupported, showBiometric, standalone: window.navigator.standalone, displayMode: window.matchMedia('(display-mode: standalone)').matches, hasCredentials: !!window.navigator.credentials, hasPublicKeyCredential: typeof window.PublicKeyCredential !== 'undefined' });
   const [biometricCredentials, setBiometricCredentials] = useState([]);
   const [biometricLoading, setBiometricLoading] = useState(false);
 
