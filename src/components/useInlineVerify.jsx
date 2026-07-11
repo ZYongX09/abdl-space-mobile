@@ -48,11 +48,13 @@ export function useInlineVerify() {
   const ensureTurnstile = useCallback(() => {
     return new Promise((resolve) => {
       if (window.turnstile) { resolve(true); return; }
+      // 超时保护：5 秒后如果还没加载，返回 false
+      const timeout = setTimeout(() => resolve(false), 5000);
       const script = document.createElement('script');
       script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
       script.async = true;
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
+      script.onload = () => { clearTimeout(timeout); resolve(true); };
+      script.onerror = () => { clearTimeout(timeout); resolve(false); };
       document.head.appendChild(script);
     });
   }, []);
@@ -204,12 +206,12 @@ export function useInlineVerify() {
       setError('创建验证失败'); return;
     }
 
-    // 等待容器元素渲染到 DOM（最多重试 5 次）
+    // 等待容器元素渲染到 DOM（最多重试 10 次，每次 200ms）
     let container = null;
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 10; i++) {
       container = document.getElementById(containerId);
       if (container) break;
-      await new Promise(r => setTimeout(r, 100));
+      await new Promise(r => setTimeout(r, 200));
     }
     if (!container) { setError('Turnstile 容器未找到'); return; }
 

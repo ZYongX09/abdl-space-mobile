@@ -48,11 +48,12 @@ export function useVerifyModal() {
   const ensureTurnstile = useCallback(() => {
     return new Promise((resolve) => {
       if (window.turnstile) { resolve(true); return; }
+      const timeout = setTimeout(() => resolve(false), 5000);
       const script = document.createElement('script');
       script.src = TURNSTILE_SCRIPT_URL;
       script.async = true;
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
+      script.onload = () => { clearTimeout(timeout); resolve(true); };
+      script.onerror = () => { clearTimeout(timeout); resolve(false); };
       document.head.appendChild(script);
     });
   }, []);
