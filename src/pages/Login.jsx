@@ -67,12 +67,8 @@ export default function Login() {
         toast.error(result.error || '验证失败');
       }
     } catch (e) {
-      // Edge Android PWA 兼容性错误处理
-      if (e.message?.includes('credential manager') || e.name === 'NotAllowedError') {
-        toast.error('此浏览器不支持安全识别，请使用密码登录');
-      } else {
-        toast.error('验证失败：' + (e.message || '未知错误'));
-      }
+      // 显示实际错误信息
+      toast.error(e.message || '验证失败');
     } finally {
       setWebauthnLoading(false);
       setShowAccountConfirm(false);
