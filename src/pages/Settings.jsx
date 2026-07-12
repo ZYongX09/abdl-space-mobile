@@ -227,8 +227,6 @@ export default function SettingsV2() {
   const showBiometric = isPWA;
   const [biometricCredentials, setBiometricCredentials] = useState([]);
   const [biometricLoading, setBiometricLoading] = useState(false);
-  const [biometricCredentials, setBiometricCredentials] = useState([]);
-  const [biometricLoading, setBiometricLoading] = useState(false);
 
   useEffect(() => {
     if (showBiometric && user) {
