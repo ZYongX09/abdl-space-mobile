@@ -16,6 +16,9 @@ import { useToast } from '../contexts/ToastContext';
 export default function ForumFeed() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const [search, setSearch] = useState('');
   const [followMap, setFollowMap] = useState({});
   const [reportTarget, setReportTarget] = useState(null);
@@ -24,19 +27,25 @@ export default function ForumFeed() {
   const toast = useToast();
   const navigate = useNavigate();
 
-  const loadPosts = async () => {
+  const loadPosts = async (pageNum = 1, append = false) => {
     try {
-      setLoading(true);
+      if (append) setLoadingMore(true); else setLoading(true);
       const searchNsfwEnabled = localStorage.getItem('abdl_search_nsfw') === 'true';
       const data = await forumAPI.feed({
+        page: pageNum,
+        limit: 20,
         search: search || undefined,
         excludeNsfw: search && !searchNsfwEnabled ? true : undefined,
       });
-      setPosts((data.posts || []).filter(p => !p.in_reply_to_id));
+      const newPosts = (data.posts || []).filter(p => !p.in_reply_to_id);
+      setPosts(prev => append ? [...prev, ...newPosts] : newPosts);
+      setHasMore(newPosts.length >= 20);
+      setPage(pageNum);
     } catch (e) {
       toast.error(e.message);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
@@ -154,6 +163,20 @@ export default function ForumFeed() {
               onReport={setReportTarget}
             />
           ))}
+          {hasMore && (
+            <button
+              onClick={() => loadPosts(page + 1, true)}
+              disabled={loadingMore}
+              style={{
+                width: '100%', padding: '12px 0', marginTop: 8,
+                background: 'transparent', border: '1px solid var(--border)',
+                borderRadius: 10, color: 'var(--text-muted)', fontSize: 13,
+                cursor: 'pointer',
+              }}
+            >
+              {loadingMore ? '加载中...' : '加载更多'}
+            </button>
+          )}
         </div>
       )}
       </PullToRefresh>
