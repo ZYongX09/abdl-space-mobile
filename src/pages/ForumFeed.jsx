@@ -32,7 +32,7 @@ export default function ForumFeed() {
         search: search || undefined,
         excludeNsfw: search && !searchNsfwEnabled ? true : undefined,
       });
-      setPosts(data.posts || []);
+      setPosts((data.posts || []).filter(p => !p.in_reply_to_id));
     } catch (e) {
       toast.error(e.message);
     } finally {

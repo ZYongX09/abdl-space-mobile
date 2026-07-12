@@ -122,7 +122,7 @@ export default function HomeV3() {
       if (p === 1) setLoading(true);
       else setLoadingMore(true);
       const data = await forumAPI.feed({ page: p, limit: PAGE_SIZE });
-      const newPosts = data.posts || [];
+      const newPosts = (data.posts || []).filter(p => !p.in_reply_to_id);
       if (append) setPosts(prev => [...prev, ...newPosts]);
       else setPosts(newPosts);
       setHasMore(newPosts.length >= PAGE_SIZE);
