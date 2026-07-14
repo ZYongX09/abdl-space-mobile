@@ -1,9 +1,10 @@
 import {
   startRegistration,
   startAuthentication,
-  browserSupportsWebAuthn,
   platformAuthenticatorIsAvailable,
 } from '@simplewebauthn/browser'
+import { requestJSON } from './requestJSON'
+import { withAuthHeader } from './authHeaders'
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? ''
 
@@ -44,11 +45,11 @@ function getDeviceName() {
 }
 
 export async function registerPasskey() {
-  const optionsRes = await fetch(`${API_BASE}/api/webauthn/register/options`, {
+  const optionsJSON = await requestJSON(`${API_BASE}/api/webauthn/register/options`, {
     method: 'POST',
+    headers: withAuthHeader(),
     credentials: 'include',
   })
-  const optionsJSON = await optionsRes.json()
 
   const deviceName = getDeviceName()
 
@@ -61,9 +62,9 @@ export async function registerPasskey() {
     throw new Error(`安全识别注册失败: ${e.message || e.name || '未知错误'}`)
   }
 
-  const verifyRes = await fetch(`${API_BASE}/api/webauthn/register/verify`, {
+  return requestJSON(`${API_BASE}/api/webauthn/register/verify`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: withAuthHeader({ 'Content-Type': 'application/json' }),
     credentials: 'include',
     body: JSON.stringify({
       ...attResp,
@@ -71,18 +72,15 @@ export async function registerPasskey() {
       nickname: deviceName,
     }),
   })
-
-  return verifyRes.json()
 }
 
-export async function authenticateWithPasskey(username) {
-  const optionsRes = await fetch(`${API_BASE}/api/webauthn/authenticate/options`, {
+export async function authenticateWithPasskey() {
+  const optionsJSON = await requestJSON(`${API_BASE}/api/webauthn/authenticate/options`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
-    body: JSON.stringify({ username }),
+    body: JSON.stringify({}),
   })
-  const optionsJSON = await optionsRes.json()
 
   let asseResp
   try {
@@ -104,7 +102,7 @@ export async function authenticateWithPasskey(username) {
     throw e
   }
 
-  const verifyRes = await fetch(`${API_BASE}/api/webauthn/authenticate/verify`, {
+  return requestJSON(`${API_BASE}/api/webauthn/authenticate/verify`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
@@ -113,21 +111,19 @@ export async function authenticateWithPasskey(username) {
       challengeId: optionsJSON.challengeId,
     }),
   })
-
-  return verifyRes.json()
 }
 
 export async function getMyCredentials() {
-  const res = await fetch(`${API_BASE}/api/webauthn/credentials`, {
+  return requestJSON(`${API_BASE}/api/webauthn/credentials`, {
+    headers: withAuthHeader(),
     credentials: 'include',
   })
-  return res.json()
 }
 
 export async function deleteCredential(id) {
-  const res = await fetch(`${API_BASE}/api/webauthn/credentials/${id}`, {
+  return requestJSON(`${API_BASE}/api/webauthn/credentials/${id}`, {
     method: 'DELETE',
+    headers: withAuthHeader(),
     credentials: 'include',
   })
-  return res.json()
 }

@@ -6,6 +6,7 @@ import { useToast } from '../contexts/ToastContext';
 import { useNsfw } from '../contexts/NsfwContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { isWebAuthnReallyAvailable, registerPasskey, getMyCredentials, deleteCredential } from '../utils/webauthn';
+import { shouldOfferWebAuthn } from '../utils/webauthnAvailability';
 
 /* ── 入场动画 ── */
 function useStagger(total) {
@@ -222,19 +223,16 @@ export default function SettingsV2() {
   const stagger = useStagger(10);
 
   // 宝宝安全识别
-  const isPWA = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
   const [showBiometric, setShowBiometric] = useState(false);
   const [biometricCredentials, setBiometricCredentials] = useState([]);
   const [biometricLoading, setBiometricLoading] = useState(false);
 
   // 异步检测 WebAuthn 是否真正可用
   useEffect(() => {
-    if (isPWA) {
-      isWebAuthnReallyAvailable().then(available => {
-        setShowBiometric(available);
-      });
-    }
-  }, [isPWA]);
+    isWebAuthnReallyAvailable().then(available => {
+      setShowBiometric(shouldOfferWebAuthn({ secure: window.isSecureContext, available }));
+    });
+  }, []);
 
   useEffect(() => {
     if (showBiometric && user) {

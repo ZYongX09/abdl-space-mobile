@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { withAuthHeader } from '../utils/authHeaders';
 
 const AuthContext = createContext();
 
@@ -44,15 +45,23 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [accounts, setAccounts] = useState(getSavedAccounts);
+  const sessionVersionRef = useRef(0);
 
   // 初始化：用 cookie 恢复登录
   useEffect(() => {
+    const sessionVersion = sessionVersionRef.current;
+    let cancelled = false;
     (async () => {
       try {
         if (USE_API) {
-          const res = await fetch(`${API_BASE}/api/auth/me`, { credentials: 'include' });
+          const res = await fetch(`${API_BASE}/api/auth/me`, {
+            headers: withAuthHeader(),
+            credentials: 'include',
+          });
+          if (cancelled || sessionVersion !== sessionVersionRef.current) return;
           if (res.ok) {
             const data = await res.json();
+            if (cancelled || sessionVersion !== sessionVersionRef.current) return;
             const u = data.user || data;
             setUser(u);
             setActiveAccountId(u.id);
@@ -68,10 +77,7 @@ export function AuthProvider({ children }) {
             saveAccounts(updated);
             setAccounts(updated);
           } else {
-            // cookie 无效，清除本地状态
-            saveAccounts([]);
-            setAccounts([]);
-            setActiveAccountId(null);
+            setUser(null);
           }
         } else {
           const u = getOfflineCurrentUser();
@@ -81,6 +87,24 @@ export function AuthProvider({ children }) {
         setLoading(false);
       }
     })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const installSession = useCallback(({ user: u, token }) => {
+    if (!u || !token) throw new Error('登录响应无效');
+
+    const saved = getSavedAccounts();
+    const entry = { id: u.id, username: u.username, avatar: u.avatar, role: u.role, token };
+    const exists = saved.findIndex(a => a.id === u.id);
+    const updated = exists >= 0
+      ? saved.map((account, index) => index === exists ? entry : account)
+      : [...saved, entry];
+
+    sessionVersionRef.current += 1;
+    saveAccounts(updated);
+    setAccounts(updated);
+    setActiveAccountId(u.id);
+    setUser(u);
   }, []);
 
   // 登录（添加账户到已保存列表）
@@ -97,21 +121,7 @@ export function AuthProvider({ children }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || '登录失败');
 
-      const u = data.user;
-
-      // 添加/更新已保存账户
-      const saved = getSavedAccounts();
-      const exists = saved.findIndex(a => a.id === u.id);
-      const entry = { id: u.id, username: u.username, avatar: u.avatar, role: u.role, token: data.token };
-      if (exists >= 0) {
-        saved[exists] = entry;
-      } else {
-        saved.push(entry);
-      }
-      saveAccounts(saved);
-      setAccounts(saved);
-      setActiveAccountId(u.id);
-      setUser(u);
+      installSession(data);
       return data;
     }
     // localStorage 模式
@@ -123,7 +133,7 @@ export function AuthProvider({ children }) {
     lsSet('abdl_currentUser', u);
     setUser({ ...u, passwordHash: undefined });
     return { token: 'local-' + u.id, user: { ...u, passwordHash: undefined } };
-  }, []);
+  }, [installSession]);
 
   // 注册
   const register = useCallback(async ({ username, email, password, code, captchaToken, inviteCode }) => {
@@ -338,7 +348,10 @@ export function AuthProvider({ children }) {
   const refreshUser = useCallback(async () => {
     if (!USE_API) return;
     try {
-      const res = await fetch(`${API_BASE}/api/auth/me`, { credentials: 'include' });
+      const res = await fetch(`${API_BASE}/api/auth/me`, {
+        headers: withAuthHeader(),
+        credentials: 'include',
+      });
       if (res.ok) {
         const data = await res.json();
         const u = data.user || data;
@@ -363,7 +376,7 @@ export function AuthProvider({ children }) {
 
     <AuthContext.Provider value={{
       user, loading, accounts,
-      login, register, betaRegister, logout, logoutAll,
+      login, installSession, register, betaRegister, logout, logoutAll,
       switchAccount, removeAccount, updateProfile,
       getConsentStatus, saveConsent, withdrawConsent,
       refreshUser,

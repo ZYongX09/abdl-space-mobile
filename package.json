@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "test": "node --test src/utils/requestJSON.test.js src/utils/authHeaders.test.js src/utils/webauthnAvailability.test.js public/sw-policy.test.js",
+    "check:sw": "node --check public/sw.js",
     "preview": "vite preview"
   },
   "dependencies": {

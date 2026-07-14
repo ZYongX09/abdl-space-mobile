@@ -1,4 +1,6 @@
-const CACHE_NAME = 'abdl-v1';
+importScripts('/sw-policy.js');
+
+const CACHE_NAME = 'abdl-v2';
 const SHELL_URLS = ['/', '/app-icon.png', '/fontawesome.min.css'];
 
 self.addEventListener('install', (event) => {
@@ -18,12 +20,13 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
+  if (!self.shouldCacheRequest(event.request, self.location.origin)) return;
+
   event.respondWith(
     caches.open(CACHE_NAME).then(cache =>
       cache.match(event.request).then(cached => {
         const fetched = fetch(event.request).then(response => {
-          if (response.ok) cache.put(event.request, response.clone());
+          if (response.ok && response.type === 'basic') cache.put(event.request, response.clone());
           return response;
         }).catch(() => cached);
         return cached || fetched;
@@ -74,7 +77,8 @@ self.addEventListener('pushsubscriptionchange', (event) => {
       .then(sub => fetch('/api/push/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(sub.toJSON()),
-      }).catch(() => {})
+      }).catch(() => {}))
   );
 });

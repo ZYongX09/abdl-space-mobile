@@ -6,6 +6,7 @@ import { useToast } from '../contexts/ToastContext';
 import { isNBWConfigured, startNBWOAuth } from '../utils/nbwOAuth';
 import { useInlineVerify } from '../components/useInlineVerify';
 import { isWebAuthnReallyAvailable, authenticateWithPasskey, getMyCredentials } from '../utils/webauthn';
+import { shouldOfferWebAuthn } from '../utils/webauthnAvailability';
 import BiometricPrompt from '../components/BiometricPrompt';
 
 const FAIL_THRESHOLD = 2;
@@ -20,7 +21,7 @@ export default function Login() {
   const [failCount, setFailCount] = useState(0);
   const [showNBWConsent, setShowNBWConsent] = useState(false);
   const captchaTokenRef = useRef(null);
-  const { login: authLogin, saveConsent, logout, user } = useAuth();
+  const { login: authLogin, installSession, saveConsent, logout, user } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -30,56 +31,25 @@ export default function Login() {
   const canSubmit = !loading && (!needCaptcha || verified);
   const nbwConfigured = isNBWConfigured();
 
-  const isPWA = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
   const [showBiometricLogin, setShowBiometricLogin] = useState(false);
   const [showBiometricPrompt, setShowBiometricPrompt] = useState(false);
   const [webauthnLoading, setWebauthnLoading] = useState(false);
-  const [hasPasskeys, setHasPasskeys] = useState(false);
-  const [showAccountConfirm, setShowAccountConfirm] = useState(false);
-  const [passkeyAccounts, setPasskeyAccounts] = useState([]);
 
   // 异步检测 WebAuthn 是否真正可用
   useEffect(() => {
-    if (isPWA) {
-      isWebAuthnReallyAvailable().then(available => {
-        setShowBiometricLogin(available);
-      });
-    }
-  }, [isPWA]);
-
-  // 检查是否有已注册的 passkey（用于免账号登录）
-  useEffect(() => {
-    if (showBiometricLogin) {
-      // 尝试获取已注册的凭证（需要先知道用户名）
-      // 这里先检查 localStorage 中是否有上次登录的用户名
-      try {
-        const accounts = JSON.parse(localStorage.getItem('abdl_accounts') || '[]');
-        if (accounts.length > 0) {
-          setHasPasskeys(true);
-          setPasskeyAccounts(accounts);
-        }
-      } catch {}
-    }
-  }, [showBiometricLogin]);
+    isWebAuthnReallyAvailable().then(available => {
+      setShowBiometricLogin(shouldOfferWebAuthn({ secure: window.isSecureContext, available }));
+    });
+  }, []);
 
   // 宝宝安全识别登录（免账号，直接弹窗确认）
-  const handleWebAuthnLogin = async (username) => {
+  const handleWebAuthnLogin = async () => {
     try {
       setWebauthnLoading(true);
-      const result = await authenticateWithPasskey(username);
+      const result = await authenticateWithPasskey();
       if (result.verified && result.token) {
-        // 存储 token 到 abdl_accounts（与正常登录流程一致）
-        const u = result.user;
-        if (u) {
-          const saved = JSON.parse(localStorage.getItem('abdl_accounts') || '[]');
-          const entry = { id: u.id, username: u.username, avatar: u.avatar, role: u.role, token: result.token };
-          const exists = saved.findIndex(a => a.id === u.id);
-          if (exists >= 0) saved[exists] = entry;
-          else saved.push(entry);
-          localStorage.setItem('abdl_accounts', JSON.stringify(saved));
-          localStorage.setItem('abdl_active_account', String(u.id));
-        }
-        saveConsent({ privacy: true, userId: u?.id });
+        installSession(result);
+        saveConsent({ privacy: true, userId: result.user?.id });
         toast.success('登录成功');
         navigate(location.state?.from || '/');
       } else {
@@ -89,25 +59,12 @@ export default function Login() {
       toast.error(e.message || '验证失败');
     } finally {
       setWebauthnLoading(false);
-      setShowAccountConfirm(false);
     }
   };
 
   // 显示账户确认弹窗
   const handleBiometricClick = () => {
-    // 如果输入框有用户名，直接用它
-    if (login.trim()) {
-      handleWebAuthnLogin(login.trim());
-      return;
-    }
-    // 有保存的账户，弹窗选择
-    if (passkeyAccounts.length > 0) {
-      setShowAccountConfirm(true);
-    } else {
-      // 无保存账户，也不需要输入用户名
-      // Passkey 的 discoverable credentials 会自动匹配账户
-      handleWebAuthnLogin('');
-    }
+    handleWebAuthnLogin('');
   };
 
 
@@ -325,72 +282,6 @@ export default function Login() {
         />
       )}
 
-      {/* 账户确认弹窗（宝宝安全识别登录） */}
-      {showAccountConfirm && (
-        <div className="modal-overlay" onClick={() => setShowAccountConfirm(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()} style={{ padding: 24, textAlign: 'center' }}>
-            <div style={{
-              width: 64, height: 64, borderRadius: 20,
-              background: 'var(--primary-light)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              margin: '0 auto 16px',
-            }}>
-              <i className="fa-solid fa-fingerprint" style={{ fontSize: 28, color: 'var(--primary)' }} />
-            </div>
-            <h3 style={{ fontSize: 17, fontWeight: 700, marginBottom: 8, color: 'var(--text)' }}>
-              确认登录账户
-            </h3>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}>
-              选择要登录的账户
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
-              {passkeyAccounts.map((acc, i) => (
-                <button
-                  key={i}
-                  onClick={() => handleWebAuthnLogin(acc.username)}
-                  disabled={webauthnLoading}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 12,
-                    padding: '12px 16px', borderRadius: 12,
-                    border: '1px solid var(--border)', background: 'var(--bg-card)',
-                    cursor: 'pointer', textAlign: 'left',
-                    transition: 'all 0.2s',
-                  }}
-                >
-                  <div style={{
-                    width: 40, height: 40, borderRadius: '50%',
-                    background: 'var(--primary-light)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 16, fontWeight: 600, color: 'var(--primary)',
-                    overflow: 'hidden', flexShrink: 0,
-                  }}>
-                    {acc.avatar ? (
-                      <img src={acc.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                      acc.username?.[0]?.toUpperCase()
-                    )}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)' }}>{acc.username}</div>
-                    <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>ID: {acc.id}</div>
-                  </div>
-                  {webauthnLoading && <i className="fa-solid fa-spinner fa-spin" style={{ color: 'var(--primary)' }} />}
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => setShowAccountConfirm(false)}
-              style={{
-                width: '100%', padding: '10px 0', borderRadius: 10,
-                border: 'none', background: 'var(--input-bg)',
-                color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer',
-              }}
-            >
-              取消
-            </button>
-          </div>
-        </div>
-      )}
     </PageLayout>
   );
 }
