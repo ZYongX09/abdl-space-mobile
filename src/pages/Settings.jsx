@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { useNsfw } from '../contexts/NsfwContext';
 import { useNotifications } from '../contexts/NotificationContext';
-import { isPWA, isWebAuthnReallyAvailable, registerPasskey, getMyCredentials, deleteCredential } from '../utils/webauthn';
+import { isWebAuthnReallyAvailable, registerPasskey, getMyCredentials, deleteCredential } from '../utils/webauthn';
 
 /* ── 入场动画 ── */
 function useStagger(total) {

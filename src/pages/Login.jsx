@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { isNBWConfigured, startNBWOAuth } from '../utils/nbwOAuth';
 import { useInlineVerify } from '../components/useInlineVerify';
-import { isWebAuthnReallyAvailable, isPWA, authenticateWithPasskey, getMyCredentials } from '../utils/webauthn';
+import { isWebAuthnReallyAvailable, authenticateWithPasskey, getMyCredentials } from '../utils/webauthn';
 import BiometricPrompt from '../components/BiometricPrompt';
 
 const FAIL_THRESHOLD = 2;
@@ -68,14 +68,24 @@ export default function Login() {
       setWebauthnLoading(true);
       const result = await authenticateWithPasskey(username);
       if (result.verified && result.token) {
-        saveConsent({ privacy: true, userId: result.user?.id });
+        // 存储 token 到 abdl_accounts（与正常登录流程一致）
+        const u = result.user;
+        if (u) {
+          const saved = JSON.parse(localStorage.getItem('abdl_accounts') || '[]');
+          const entry = { id: u.id, username: u.username, avatar: u.avatar, role: u.role, token: result.token };
+          const exists = saved.findIndex(a => a.id === u.id);
+          if (exists >= 0) saved[exists] = entry;
+          else saved.push(entry);
+          localStorage.setItem('abdl_accounts', JSON.stringify(saved));
+          localStorage.setItem('abdl_active_account', String(u.id));
+        }
+        saveConsent({ privacy: true, userId: u?.id });
         toast.success('登录成功');
         navigate(location.state?.from || '/');
       } else {
         toast.error(result.error || '验证失败');
       }
     } catch (e) {
-      // 显示实际错误信息
       toast.error(e.message || '验证失败');
     } finally {
       setWebauthnLoading(false);

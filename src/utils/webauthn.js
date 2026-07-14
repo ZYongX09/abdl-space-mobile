@@ -79,6 +79,7 @@ export async function authenticateWithPasskey(username) {
   const optionsRes = await fetch(`${API_BASE}/api/webauthn/authenticate/options`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify({ username }),
   })
   const optionsJSON = await optionsRes.json()
@@ -106,6 +107,7 @@ export async function authenticateWithPasskey(username) {
   const verifyRes = await fetch(`${API_BASE}/api/webauthn/authenticate/verify`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify({
       ...asseResp,
       challengeId: optionsJSON.challengeId,
