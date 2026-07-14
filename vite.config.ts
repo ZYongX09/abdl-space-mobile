@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import { createHtmlPlugin } from 'vite-plugin-html'
 import { copyFileSync, mkdirSync, readdirSync, statSync } from 'fs'
@@ -21,13 +21,16 @@ function copyDirSync(src, dest) {
   }
 }
 
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd())
+  return {
   plugins: [
     react(),
     createHtmlPlugin({
       inject: {
         data: {
-          captchaKey: process.env.VITE_CAPTCHA_KEY || '',
+          captchaKey: env.VITE_CAPTCHA_KEY || process.env.VITE_CAPTCHA_KEY || '',
+          turnstileSiteKey: env.VITE_TURNSTILE_SITE_KEY || process.env.VITE_TURNSTILE_SITE_KEY || '0x4AAAAAADYK46vBrTTTBcb6',
         },
       },
     }),
@@ -53,4 +56,5 @@ export default defineConfig({
       },
     },
   },
+  }
 })

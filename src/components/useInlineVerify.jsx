@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 
 const API_BASE = import.meta.env.VITE_API_BASE || '';
+const FALLBACK_TURNSTILE_SITE_KEY = '0x4AAAAAADYK46vBrTTTBcb6';
 
 /**
  * useInlineVerify — 内嵌验证码 Hook（直接调内部 API，不走 embed.js SDK）
@@ -85,6 +86,7 @@ export function useInlineVerify() {
 
     (async () => {
       try {
+        setPhase('loading');
         const res = await fetch(`${API_BASE}/api/captcha/risk`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -192,7 +194,7 @@ export function useInlineVerify() {
 
   async function renderTurnstile(containerId, mode) {
     const ok = await ensureTurnstile();
-    if (!ok) { setError('Turnstile 加载失败'); return; }
+    if (!ok || staleRef.current) { if (!staleRef.current) setError('Turnstile 加载失败'); return; }
 
     try {
       const res = await fetch(`${API_BASE}/api/captcha/challenge`, {
@@ -203,7 +205,15 @@ export function useInlineVerify() {
       const data = await res.json();
       turnstileSessionRef.current = data.session_id;
     } catch {
-      setError('创建验证失败'); return;
+      if (!staleRef.current) setError('创建验证失败');
+      return;
+    }
+
+    if (staleRef.current) return;
+
+    if (turnstileWidgetRef.current) {
+      try { window.turnstile?.remove(turnstileWidgetRef.current); } catch {}
+      turnstileWidgetRef.current = null;
     }
 
     // 等待容器元素渲染到 DOM（最多重试 10 次，每次 200ms）
@@ -213,9 +223,13 @@ export function useInlineVerify() {
       if (container) break;
       await new Promise(r => setTimeout(r, 200));
     }
-    if (!container) { setError('Turnstile 容器未找到'); return; }
+    if (!container) { if (!staleRef.current) setError('Turnstile 容器未找到'); return; }
 
-    const siteKey = window.__TURNSTILE_SITE_KEY || '';
+    if (staleRef.current) return;
+    container.innerHTML = '';
+
+    const rawKey = window.__TURNSTILE_SITE_KEY || '';
+    const siteKey = (rawKey && rawKey.startsWith('0x')) ? rawKey : FALLBACK_TURNSTILE_SITE_KEY;
     if (!siteKey) { setError('Turnstile 未配置'); return; }
 
     try {

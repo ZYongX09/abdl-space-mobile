@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 
 const API_BASE = import.meta.env.VITE_API_BASE || '';
 const TURNSTILE_SCRIPT_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+const FALLBACK_TURNSTILE_SITE_KEY = '0x4AAAAAADYK46vBrTTTBcb6';
 
 /**
  * useVerifyModal — 验证码弹窗 Hook（支持 Turnstile + Quantum 混合验证）
@@ -88,6 +89,7 @@ export function useVerifyModal() {
     if (!show) return;
     (async () => {
       try {
+        setPhase('loading');
         const res = await fetch(`${API_BASE}/api/captcha/risk`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}',
         });
@@ -290,7 +292,7 @@ export function useVerifyModal() {
 
   async function renderTurnstile(containerId, isBoth) {
     const ok = await ensureTurnstile();
-    if (!ok) { setError('Turnstile 加载失败'); return; }
+    if (!ok || staleRef.current) { if (!staleRef.current) setError('Turnstile 加载失败'); return; }
     try {
       const res = await fetch(`${API_BASE}/api/captcha/challenge`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -298,12 +300,36 @@ export function useVerifyModal() {
       });
       const data = await res.json();
       turnstileSessionRef.current = data.session_id;
-    } catch { setError('创建验证失败'); return; }
+    } catch { if (!staleRef.current) setError('创建验证失败'); return; }
 
-    const container = isBoth ? turnstileBothContainerRef.current : document.getElementById(containerId);
-    if (!container) return;
-    const siteKey = window.__TURNSTILE_SITE_KEY || '';
-    if (!siteKey) { setError('Turnstile 未配置'); return; }
+    if (staleRef.current) return;
+
+    if (turnstileWidgetRef.current) {
+      try { window.turnstile?.remove(turnstileWidgetRef.current); } catch {}
+      turnstileWidgetRef.current = null;
+    }
+
+    let container = null;
+    if (isBoth) {
+      for (let i = 0; i < 10; i++) {
+        container = turnstileBothContainerRef.current;
+        if (container) break;
+        await new Promise(r => setTimeout(r, 200));
+      }
+    } else {
+      for (let i = 0; i < 10; i++) {
+        container = document.getElementById(containerId);
+        if (container) break;
+        await new Promise(r => setTimeout(r, 200));
+      }
+    }
+    if (!container) { if (!staleRef.current) setError('Turnstile 容器未找到'); return; }
+
+    if (staleRef.current) return;
+    container.innerHTML = '';
+
+    const rawKey = window.__TURNSTILE_SITE_KEY || '';
+    const siteKey = (rawKey && rawKey.startsWith('0x')) ? rawKey : FALLBACK_TURNSTILE_SITE_KEY;
 
     try {
       turnstileWidgetRef.current = window.turnstile.render(container, {
