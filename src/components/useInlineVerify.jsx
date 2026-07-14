@@ -2,6 +2,14 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 
 const API_BASE = import.meta.env.VITE_API_BASE || '';
 const FALLBACK_TURNSTILE_SITE_KEY = '0x4AAAAAADYK46vBrTTTBcb6';
+const VERIFY_COOLDOWN_MS = 10 * 60 * 1000;
+
+function isRecentlyVerified() {
+  try { return Date.now() - parseInt(localStorage.getItem('abdl_last_verify') || '0', 10) < VERIFY_COOLDOWN_MS; } catch { return false; }
+}
+function markVerified() {
+  try { localStorage.setItem('abdl_last_verify', String(Date.now())); } catch { /* ignore */ }
+}
 
 /**
  * useInlineVerify — 内嵌验证码 Hook（直接调内部 API，不走 embed.js SDK）
@@ -73,6 +81,7 @@ export function useInlineVerify() {
   }, []);
 
   const trigger = useCallback(() => {
+    if (isRecentlyVerified()) { setVerified(true); return; }
     staleRef.current = false;
     setVerified(false);
     tokenRef.current = null;
@@ -430,6 +439,7 @@ export function useInlineVerify() {
   }
 
   const finishVerify = useCallback(() => {
+    markVerified();
     setPhase('done');
     setVerified(true);
     setTimeout(() => cleanup(), 1200);

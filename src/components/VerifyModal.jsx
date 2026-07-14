@@ -3,6 +3,14 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 const API_BASE = import.meta.env.VITE_API_BASE || '';
 const TURNSTILE_SCRIPT_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
 const FALLBACK_TURNSTILE_SITE_KEY = '0x4AAAAAADYK46vBrTTTBcb6';
+const VERIFY_COOLDOWN_MS = 10 * 60 * 1000;
+
+function isRecentlyVerified() {
+  try { return Date.now() - parseInt(localStorage.getItem('abdl_last_verify') || '0', 10) < VERIFY_COOLDOWN_MS; } catch { return false; }
+}
+function markVerified() {
+  try { localStorage.setItem('abdl_last_verify', String(Date.now())); } catch { /* ignore */ }
+}
 
 /**
  * useVerifyModal — 验证码弹窗 Hook（支持 Turnstile + Quantum 混合验证）
@@ -75,6 +83,7 @@ export function useVerifyModal() {
   }, []);
 
   const trigger = useCallback((onPass) => {
+    if (isRecentlyVerified()) { onPass(); return; }
     staleRef.current = false;
     actionRef.current = onPass;
     tokenRef.current = null;
@@ -353,6 +362,7 @@ export function useVerifyModal() {
   }
 
   const finishVerification = useCallback(() => {
+    markVerified();
     setPhase('done');
     const action = actionRef.current;
     setTimeout(() => {
