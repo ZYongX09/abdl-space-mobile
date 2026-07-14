@@ -3,13 +3,29 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 const API_BASE = import.meta.env.VITE_API_BASE || '';
 const TURNSTILE_SCRIPT_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
 const FALLBACK_TURNSTILE_SITE_KEY = '0x4AAAAAADYK46vBrTTTBcb6';
-const VERIFY_COOLDOWN_MS = 10 * 60 * 1000;
+const VERIFY_WINDOW_MS = 60 * 60 * 1000;
 
-function isRecentlyVerified() {
-  try { return Date.now() - parseInt(localStorage.getItem('abdl_last_verify') || '0', 10) < VERIFY_COOLDOWN_MS; } catch { return false; }
+function shouldSkipVerification() {
+  try {
+    const ts = parseInt(localStorage.getItem('abdl_verify_ts') || '0', 10);
+    const freeUsed = localStorage.getItem('abdl_free_used') === '1';
+    if (Date.now() - ts > VERIFY_WINDOW_MS) {
+      localStorage.setItem('abdl_verify_ts', String(Date.now()));
+      localStorage.setItem('abdl_free_used', '1');
+      return true;
+    }
+    if (!freeUsed) {
+      localStorage.setItem('abdl_free_used', '1');
+      return true;
+    }
+    return false;
+  } catch { return false; }
 }
 function markVerified() {
-  try { localStorage.setItem('abdl_last_verify', String(Date.now())); } catch { /* ignore */ }
+  try {
+    localStorage.setItem('abdl_verify_ts', String(Date.now()));
+    localStorage.setItem('abdl_free_used', '0');
+  } catch { /* ignore */ }
 }
 
 /**
@@ -83,7 +99,7 @@ export function useVerifyModal() {
   }, []);
 
   const trigger = useCallback((onPass) => {
-    if (isRecentlyVerified()) { onPass(); return; }
+    if (shouldSkipVerification()) { onPass(); return; }
     staleRef.current = false;
     actionRef.current = onPass;
     tokenRef.current = null;
