@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import PageLayout from '../components/PageLayout';
 import { LoadingSkeleton, Spinner } from '../components/Feedback';
 import TabBar from '../components/TabBar';
-import { adminAPI } from '../api';
+import { adminAPI } from '../api.js';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { useVerifyModal } from '../components/VerifyModal';
@@ -111,6 +111,15 @@ export default function AdminPage() {
         const data = await adminAPI.banUser(id);
         setUsers(prev => prev.map(u => u.id === id ? { ...u, banned: data.banned } : u));
         toast.success(data.banned ? '已封禁' : '已解封');
+      } catch (e) { toast.error(e.message); }
+    });
+  };
+
+  const handleTrackAndBanUserIp = async (id) => {
+    trigger(async () => {
+      try {
+        const data = await adminAPI.trackAndBanUserIp(id);
+        toast.success(data.banned_ip_count > 0 ? `已开启追踪并封禁 ${data.banned_ip_count} 个已知 IP` : '已开启追踪，目标下次访问时将自动封禁 IP');
       } catch (e) { toast.error(e.message); }
     });
   };
@@ -229,6 +238,13 @@ export default function AdminPage() {
   return (
     <>
     <PageLayout hero={{ icon: 'fa-shield-halved', title: '管理后台' }}>
+      <nav aria-label="管理功能" className="mb-4">
+        <Link to="/admin/sponsors" className="card card-interactive flex items-center gap-3" style={{ padding: '1rem', minHeight: 44 }}>
+          <i className="fa-solid fa-heart" aria-hidden="true" style={{ color: 'var(--primary-dark)' }} />
+          <span style={{ color: 'var(--text)' }}>赞助者管理</span>
+          <span className="text-xs" style={{ color: 'var(--text-light)' }}>配置、套餐、额度与库存</span>
+        </Link>
+      </nav>
       {/* 标签页 */}
       <TabBar tabs={TABS} value={tab} onChange={setTab} />
 
@@ -299,6 +315,10 @@ export default function AdminPage() {
                       <button className="btn btn-outline btn-sm" style={{ padding: '4px 10px', fontSize: '0.75rem' }}
                         onClick={() => handleBanUser(u.id)} title={u.banned ? '解封' : '封禁'}>
                         <i className={`fa-solid ${u.banned ? 'fa-unlock' : 'fa-ban'}`} />
+                      </button>
+                      <button className="btn btn-sm" style={{ padding: '4px 10px', fontSize: '0.75rem', background: 'var(--danger)', color: 'white' }}
+                        onClick={() => handleTrackAndBanUserIp(u.id)} title="追踪并永久封禁 IP">
+                        <i className="fa-solid fa-radar" />
                       </button>
                       <button className="btn btn-sm" style={{ padding: '4px 10px', fontSize: '0.75rem', background: 'var(--danger)', color: 'white' }}
                         onClick={() => handleDeleteUser(u.id)} title="删除用户">

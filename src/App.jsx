@@ -11,6 +11,7 @@ import ErrorBoundary from './components/ErrorBoundary'
 import RedirectNotice from './components/RedirectNotice'
 import AppDownloadBanner from './components/AppDownloadBanner'
 import AdBlockNotice from './components/AdBlockNotice'
+import PushPrompt from './components/PushPrompt'
 import { useExternalLinkInterceptor } from './hooks/useExternalLinkInterceptor'
 
 // 路由级懒加载
@@ -40,6 +41,7 @@ const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
 const BetaRegister = lazy(() => import('./pages/BetaRegister'))
 const AccountPrivacy = lazy(() => import('./pages/AccountPrivacy'))
 const AdminPage = lazy(() => import('./pages/AdminPage'))
+const AdminSponsors = lazy(() => import('./pages/AdminSponsors.jsx'))
 const HomeV3 = lazy(() => import('./pages/HomeV3'))
 const PointsPage = lazy(() => import('./pages/PointsPage'))
 const InvitePage = lazy(() => import('./pages/InvitePage'))
@@ -75,6 +77,7 @@ const ROUTE_TITLES = {
   '/messages': '私信',
   '/notifications': '通知',
   '/admin': '管理后台',
+  '/admin/sponsors': '赞助者管理',
   '/admin/notifications': '推送管理',
   '/create-post': '发帖',
   '/account': '账户与隐私',
@@ -174,6 +177,7 @@ export default function App() {
                 <Route path="/messages" element={<MessagesPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/admin" element={<AdminPage />} />
+                <Route path="/admin/sponsors" element={<AdminSponsors />} />
                 <Route path="/admin/notifications" element={<NotificationAdmin />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/account" element={<AccountPrivacy />} />
@@ -202,6 +206,7 @@ export default function App() {
       </AppMainContent>
       <MobileBottomNav />
       <ToastPopup />
+      <PushPrompt />
     </div>
     </NsfwProvider>
     </NotificationProvider>

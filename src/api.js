@@ -959,6 +959,11 @@ export const adminAPI = {
     return { banned: true };
   },
 
+  trackAndBanUserIp: async (id) => {
+    if (USE_API) return apiFetch(`/api/admin/security/users/${id}/track-and-ban`, { method: 'POST' });
+    return { tracked: true, banned_ip_count: 0 };
+  },
+
   pinPost: async (id) => {
     if (USE_API) return apiFetch(`/api/admin/posts/${id}/pin`, { method: 'POST' });
     return { pinned: true };
