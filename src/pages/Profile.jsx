@@ -25,6 +25,7 @@ import LevelBadge from '../components/LevelBadge';
 import CheckInButton from '../components/CheckInButton';
 import PointsCard from '../components/PointsCard';
 import BadgeGallery from '../components/BadgeGallery';
+import BabyVerificationCard from '../components/BabyVerificationCard';
 
 // ============================================================
 // MIUI 风格动画
@@ -1282,6 +1283,7 @@ export default function ProfilePageV2() {
         {/* 徽章画廊 */}
         <div style={{ marginTop: '12px' }}>
           <BadgeGallery userId={targetId} editable={isSelf} />
+          {isSelf && <BabyVerificationCard />}
         </div>
       </div>
 

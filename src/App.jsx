@@ -42,6 +42,9 @@ const BetaRegister = lazy(() => import('./pages/BetaRegister'))
 const AccountPrivacy = lazy(() => import('./pages/AccountPrivacy'))
 const AdminPage = lazy(() => import('./pages/AdminPage'))
 const AdminSponsors = lazy(() => import('./pages/AdminSponsors.jsx'))
+const AdminBabyVerifications = lazy(() => import('./pages/AdminBabyVerifications.jsx'))
+const CertificateVerify = lazy(() => import('./pages/CertificateVerify.jsx'))
+const BabyVerificationStatus = lazy(() => import('./pages/BabyVerificationStatus.jsx'))
 const HomeV3 = lazy(() => import('./pages/HomeV3'))
 const PointsPage = lazy(() => import('./pages/PointsPage'))
 const InvitePage = lazy(() => import('./pages/InvitePage'))
@@ -78,6 +81,8 @@ const ROUTE_TITLES = {
   '/notifications': '通知',
   '/admin': '管理后台',
   '/admin/sponsors': '赞助者管理',
+  '/admin/baby-verifications': '宝宝认证审核',
+  '/baby-verification': '宝宝认证',
   '/admin/notifications': '推送管理',
   '/create-post': '发帖',
   '/account': '账户与隐私',
@@ -91,6 +96,7 @@ const ROUTE_TITLES = {
 
 function getTitle(pathname) {
   if (ROUTE_TITLES[pathname]) return ROUTE_TITLES[pathname]
+  if (pathname.startsWith('/c/')) return '证书验真'
   if (pathname.startsWith('/diaper/')) return '纸尿裤详情'
   if (pathname.startsWith('/diaper-wiki/')) return '裤裤百科'
   if (pathname.startsWith('/forum/')) return '帖子详情'
@@ -135,17 +141,18 @@ export default function App() {
     document.title = getTitle(pathname) + ' — ABDL Space 移动版'
   }, [pathname])
 
+  const isCertificate = pathname.startsWith('/c/')
   return (
     <MobileHeaderProvider>
-    <RedirectNotice />
-    <AppDownloadBanner />
-    <AdBlockNotice />
+    {!isCertificate && <RedirectNotice />}
+    {!isCertificate && <AppDownloadBanner />}
+    {!isCertificate && <AdBlockNotice />}
     <NotificationProvider>
     <NsfwProvider>
     <div className="app-layout">
-      <MobileHeaderLayout />
+      {!isCertificate && <MobileHeaderLayout />}
       <AppMainContent>
-        <div className="container mx-auto px-3 py-4 max-w-[720px]">
+        <div className={isCertificate ? '' : 'container mx-auto px-3 py-4 max-w-[720px]'}>
           <ErrorBoundary>
             <Suspense fallback={<Loading />}>
               <Routes>
@@ -178,6 +185,9 @@ export default function App() {
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/admin/sponsors" element={<AdminSponsors />} />
+                <Route path="/admin/baby-verifications" element={<AdminBabyVerifications />} />
+                <Route path="/baby-verification" element={<BabyVerificationStatus />} />
+                <Route path="/c/:token" element={<CertificateVerify />} />
                 <Route path="/admin/notifications" element={<NotificationAdmin />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/account" element={<AccountPrivacy />} />
@@ -191,7 +201,7 @@ export default function App() {
             </Suspense>
           </ErrorBoundary>
         </div>
-        <footer className="text-center py-6 text-xs space-y-2" style={{ color: 'var(--text-muted)' }}>
+        {!isCertificate && <footer className="text-center py-6 text-xs space-y-2" style={{ color: 'var(--text-muted)' }}>
           <div className="flex items-center justify-center gap-3 flex-wrap">
             <i className="fa-solid fa-baby" style={{ color: 'var(--primary)' }} />
             <span>ABDL Space 移动版 · © {new Date().getFullYear()}</span>
@@ -202,11 +212,11 @@ export default function App() {
             <a href="/settings" style={{ color: 'var(--link-color)', textDecoration: 'none' }}><i className="fa-solid fa-gear mr-1" />设置</a>
             <a href="/about" style={{ color: 'var(--link-color)', textDecoration: 'none' }}><i className="fa-solid fa-circle-info mr-1" />关于</a>
           </div>
-        </footer>
+        </footer>}
       </AppMainContent>
-      <MobileBottomNav />
-      <ToastPopup />
-      <PushPrompt />
+      {!isCertificate && <MobileBottomNav />}
+      {!isCertificate && <ToastPopup />}
+      {!isCertificate && <PushPrompt />}
     </div>
     </NsfwProvider>
     </NotificationProvider>

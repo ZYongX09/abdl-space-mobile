@@ -239,6 +239,7 @@ export default function AdminPage() {
     <>
     <PageLayout hero={{ icon: 'fa-shield-halved', title: '管理后台' }}>
       <nav aria-label="管理功能" className="mb-4">
+        <Link to="/admin/baby-verifications" className="card card-interactive flex items-center gap-3" style={{ padding: '1rem', minHeight: 44 }}><i className="fa-solid fa-shield-heart" style={{ color: 'var(--primary-dark)' }} /><span>宝宝认证审核</span><span className="text-xs" style={{ color: 'var(--text-light)' }}>待审核、照片、证书和审计</span></Link>
         <Link to="/admin/sponsors" className="card card-interactive flex items-center gap-3" style={{ padding: '1rem', minHeight: 44 }}>
           <i className="fa-solid fa-heart" aria-hidden="true" style={{ color: 'var(--primary-dark)' }} />
           <span style={{ color: 'var(--text)' }}>赞助者管理</span>

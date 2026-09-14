@@ -212,7 +212,7 @@ export function AuthProvider({ children }) {
         lsDel('abdl_currentUser');
         // 如果还有其他保存的账户，跳转登录页让用户选择
         if (saved.length > 0) {
-          toast.info('请重新登录其他账户');
+          window.dispatchEvent(new CustomEvent('toast', { detail: { type: 'info', message: '请重新登录其他账户' } }));
         }
         window.location.href = '/login';
       });

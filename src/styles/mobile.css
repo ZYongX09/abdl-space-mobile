@@ -38,3 +38,7 @@
 .homev3-page {
   margin: -48px -12px 0;
 }
+
+
+/* 宝宝认证移动端增强：保留原 mobile.css 并追加 */
+.mobile-bv-admin nav,.mobile-bv-actions{display:flex;gap:8px;overflow-x:auto;margin-bottom:12px}.mobile-bv-filters,.mobile-bv-config{display:grid;gap:10px}.mobile-bv-list{display:grid;gap:10px}.mobile-bv-list>button{display:flex;justify-content:space-between;align-items:center;text-align:left;width:100%}.mobile-bv-list small{display:block;color:var(--text-muted);margin-top:4px}.mobile-bv-sheet{position:fixed;inset:0;z-index:1400;overflow:auto;background:var(--background);padding:16px}.mobile-bv-sheet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.mobile-bv-photos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.mobile-bv-photo button{width:100%;aspect-ratio:4/3;border:0;border-radius:12px;overflow:hidden;background:var(--input-bg);color:var(--text-muted)}.mobile-bv-photo img{width:100%;height:100%;object-fit:cover}.mobile-bv-photo img.blurred{filter:blur(24px)}.mobile-bv-photo small{display:block;color:var(--text-muted)}.mobile-bv-audit{white-space:pre-wrap;word-break:break-word;overflow:auto}.certificate-page{padding:max(16px,env(safe-area-inset-top)) 12px max(16px,env(safe-area-inset-bottom))}.certificate-card{border-radius:20px;padding:20px 16px}.certificate-qr{flex-direction:column;text-align:center}@media(max-width:420px){.mobile-bv-photos{grid-template-columns:1fr}}
