@@ -959,6 +959,11 @@ export const adminAPI = {
     return { banned: true };
   },
 
+  trackAndBanUserIp: async (id) => {
+    if (USE_API) return apiFetch(`/api/admin/security/users/${id}/track-and-ban`, { method: 'POST' });
+    return { tracked: true, banned_ip_count: 0 };
+  },
+
   pinPost: async (id) => {
     if (USE_API) return apiFetch(`/api/admin/posts/${id}/pin`, { method: 'POST' });
     return { pinned: true };
@@ -1204,10 +1209,10 @@ export const badgesAPI = {
   },
 
   /** 设置展示徽章 */
-  setDisplay: async (userId, badgeKeys) => {
+  setDisplay: async (userId, badgeKey) => {
     return apiFetch(`/api/users/${userId}/badges/display`, {
       method: 'POST',
-      body: JSON.stringify({ badge_keys: badgeKeys }),
+      body: JSON.stringify({ badge_key: badgeKey || null }),
     });
   },
 

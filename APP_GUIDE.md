@@ -109,6 +109,9 @@ ABDL Space 移动端（abdl-space-mobile）是 ABDL Space 主站的移动端版�
 | `/messages` | MessagesPage | 私信 |
 | `/notifications` | NotificationsPage | 通知 |
 | `/admin` | AdminPage | 管理后台 |
+| `/admin/baby-verifications` | AdminBabyVerifications | 宝宝认证审核 |
+| `/baby-verification` | BabyVerificationStatus | 当前账号认证状态与额度 |
+| `/c/:token` | CertificateVerify | 公开证书实时验真 |
 
 ## 部署信息
 
@@ -133,3 +136,9 @@ img.abdl-space.top      → 图床（共享）
 
 - 共享后端 API，不重复开发
 - 共享认证体系（JWT cookie 跨域，Domain=.abdl-space.top）
+
+
+## 宝宝认证网页功能
+- 与主站同步公开证书验真、用户认证状态/额度/证书和管理员审核。
+- 移动网页不提供认证照片或相册上传，统一提示在 Android App 完成拍摄。
+- 证书验真及管理照片禁止进入 localStorage、内存缓存和 Service Worker 缓存。
