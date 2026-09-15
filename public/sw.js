@@ -28,7 +28,10 @@ self.addEventListener('fetch', (event) => {
         const fetched = fetch(event.request).then(response => {
           if (response.ok && response.type === 'basic') cache.put(event.request, response.clone());
           return response;
-        }).catch(() => cached);
+        }).catch(error => {
+          if (cached) return cached;
+          throw error;
+        });
         return cached || fetched;
       })
     )
