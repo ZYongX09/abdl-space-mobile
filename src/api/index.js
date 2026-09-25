@@ -906,10 +906,24 @@ export const adminAPI = {
     return { users: Object.keys(LS.get('users') || {}).length, posts: (LS.get('posts') || []).length, diapers: _diapers?.length || 0, comments: 0, ratings: 0 };
   },
 
-  users: async () => {
-    if (USE_API) return apiFetch('/api/admin/users');
+  users: async ({ page = 1, limit = 20, q = '', role = '', qq_bound = '' } = {}) => {
+    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+    if (q) params.set('q', q);
+    if (role) params.set('role', role);
+    if (qq_bound === 'bound' || qq_bound === 'unbound') params.set('qq_bound', qq_bound);
+    if (USE_API) return apiFetch(`/api/admin/users?${params}`);
     const users = LS.get('users') || {};
-    return { users: Object.values(users).map(u => ({ ...u, password: undefined })) };
+    let list = Object.values(users).map(u => ({ ...u, password: undefined }));
+    if (q) {
+      const query = q.toLowerCase();
+      list = list.filter(u => u.username?.toLowerCase().includes(query) || u.email?.toLowerCase().includes(query));
+    }
+    if (role) list = list.filter(u => u.role === role);
+    if (qq_bound === 'bound') list = list.filter(u => u.qq_bound === true);
+    if (qq_bound === 'unbound') list = list.filter(u => u.qq_bound !== true);
+    const total = list.length;
+    const start = (Number(page) - 1) * Number(limit);
+    return { users: list.slice(start, start + Number(limit)), pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.max(1, Math.ceil(total / Number(limit))) } };
   },
 
   deleteUser: async (id) => {

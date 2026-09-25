@@ -1,13 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import PageLayout from '../components/PageLayout';
 import { LoadingSkeleton, Spinner } from '../components/Feedback';
 import TabBar from '../components/TabBar';
-import { adminAPI } from '../api.js';
+import { adminAPI } from '../api';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { useVerifyModal } from '../components/VerifyModal';
 import { Link } from 'react-router-dom';
 import { uploadImage } from '../utils/imageUpload';
+import { createAdminIdentityAPI } from '../adminIdentity/api.js';
+import { operationKeeper, validateUnbindInput } from '../adminIdentity/model.js';
 
 const TABS = [
   { key: 'overview', label: '概览', icon: 'fa-chart-pie' },
@@ -20,14 +22,33 @@ const TABS = [
 ];
 
 export default function AdminPage() {
-  const { user } = useAuth();
+  const { user, accounts } = useAuth();
   const toast = useToast();
   const { trigger, VerifyModal } = useVerifyModal();
   const [tab, setTab] = useState('overview');
   const [loading, setLoading] = useState(true);
+  const token = accounts?.find(account => String(account.id) === String(user?.id))?.token || '';
+  const sessionKey = `${user?.id ?? ''}:${token}`;
+  const session = useRef(sessionKey);
+  useEffect(() => { session.current = sessionKey; }, [sessionKey]);
+  const identityAPI = useMemo(() => createAdminIdentityAPI({
+    base: import.meta.env.VITE_API_BASE ?? '',
+    getToken: () => token,
+    isCurrentSession: () => session.current === sessionKey,
+  }), [sessionKey, token]);
+  const identityOperations = useRef(operationKeeper());
+  const identityRequest = useRef(0);
 
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
+  const [usersPage, setUsersPage] = useState(1);
+  const [usersPagination, setUsersPagination] = useState({ page: 1, total: 0, totalPages: 1 });
+  const [qqFilter, setQqFilter] = useState('');
+  const [identityDetail, setIdentityDetail] = useState(null);
+  const [identityLoading, setIdentityLoading] = useState(false);
+  const [identityError, setIdentityError] = useState('');
+  const [unbindForm, setUnbindForm] = useState({ reason: '', confirmUsername: '' });
+  const [identityBusy, setIdentityBusy] = useState(false);
   const [posts, setPosts] = useState([]);
   const [reports, setReports] = useState([]);
   const [reportStatus, setReportStatus] = useState('pending');
@@ -56,7 +77,7 @@ export default function AdminPage() {
   useEffect(() => {
     if (user?.role !== 'admin') { setLoading(false); return; }
     loadTab(tab);
-  }, [user, tab]);
+  }, [user, tab, usersPage, qqFilter]);
 
   const loadTab = async (t) => {
     setLoading(true);
@@ -65,8 +86,9 @@ export default function AdminPage() {
         const data = await adminAPI.stats();
         setStats(data);
       } else if (t === 'users') {
-        const data = await adminAPI.users();
+        const data = await adminAPI.users({ page: usersPage, limit: 20, qq_bound: qqFilter });
         setUsers(data.users || []);
+        setUsersPagination(data.pagination || { page: usersPage, total: data.users?.length || 0, totalPages: 1 });
       } else if (t === 'posts') {
         const data = await adminAPI.posts();
         setPosts(data.posts || []);
@@ -95,11 +117,13 @@ export default function AdminPage() {
     }
   };
 
-  const handleDeleteUser = async (id) => {
+  const handleDeleteUser = async (target) => {
+    if (!window.confirm(`确认永久删除 @${target.username} 吗？将同时删除帖子、评论、点赞、签到记录及 QQ/NBW 等第三方身份绑定，且不可恢复。`)) return;
     trigger(async () => {
       try {
-        await adminAPI.deleteUser(id);
-        setUsers(prev => prev.filter(u => u.id !== id));
+        await adminAPI.deleteUser(target.id);
+        setUsers(prev => prev.filter(u => u.id !== target.id));
+        if (identityDetail?.user?.id === target.id) setIdentityDetail(null);
         toast.success('已删除');
       } catch (e) { toast.error(e.message); }
     });
@@ -132,6 +156,75 @@ export default function AdminPage() {
         toast.success('已提升为管理员');
       } catch (e) { toast.error(e.message); }
     });
+  };
+
+  const openIdentityDetail = async (target) => {
+    const requestId = ++identityRequest.current;
+    setIdentityDetail({ user: target, methods: {}, audit: [] });
+    setIdentityLoading(true);
+    setIdentityError('');
+    setUnbindForm({ reason: '', confirmUsername: '' });
+    try {
+      const result = await identityAPI.detail(target.id);
+      if (identityRequest.current === requestId) setIdentityDetail(result);
+    } catch (error) {
+      if (identityRequest.current === requestId) setIdentityError(error.message || '读取登录方式失败');
+    } finally {
+      if (identityRequest.current === requestId) setIdentityLoading(false);
+    }
+  };
+
+  const refreshIdentityDetail = async () => {
+    if (!identityDetail?.user?.id) return;
+    const userId = identityDetail.user.id;
+    const requestId = ++identityRequest.current;
+    setIdentityLoading(true);
+    setIdentityError('');
+    try {
+      const detail = await identityAPI.detail(userId);
+      if (identityRequest.current !== requestId) return;
+      setIdentityDetail(detail);
+      setUsers(prev => prev.map(item => item.id === detail.user.id ? { ...item, qq_bound: detail.methods?.qq?.bound === true } : item));
+    } catch (error) {
+      if (identityRequest.current === requestId) setIdentityError(error.message || '读取登录方式失败');
+    } finally {
+      if (identityRequest.current === requestId) setIdentityLoading(false);
+    }
+  };
+
+  const handleUnbindQQ = async (method) => {
+    if (!identityDetail?.user || identityBusy) return;
+    const key = `qq:${identityDetail.user.id}`;
+    let body;
+    try {
+      body = validateUnbindInput({
+        ...unbindForm,
+        username: identityDetail.user.username,
+        expectedBindingVersion: method.updated_at,
+      });
+    } catch (error) {
+      toast.error(error.message);
+      return;
+    }
+    if (!window.confirm(`确认解除 @${identityDetail.user.username} 的 QQ 登录方式？理由和操作编号将写入审计记录。`)) return;
+    const operation_id = identityOperations.current.get(key, body);
+    setIdentityBusy(true);
+    setIdentityError('');
+    try {
+      await identityAPI.unbindQQ(identityDetail.user.id, { ...body, operation_id });
+      identityOperations.current.done(key);
+      toast.success('QQ 登录方式已解绑');
+      setUnbindForm({ reason: '', confirmUsername: '' });
+      await refreshIdentityDetail();
+      const data = await adminAPI.users({ page: usersPage, limit: 20, qq_bound: qqFilter });
+      setUsers(data.users || []);
+      setUsersPagination(data.pagination || usersPagination);
+    } catch (error) {
+      if (error.definitive) identityOperations.current.done(key);
+      setIdentityError(error.message || '解绑失败，请刷新身份详情确认状态');
+    } finally {
+      setIdentityBusy(false);
+    }
   };
 
   const handlePinPost = async (id) => {
@@ -286,7 +379,16 @@ export default function AdminPage() {
 
       {/* 用户管理 */}
       {tab === 'users' && (
-        loading ? <LoadingSkeleton count={5} height={60} /> : (
+        <>
+          <div className="card mb-3" style={{ padding: '0.75rem' }}>
+            <label className="block text-xs font-semibold mb-2" style={{ color: 'var(--text-light)' }}>QQ 绑定筛选</label>
+            <div className="grid grid-cols-3 gap-2">
+              {[['', '全部'], ['bound', '已绑定 QQ'], ['unbound', '未绑定 QQ']].map(([value, label]) => (
+                <button key={value || 'all'} type="button" className="btn btn-sm" onClick={() => { setQqFilter(value); setUsersPage(1); }} style={{ background: qqFilter === value ? 'var(--primary)' : 'var(--input-bg)', color: qqFilter === value ? 'white' : 'var(--text)', border: 'none' }}>{label}</button>
+              ))}
+            </div>
+          </div>
+          {loading ? <LoadingSkeleton count={5} height={96} /> : (
           <div className="space-y-2 miui-list-enter">
             {users.length === 0 ? (
               <p className="text-center text-sm py-8" style={{ color: 'var(--text-muted)' }}>暂无用户</p>
@@ -300,6 +402,7 @@ export default function AdminPage() {
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-semibold truncate" style={{ color: 'var(--text)' }}>{u.username}</span>
                     {u.role === 'admin' && <span className="tag" style={{ background: 'var(--accent)', color: 'white', fontSize: '0.65rem', padding: '1px 6px' }}>管理员</span>}
+                    {u.qq_bound && <span className="tag" style={{ background: '#12b7f5', color: 'white', fontSize: '0.65rem', padding: '1px 6px' }}>QQ</span>}
                     {u.banned && <span className="tag" style={{ background: 'var(--danger)', color: 'white', fontSize: '0.65rem', padding: '1px 6px' }}>已封禁</span>}
                   </div>
                   <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
@@ -307,6 +410,9 @@ export default function AdminPage() {
                   </div>
                 </div>
                 <div className="flex gap-1.5 flex-shrink-0">
+                  <button className="btn btn-outline btn-sm" style={{ padding: '4px 10px', fontSize: '0.75rem' }} onClick={() => openIdentityDetail(u)} title="查看登录方式" aria-label={`查看 ${u.username} 的登录方式`}>
+                    <i className="fa-solid fa-key" />
+                  </button>
                   {u.role !== 'admin' && (
                     <>
                       <button className="btn btn-outline btn-sm" style={{ padding: '4px 10px', fontSize: '0.75rem' }}
@@ -322,7 +428,7 @@ export default function AdminPage() {
                         <i className="fa-solid fa-radar" />
                       </button>
                       <button className="btn btn-sm" style={{ padding: '4px 10px', fontSize: '0.75rem', background: 'var(--danger)', color: 'white' }}
-                        onClick={() => handleDeleteUser(u.id)} title="删除用户">
+                        onClick={() => handleDeleteUser(u)} title="删除用户">
                         <i className="fa-solid fa-trash" />
                       </button>
                     </>
@@ -331,7 +437,15 @@ export default function AdminPage() {
               </div>
             ))}
           </div>
-        )
+          )}
+          {!loading && usersPagination.totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-4">
+              <button className="btn btn-outline btn-sm" disabled={usersPage <= 1} onClick={() => setUsersPage(page => page - 1)}>上一页</button>
+              <span className="text-xs" style={{ color: 'var(--text-muted)' }}>第 {usersPagination.page || usersPage} / {usersPagination.totalPages} 页 · 共 {usersPagination.total} 人</span>
+              <button className="btn btn-outline btn-sm" disabled={usersPage >= usersPagination.totalPages} onClick={() => setUsersPage(page => page + 1)}>下一页</button>
+            </div>
+          )}
+        </>
       )}
 
       {/* 帖子管理 */}
@@ -854,7 +968,95 @@ export default function AdminPage() {
       )}
 
     </PageLayout>
+    {identityDetail && (
+      <IdentityDetailSheet
+        detail={identityDetail}
+        loading={identityLoading}
+        error={identityError}
+        busy={identityBusy}
+        form={unbindForm}
+        setForm={setUnbindForm}
+        onClose={() => { if (!identityBusy) { identityRequest.current++; setIdentityDetail(null); setIdentityError(''); setIdentityLoading(false); } }}
+        onRefresh={refreshIdentityDetail}
+        onUnbindQQ={handleUnbindQQ}
+      />
+    )}
     <>{VerifyModal}</>
     </>
+  );
+}
+
+function formatIdentityTime(value) {
+  if (value === null || value === undefined || value === '') return '—';
+  const date = typeof value === 'number' && value < 1e12 ? new Date(value * 1000) : new Date(value);
+  return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString('zh-CN', { hour12: false });
+}
+
+function identityMethodLabel(type) {
+  return ({ password: '密码', email: '邮箱', nbw: '宝宝新天地', passkey: 'Passkey', qq: 'QQ' })[type] || type;
+}
+
+function IdentityDetailSheet({ detail, loading, error, busy, form, setForm, onClose, onRefresh, onUnbindQQ }) {
+  const rawMethods = detail?.methods || {};
+  const methods = [
+    { type: 'password', available: rawMethods.password === true },
+    { type: 'email', available: rawMethods.verified_email === true, email: detail?.user?.email, verified: detail?.user?.email_verified === true },
+    { type: 'nbw', available: rawMethods.nbw === true },
+    { type: 'passkey', available: Number(rawMethods.passkeys?.count || 0) > 0, count: Number(rawMethods.passkeys?.count || 0), last_used_at: rawMethods.passkeys?.last_used_at },
+    { type: 'qq', ...(rawMethods.qq || {}) },
+  ];
+  return (
+    <div role="dialog" aria-modal="true" aria-label="用户登录方式详情" style={{ position: 'fixed', inset: 0, zIndex: 1200, background: 'var(--bg)', overflowY: 'auto' }}>
+      <header className="sticky top-0 flex items-center gap-3" style={{ zIndex: 2, padding: '0.85rem 1rem', background: 'var(--card-bg)', borderBottom: '1px solid var(--border)', backdropFilter: 'blur(18px)' }}>
+        <button type="button" className="btn btn-outline btn-sm" onClick={onClose} disabled={busy} aria-label="关闭登录方式详情"><i className="fa-solid fa-arrow-left" /></button>
+        <div className="flex-1 min-w-0"><div className="font-bold truncate">登录方式 · @{detail?.user?.username || '用户'}</div><div className="text-xs" style={{ color: 'var(--text-muted)' }}>ID {detail?.user?.id ?? '—'} · 敏感标识不会在前端展示</div></div>
+        <button type="button" className="btn btn-outline btn-sm" onClick={onRefresh} disabled={loading || busy}><i className={`fa-solid fa-rotate${loading ? ' fa-spin' : ''}`} /></button>
+      </header>
+      <main style={{ padding: '1rem', paddingBottom: 'calc(2rem + env(safe-area-inset-bottom))', maxWidth: 720, margin: '0 auto' }}>
+        {error && <div role="alert" className="card mb-3" style={{ padding: '0.85rem', color: 'var(--danger)', borderColor: 'var(--danger)' }}>{error}</div>}
+        {loading ? <LoadingSkeleton count={4} height={88} /> : (
+          <div className="space-y-3">
+            <section className="card" style={{ padding: '1rem' }}>
+              <h2 className="font-bold mb-3">账户登录能力</h2>
+              <div className="space-y-2">
+                {methods.map((method, index) => (
+                  <div key={`${method.type}-${index}`} className="rounded-xl" style={{ padding: '0.85rem', background: 'var(--input-bg)' }}>
+                    <div className="flex items-center gap-2">
+                      {method.type === 'qq' && method.avatar ? <img src={method.avatar} alt="QQ 头像" referrerPolicy="no-referrer" style={{ width: 38, height: 38, borderRadius: '50%', objectFit: 'cover' }} /> : <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: method.bound ? 'var(--primary-light)' : 'var(--card-bg)', color: method.bound ? 'var(--primary-dark)' : 'var(--text-muted)' }}><i className={`fa-solid ${method.type === 'password' ? 'fa-lock' : method.type === 'email' ? 'fa-envelope' : method.type === 'nbw' ? 'fa-baby' : method.type === 'passkey' ? 'fa-fingerprint' : method.type === 'qq' ? 'fa-comment-dots' : 'fa-key'}`} /></div>}
+                      <div className="flex-1 min-w-0"><div className="font-semibold">{identityMethodLabel(method.type)}</div><div className="text-xs" style={{ color: 'var(--text-muted)' }}>{method.bound ? '已绑定' : method.available || method.enabled ? '可用' : '未绑定'}{method.verified === true ? ' · 已验证' : ''}{method.count != null ? ` · ${method.count} 个` : ''}</div></div>
+                      <span className="tag" style={{ fontSize: '0.65rem', padding: '2px 7px', background: method.bound || method.available || method.enabled ? 'var(--success)' : 'var(--border)', color: method.bound || method.available || method.enabled ? 'white' : 'var(--text-muted)' }}>{method.bound || method.available || method.enabled ? '可登录' : '不可用'}</span>
+                    </div>
+                    {method.type === 'email' && method.email && <div className="text-xs mt-2" style={{ color: 'var(--text-light)' }}>{method.email}</div>}
+                    {method.type === 'nbw' && method.username && <div className="text-xs mt-2" style={{ color: 'var(--text-light)' }}>用户名：{method.username}</div>}
+                    {method.type === 'qq' && method.bound && (
+                      <>
+                        <div className="grid grid-cols-2 gap-2 mt-3 text-xs" style={{ color: 'var(--text-light)' }}>
+                          <div>QQ 昵称<br /><strong style={{ color: 'var(--text)' }}>{method.nickname || '—'}</strong></div>
+                          <div>绑定版本<br /><strong style={{ color: 'var(--text)' }}>{method.updated_at ?? '—'}</strong></div>
+                          <div>绑定时间<br /><strong style={{ color: 'var(--text)' }}>{formatIdentityTime(method.bound_at || method.created_at)}</strong></div>
+                          <div>更新时间<br /><strong style={{ color: 'var(--text)' }}>{formatIdentityTime(method.updated_at)}</strong></div>
+                        </div>
+                        <div className="mt-3" style={{ borderTop: '1px solid var(--border)', paddingTop: '0.8rem' }}>
+                          <label className="block text-xs font-semibold mb-1">管理员解绑理由</label>
+                          <textarea className="form-control" rows={3} maxLength={500} value={form.reason} onChange={e => setForm(current => ({ ...current, reason: e.target.value }))} placeholder="必填，将写入审计日志；不要填写令牌或敏感标识" />
+                          <label className="block text-xs font-semibold mt-3 mb-1">输入用户名确认</label>
+                          <input className="form-control" maxLength={64} value={form.confirmUsername} onChange={e => setForm(current => ({ ...current, confirmUsername: e.target.value }))} placeholder={detail.user.username} autoComplete="off" />
+                          <button type="button" className="btn mt-3 w-full" disabled={busy || method.can_unbind === false} onClick={() => onUnbindQQ(method)} style={{ minHeight: 44, background: 'var(--danger)', color: 'white' }}>{busy ? '正在提交，请勿重复操作…' : method.can_unbind === false ? '当前不可解绑（会失去最后登录方式）' : '管理员解绑 QQ'}</button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ))}
+                {!methods.length && <p className="text-sm text-center py-4" style={{ color: 'var(--text-muted)' }}>暂无登录方式数据</p>}
+              </div>
+            </section>
+            <section className="card" style={{ padding: '1rem' }}>
+              <h2 className="font-bold mb-3">身份管理审计</h2>
+              {detail.audit?.length ? <div className="space-y-2">{detail.audit.map((item, index) => <div key={item.id || index} className="rounded-xl" style={{ padding: '0.75rem', background: 'var(--input-bg)' }}><div className="flex justify-between gap-2"><strong className="text-sm">{item.action || item.operation || '身份操作'}</strong><span className="text-xs" style={{ color: 'var(--text-muted)' }}>{formatIdentityTime(item.created_at)}</span></div><div className="text-xs mt-1" style={{ color: 'var(--text-light)' }}>管理员：{item.actor?.username || (item.actor?.id ? `ID ${item.actor.id}` : '—')}{item.reason ? ` · 理由：${item.reason}` : ''}</div>{item.operation_id && <div className="text-xs mt-1 break-all" style={{ color: 'var(--text-muted)' }}>操作编号：{item.operation_id}</div>}</div>)}</div> : <p className="text-sm text-center py-4" style={{ color: 'var(--text-muted)' }}>暂无审计记录</p>}
+            </section>
+          </div>
+        )}
+      </main>
+    </div>
   );
 }
