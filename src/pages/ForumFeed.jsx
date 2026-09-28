@@ -12,6 +12,7 @@ import ReportModal from '../components/ReportModal';
 import { forumAPI, followsAPI } from '../api';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
+import { useFollowStatuses } from '../hooks/useFollowStatuses.js';
 
 export default function ForumFeed() {
   const [posts, setPosts] = useState([]);
@@ -20,10 +21,13 @@ export default function ForumFeed() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [search, setSearch] = useState('');
-  const [followMap, setFollowMap] = useState({});
   const [reportTarget, setReportTarget] = useState(null);
   const likingRef = useRef(new Set());
   const { user } = useAuth();
+  const followTargetIds = posts
+    .map(post => post.user?.id)
+    .filter(id => id && String(id) !== String(user?.id));
+  const { followMap, setFollowing } = useFollowStatuses(user?.id, followTargetIds, followsAPI.statusMany);
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -54,21 +58,6 @@ export default function ForumFeed() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // 获取帖子中用户的关注状态
-  useEffect(() => {
-    if (!user || posts.length === 0) return;
-    const userIds = [...new Set(posts.map(p => p.user?.id).filter(id => id && id !== user.id))];
-    if (userIds.length === 0) return;
-    (async () => {
-      try {
-        const results = await Promise.all(userIds.map(id => followsAPI.status(id).catch(() => null)));
-        const map = {};
-        userIds.forEach((id, i) => { if (results[i]) map[id] = results[i].following; });
-        if (Object.keys(map).length > 0) setFollowMap(prev => ({ ...prev, ...map }));
-      } catch {}
-    })();
-  }, [posts, user]);
-
   const handleLike = async (postId) => {
     if (!user) { toast.error('请先登录'); return; }
     if (likingRef.current.has(postId)) return;
@@ -97,8 +86,8 @@ export default function ForumFeed() {
     e.preventDefault();
     if (!user) { toast.error('请先登录'); return; }
     const wasFollowing = followMap[userId];
-    // Optimistic update
-    setFollowMap(prev => ({ ...prev, [userId]: !wasFollowing }));
+    // Optimistic update；版本标记可防止更早发出的批量响应覆盖它。
+    setFollowing(userId, !wasFollowing);
     try {
       if (wasFollowing) {
         await followsAPI.unfollow(userId);
@@ -106,8 +95,7 @@ export default function ForumFeed() {
         await followsAPI.follow(userId);
       }
     } catch (err) {
-      // Rollback
-      setFollowMap(prev => ({ ...prev, [userId]: wasFollowing }));
+      setFollowing(userId, wasFollowing);
       toast.error(err.message);
     }
   };

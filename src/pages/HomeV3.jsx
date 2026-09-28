@@ -8,6 +8,7 @@ import RichContent from '../components/RichContent';
 import OfficialBadge from '../components/OfficialBadge';
 import BetaBadge from '../components/BetaBadge';
 import { forumAPI, followsAPI } from '../api';
+import { useFollowStatuses } from '../hooks/useFollowStatuses.js';
 
 const TABS = [
   { key: 'recommend', label: '为你推荐' },
@@ -107,10 +108,13 @@ export default function HomeV3() {
   const [hasMore, setHasMore] = useState(true);
   const [tab, setTab] = useState('recommend');
   const [page, setPage] = useState(1);
-  const [followMap, setFollowMap] = useState({});
   const likingRef = useRef(new Set());
 
   const { user } = useAuth();
+  const followTargetIds = posts
+    .map(post => post.user?.id)
+    .filter(id => id && String(id) !== String(user?.id));
+  const { followMap, setFollowing } = useFollowStatuses(user?.id, followTargetIds, followsAPI.statusMany);
   const toast = useToast();
   const navigate = useNavigate();
   const { setHeaderVisible } = useMobileHeaderActions();
@@ -133,13 +137,6 @@ export default function HomeV3() {
 
   useEffect(() => { loadPosts(1); }, []);
 
-  useEffect(() => {
-    if (!user || posts.length === 0) return;
-    const uids = [...new Set(posts.map(p => p.user?.id).filter(Boolean))];
-    Promise.all(uids.map(id => followsAPI.status(id).then(s => [id, s.following])))
-      .then(entries => setFollowMap(Object.fromEntries(entries))).catch(() => {});
-  }, [user, posts]);
-
   const handleLike = async (post) => {
     if (!user) { navigate('/login'); return; }
     if (likingRef.current.has(post.id)) return;
@@ -156,10 +153,10 @@ export default function HomeV3() {
     try {
       if (followMap[userId]) {
         await followsAPI.unfollow(userId);
-        setFollowMap(prev => ({ ...prev, [userId]: false }));
+        setFollowing(userId, false);
       } else {
         await followsAPI.follow(userId);
-        setFollowMap(prev => ({ ...prev, [userId]: true }));
+        setFollowing(userId, true);
       }
     } catch (e) { toast.error(e.message); }
   };
