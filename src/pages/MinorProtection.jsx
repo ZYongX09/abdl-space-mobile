@@ -22,7 +22,7 @@ export default function MinorProtection() {
         <h2 className="text-lg font-bold" style={heading}>English — official supplement</h2>
         <p>Updated and effective: October 3, 2026. Version 2026.10. This supplement does not create an exception allowing minors to use ABDL Space.</p>
         <h3 className="text-base font-bold" style={heading}>1. Age restriction</h3>
-        <p>The desktop website, mobile website and official App are exclusively for adults aged 18 or older. Anyone under 18 must not register or use the service. Guardian consent, third-party authorization and Baby Verification do not override this restriction. NewBabyWorld and other providers' age rules do not change ours.</p>
+        <p>The desktop website, mobile website and official App are exclusively for adults aged 18 or older. Anyone under 18 must not register or use the service. Guardian consent, third-party authorization and Baby Verification do not override this restriction. The age rules of 宝宝新天地 and other providers do not change ours.</p>
         <h3 className="text-base font-bold" style={heading}>2. Identification and service restrictions</h3>
         <p>We may identify minors through declarations, profile information or reports. Ordinary login and Baby Verification are not identity-document verification or reliable age verification. When we discover, or have reasonable grounds to suspect, use by a minor, we will investigate and restrict or terminate the relevant service. Guardian consent will not restore eligibility while the user is under 18.</p>
         <h3 className="text-base font-bold" style={heading}>3. Information collected inadvertently</h3>
