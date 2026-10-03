@@ -503,7 +503,7 @@ export default function BetaRegister() {
                   style={{ accentColor: 'var(--primary-dark)' }}
                 />
                 <span className="text-xs leading-relaxed" style={{ color: 'var(--text-light)' }}>
-                  我已阅读并同意{' '}
+                  我确认已年满18周岁，并已阅读{' '}
                   <button
                     type="button"
                     onClick={() => setPolicyModal('minor')}

@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "test": "node --test src/adminIdentity/model.test.js src/babyVerification/model.test.js src/sponsors/adminModel.test.js src/utils/requestJSON.test.js src/utils/authHeaders.test.js src/utils/webauthnAvailability.test.js src/utils/followStatus.test.js public/sw-policy.test.js",
+    "test": "node --test src/legal/*.test.js src/policyRoutes.test.js src/minorPolicy.test.js src/adminIdentity/model.test.js src/babyVerification/model.test.js src/sponsors/adminModel.test.js src/utils/requestJSON.test.js src/utils/authHeaders.test.js src/utils/webauthnAvailability.test.js src/utils/followStatus.test.js public/sw-policy.test.js",
     "check:sw": "node --check public/sw.js",
     "preview": "vite preview"
   },
