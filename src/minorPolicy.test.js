@@ -7,6 +7,12 @@ const modal = readFileSync(new URL('./components/PolicyModal.jsx', import.meta.u
 const register = readFileSync(new URL('./pages/Register.jsx', import.meta.url), 'utf8');
 const betaRegister = readFileSync(new URL('./pages/BetaRegister.jsx', import.meta.url), 'utf8');
 
+test('minor supplement uses 宝宝新天地 consistently in displayed text', () => {
+  const displayedText = supplement.replace(/<[^>]*>/g, '');
+  assert.doesNotMatch(displayedText, /\bNBW\b|NewBabyWorld/i);
+  assert.ok(displayedText.includes('The age rules of 宝宝新天地 and other providers'));
+});
+
 test('minor supplement does not authorize access through guardian consent', () => {
   assert.ok(supplement.includes('仅面向年满18周岁'));
   assert.ok(supplement.includes('Guardian consent will not restore eligibility'));
