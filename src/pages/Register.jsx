@@ -223,7 +223,7 @@ export default function Register() {
               <label className="flex items-start gap-2.5 cursor-pointer">
                 <input type="checkbox" checked={agreeMinor} onChange={e => setAgreeMinor(e.target.checked)} className="mt-0.5 w-4 h-4 rounded cursor-pointer accent-[var(--primary-dark)]" />
                 <span className="text-xs leading-relaxed" style={{ color: 'var(--text-light)' }}>
-                  我已阅读并同意 <Link to="/privacy" target="_blank" style={{ color: 'var(--link-color)' }}>未成年人个人信息保护政策</Link>
+                  我确认已年满18周岁，并已阅读 <Link to="/minor-protection" target="_blank" style={{ color: 'var(--link-color)' }}>未成年人个人信息保护说明</Link>
                 </span>
               </label>
             </div>
