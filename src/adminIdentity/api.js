@@ -1,4 +1,3 @@
-import { getActiveToken } from '../utils/authHeaders.js';
 import { assertSafeIdentityResponse } from './model.js';
 
 function isObject(value) {
@@ -6,14 +5,15 @@ function isObject(value) {
 }
 
 function validDetail(data) {
-	return isObject(data) && isObject(data.user) && isObject(data.methods) && Array.isArray(data.audit);
+	return isObject(data) && isObject(data.user) && isObject(data.methods)
+		&& (data.methods.qq == null || isObject(data.methods.qq)) && Array.isArray(data.audit);
 }
 
 function validUnbind(data) {
 	return isObject(data) && data.qq_bound === false && ['number', 'string'].includes(typeof data.user_id) && typeof data.operation_id === 'string';
 }
 
-export function createAdminIdentityAPI({ base = '', fetcher = (...args) => fetch(...args), getToken = getActiveToken, isCurrentSession = () => true } = {}) {
+export function createAdminIdentityAPI({ base = '', fetcher = (...args) => fetch(...args), getToken = () => '', isCurrentSession = () => true } = {}) {
 	async function request(path, method = 'GET', body, shape = 'object') {
 		const controller = new AbortController();
 		const timer = setTimeout(() => controller.abort(), method === 'GET' ? 30000 : 90000);
@@ -69,6 +69,3 @@ export function createAdminIdentityAPI({ base = '', fetcher = (...args) => fetch
 		unbindQQ: (userId, body) => request(`/users/${id(userId)}/qq/unbind`, 'POST', body, 'unbind'),
 	};
 }
-
-const ENV_BASE = import.meta.env?.VITE_API_BASE ?? '';
-export const adminIdentityAPI = createAdminIdentityAPI({ base: ENV_BASE });

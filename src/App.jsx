@@ -13,6 +13,7 @@ import AppDownloadBanner from './components/AppDownloadBanner'
 import AdBlockNotice from './components/AdBlockNotice'
 import PushPrompt from './components/PushPrompt'
 import { useExternalLinkInterceptor } from './hooks/useExternalLinkInterceptor'
+import AdminRoutes, { ADMIN_ROUTE_TITLES, isAdminPath } from './AdminRoutes.jsx'
 
 // 路由级懒加载
 const ForumFeed = lazy(() => import('./pages/ForumFeed'))
@@ -40,9 +41,6 @@ const NotificationsPage = lazy(() => import('./pages/NotificationsPage'))
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
 const BetaRegister = lazy(() => import('./pages/BetaRegister'))
 const AccountPrivacy = lazy(() => import('./pages/AccountPrivacy'))
-const AdminPage = lazy(() => import('./pages/AdminPage'))
-const AdminSponsors = lazy(() => import('./pages/AdminSponsors.jsx'))
-const AdminBabyVerifications = lazy(() => import('./pages/AdminBabyVerifications.jsx'))
 const CertificateVerify = lazy(() => import('./pages/CertificateVerify.jsx'))
 const BabyVerificationStatus = lazy(() => import('./pages/BabyVerificationStatus.jsx'))
 const HomeV3 = lazy(() => import('./pages/HomeV3'))
@@ -52,7 +50,6 @@ const ExternalLink = lazy(() => import('./pages/ExternalLink'))
 const CreatePost = lazy(() => import('./pages/CreatePost'))
 const BugDashboard = lazy(() => import('./pages/BugDashboard'))
 const AppDownload = lazy(() => import('./pages/AppDownload'))
-const NotificationAdmin = lazy(() => import('./pages/NotificationAdmin'))
 
 function Loading() {
   return (
@@ -83,11 +80,8 @@ const ROUTE_TITLES = {
   '/app': '下载客户端',
   '/messages': '私信',
   '/notifications': '通知',
-  '/admin': '管理后台',
-  '/admin/sponsors': '赞助者管理',
-  '/admin/baby-verifications': '宝宝认证审核',
+  ...ADMIN_ROUTE_TITLES,
   '/baby-verification': '宝宝认证',
-  '/admin/notifications': '推送管理',
   '/create-post': '发帖',
   '/account': '账户与隐私',
   '/forgot-password': '找回密码',
@@ -100,6 +94,7 @@ const ROUTE_TITLES = {
 
 function getTitle(pathname) {
   if (ROUTE_TITLES[pathname]) return ROUTE_TITLES[pathname]
+  if (isAdminPath(pathname)) return '管理后台'
   if (pathname.startsWith('/c/')) return '证书验真'
   if (pathname.startsWith('/diaper/')) return '纸尿裤详情'
   if (pathname.startsWith('/diaper-wiki/')) return '裤裤百科'
@@ -145,12 +140,17 @@ export default function App() {
     document.title = getTitle(pathname) + ' — ABDL Space 移动版'
   }, [pathname])
 
+  const isAdmin = isAdminPath(pathname)
+  // 独立后台宿主；全局 ToastProvider 留在 main.jsx，前台浮层一律不挂载。
+  // CookieConsent 若恢复到宿主，也必须使用下方 !isAdmin 条件。
+  if (isAdmin) return <><AdminRoutes /><div className="ac-admin-theme"><ToastPopup /></div></>
+
   const isCertificate = pathname.startsWith('/c/')
   return (
     <MobileHeaderProvider>
-    {!isCertificate && <RedirectNotice />}
-    {!isCertificate && <AppDownloadBanner />}
-    {!isCertificate && <AdBlockNotice />}
+    {!isAdmin && !isCertificate && <RedirectNotice />}
+    {!isAdmin && !isCertificate && <AppDownloadBanner />}
+    {!isAdmin && !isCertificate && <AdBlockNotice />}
     <NotificationProvider>
     <NsfwProvider>
     <div className="app-layout">
@@ -187,12 +187,8 @@ export default function App() {
                 <Route path="/user/:id" element={<Profile />} />
                 <Route path="/messages" element={<MessagesPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
-                <Route path="/admin" element={<AdminPage />} />
-                <Route path="/admin/sponsors" element={<AdminSponsors />} />
-                <Route path="/admin/baby-verifications" element={<AdminBabyVerifications />} />
                 <Route path="/baby-verification" element={<BabyVerificationStatus />} />
                 <Route path="/c/:token" element={<CertificateVerify />} />
-                <Route path="/admin/notifications" element={<NotificationAdmin />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/account" element={<AccountPrivacy />} />
                 <Route path="/external" element={<ExternalLink />} />
@@ -220,7 +216,7 @@ export default function App() {
       </AppMainContent>
       {!isCertificate && <MobileBottomNav />}
       {!isCertificate && <ToastPopup />}
-      {!isCertificate && <PushPrompt />}
+      {!isAdmin && !isCertificate && <PushPrompt />}
     </div>
     </NsfwProvider>
     </NotificationProvider>
