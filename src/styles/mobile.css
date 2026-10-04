@@ -1,14 +1,14 @@
 /* 移动端专属覆盖 — 仅处理布局结构差异，不覆盖组件样式 */
 
 /* 强制移动端布局（不依赖 media query） */
-.app-layout {
+.app-layout:not(.admin-host) {
   flex-direction: column !important;
   min-height: 100dvh !important;
   height: auto !important;
   overflow: visible !important;
 }
 
-.app-main-content {
+.app-layout:not(.admin-host) > .app-main-content {
   flex: 1 !important;
   overflow-y: visible !important;
   overflow-x: hidden !important;

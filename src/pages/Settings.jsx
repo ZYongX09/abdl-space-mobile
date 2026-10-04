@@ -319,6 +319,12 @@ export default function SettingsV2() {
         </div>
       </div>
 
+      {user?.role === 'admin' && <div style={{ paddingTop: 12 }}>
+        <Group title="管理" anim={stagger(1)}>
+          <Item icon="fa-solid fa-user-shield" label="管理控制台" desc="用户、内容、认证及 App 管理" onClick={() => navigate('/admin')} />
+        </Group>
+      </div>}
+
       {/* ── 内容与安全 ── */}
       <div style={{ paddingTop: 12 }}>
         <Group title="内容与安全" anim={stagger(1)}>

@@ -108,10 +108,43 @@ ABDL Space 移动端（abdl-space-mobile）是 ABDL Space 主站的移动端版�
 | `/settings` | Settings | 设置 |
 | `/messages` | MessagesPage | 私信 |
 | `/notifications` | NotificationsPage | 通知 |
-| `/admin` | AdminPage | 管理后台 |
-| `/admin/baby-verifications` | AdminBabyVerifications | 宝宝认证审核 |
+| `/admin` | AdminOverview | 独立管理控制台概览 |
+| `/admin/users` | AdminUsers | 用户身份、账户治理与超级管理员角色管理 |
+| `/admin/app-clients` | AdminAppClients | App 更新提醒、版本废弃与观测 |
+| `/admin/sponsors` | AdminSponsors | 赞助者配置、权益与库存 |
+| `/admin/baby-verifications` | AdminBabyVerifications | 宝宝认证审核（独立后台 adapter） |
+| `/admin/badges` | AdminBadges | 徽章管理 |
+| `/admin/posts` | AdminPosts | 帖子治理 |
+| `/admin/comments` | AdminComments | 评论治理 |
+| `/admin/novels` | AdminNovels | 小说管理 |
+| `/admin/reports` | AdminReports | 举报管理 |
+| `/admin/security` | AdminSecurity | 安全日志与统计 |
+| `/admin/settings` | AdminSettings | 站点设置 |
+| `/admin/diapers` | AdminDiapers | 产品与品牌 |
+| `/admin/notifications` | AdminNotifications | 推送管理 |
+| `/admin/*` | AdminUnknownRoute | 未知管理路径不挂载数据页 |
 | `/baby-verification` | BabyVerificationStatus | 当前账号认证状态与额度 |
 | `/c/:token` | CertificateVerify | 公开证书实时验真 |
+
+## 管理控制台本地验收（2026-10-04，未部署）
+
+本分支将主站 14 个后台页面移植到独立移动宿主。后台不挂载前台 Header、底部导航、Footer、720px 容器或广告拦截/跳转/下载/推送推广提示；全局必要 toast 与通知 toast 保留并使用后台深浅 token。身份恢复中、未登录、普通用户和未知路径不挂载后台数据页。普通管理员可以治理普通用户，管理员目标需先由超级管理员撤销角色，ID 1 受保护。
+
+后端持久化角色仍只有 `user` / `admin`；`is_super_admin` 由当前数据库 `id=1 && role=admin` 派生，不信任旧 token 中的管理角色。界面兼容旧身份响应缺失标记，显式 false 不回退；安全授权始终依赖配套后端。授予与撤销使用 `PATCH /api/admin/users/:id/role`，仅超级管理员可操作。这里没有部署后端或验证生产接口。
+
+后台仅深浅主题：明确 light/dark 沿用前台结果（包括前台时间自动模式），多彩在后台映射为系统 `matchMedia` 深浅并实时监听，不写入或修改前台保存偏好。前台宝宝认证继续用 `src/babyVerification`，后台审核使用 `src/adminBabyVerification`。
+
+隔离 GUI 启动命令（不要用默认 `npm run dev` 做本次验收，它配置了生产 `/api` 代理）
+
+```bash
+ADMIN_FIXTURE_UI=1 APP_FIXTURE_PORT=8792 node /home/ZYongX/projects/abdl-space-mobile/tests/app-clients-fixture-server.js
+```
+
+打开 `http://127.0.0.1:8792/__fixture/start` 选择测试身份和主题。该服务只监听回环地址，不读取默认 Vite 配置或 .env，不启用任何生产代理；HTML 外部 captcha/统计脚本被移除，CSP 限制同源连接并禁用测试页 Service Worker。角色修改与 App 保存仅在进程内存，不转发真实 API；没有实现的接口返回错误，不能视为生产集成通过。测试路径可用 `npm test`、`npm run build`、`npm run check:sw`，lint 应区分新增限定检查与历史全库错误。
+
+本次自动验证：`npm test` 143/143 通过，`npm run build` 和 `npm run check:sw` 通过，`git diff --check` 通过。新增后台/adapter/tests 限定 ESLint 为 0 errors、35 warnings；现有宿主改动文件与 HEAD 基线相比无新增 lint error，不代表旧全库 lint 全绿。构建仍提示未配置 `VITE_CAPTCHA_KEY` 和较大 chunk，不能将本地构建成功视为生产配置或部署验证。
+
+开发验收阶段仅本地验证，未调用生产 API。2026-10-05 用户授权提交、推送并通过 PR 交付到 `main`；GitHub PR 合并与 Cloudflare Pages 自动部署需分别核验，本次不主动运行部署命令或生产 SQL。合并前再次复跑 143/143 测试及 SW 检查通过；GUI 结果以实际浏览器验收记录为准。
 
 ## 部署信息
 

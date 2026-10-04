@@ -46,6 +46,10 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [accounts, setAccounts] = useState(getSavedAccounts);
   const sessionVersionRef = useRef(0);
+  const refreshRequest = useRef(0);
+  const currentSession = useRef(null);
+  const activeToken = accounts.find(account => String(account.id) === String(user?.id))?.token || '';
+  currentSession.current = JSON.stringify([user?.id, user?.role, Object.hasOwn(user || {}, 'is_super_admin'), user?.is_super_admin, activeToken]);
 
   // 初始化：用 cookie 恢复登录
   useEffect(() => {
@@ -347,13 +351,19 @@ export function AuthProvider({ children }) {
 
   const refreshUser = useCallback(async () => {
     if (!USE_API) return;
+    const request = ++refreshRequest.current;
+    const session = currentSession.current;
+    const version = sessionVersionRef.current;
+    const current = () => request === refreshRequest.current && session === currentSession.current && version === sessionVersionRef.current;
     try {
       const res = await fetch(`${API_BASE}/api/auth/me`, {
         headers: withAuthHeader(),
         credentials: 'include',
       });
+      if (!current()) return;
       if (res.ok) {
         const data = await res.json();
+        if (!current()) return;
         const u = data.user || data;
         setUser(u);
         // 同步更新已保存账户列表（修复 NBW 登录后未出现在账户列表的问题）
@@ -368,6 +378,11 @@ export function AuthProvider({ children }) {
         }
         saveAccounts(updated);
         setAccounts(updated);
+      } else if (res.status === 401 || res.status === 403) {
+        sessionVersionRef.current += 1;
+        setUser(null);
+        setActiveAccountId(null);
+        if (window.__apiCache) window.__apiCache.clear();
       }
     } catch {}
   }, []);
