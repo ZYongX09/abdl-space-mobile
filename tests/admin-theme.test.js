@@ -369,13 +369,19 @@ test('隔离fixture HTTP角色/列表/详情/overview契约，撤权即时生效
   };
   try {
     const start = await fetch(base + '/__fixture/start');
-    assert.match(await start.text(), /cookie_consent[\s\S]*accepted:false/);
+    const landing = await start.text();
+    assert.match(landing, /src="\/__fixture\/landing\.js"/);
+    const landingJs = await (await fetch(base + '/__fixture/landing.js')).text();
+    assert.match(landingJs, /cookie_consent[\s\S]*accepted:\s*false/);
     assert.match(start.headers.get('content-security-policy'), /connect-src 'self'/);
     assert.equal((await request('/api/auth/me')).data.is_super_admin, true);
     const users = (await request('/api/admin/users')).data.users;
     assert.equal(users.length, 4); assert.equal(users[1].is_super_admin, false);
     assert.equal((await request('/api/admin/users/1/detail')).data.user.is_super_admin, true);
     assert.equal((await request('/api/admin/stats/overview')).status, 200);
+    await request('/__fixture/session?id=2');
+    await request('/__fixture/session', 'POST', { id: 3 });
+    assert.equal((await request('/api/auth/me')).data.id, 3);
     await request('/__fixture/session?id=2');
     assert.equal((await request('/api/admin/users/3/role', 'PATCH', { role: 'admin' })).status, 403);
     assert.equal((await request('/api/admin/add', 'POST', { user_ids: [3] })).status, 403);
