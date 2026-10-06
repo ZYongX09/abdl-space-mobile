@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { diapersAPI } from '../api';
 import { LoadingSkeleton, EmptyState } from '../components/Feedback';
+import { buildMediaPreviewUrl } from '../utils/mediaUrl';
 
 export default function Home() {
   const [diapers, setDiapers] = useState([]);
@@ -113,7 +114,7 @@ export default function Home() {
             >
               <div className="flex items-center gap-3">
                 {d.images?.length > 0 && (
-                  <img src={d.images[0]} alt="" className="w-14 h-14 object-cover rounded-lg flex-shrink-0" />
+                  <img src={buildMediaPreviewUrl(d.images[0])} alt="" className="w-14 h-14 object-cover rounded-lg flex-shrink-0" />
                 )}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">

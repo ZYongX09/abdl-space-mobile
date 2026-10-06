@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import NsfwGuard from './NsfwGuard';
+import { buildMediaPreviewUrl } from '../utils/mediaUrl';
 
 function ImageItem({ url, onClick, overlay, isNsfw, nsfwType }) {
   const [loaded, setLoaded] = useState(false);
@@ -347,10 +348,11 @@ export default function ImageGrid({ images = [] }) {
   if (!images.length) return null;
 
   const imageItems = images.map(img => {
-    if (typeof img === 'string') return { url: img, isNsfw: undefined, nsfwType: undefined };
-    return { url: img?.image_url || img?.src || '', isNsfw: img?.is_nsfw, nsfwType: img?.nsfw_type };
+    if (typeof img === 'string') return { url: img, preview: buildMediaPreviewUrl(img), isNsfw: undefined, nsfwType: undefined };
+    const src = img?.image_url || img?.src || '';
+    return { url: src, preview: img?.preview_url || buildMediaPreviewUrl(src), isNsfw: img?.is_nsfw, nsfwType: img?.nsfw_type };
   });
-  const urls = imageItems.map(i => i.url);
+  const urls = imageItems.map(i => i.preview);
   const count = Math.min(urls.length, 4);
   const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth <= 768);
   useEffect(() => {
@@ -381,7 +383,7 @@ export default function ImageGrid({ images = [] }) {
         {imageItems.slice(0, 4).map((item, i) => (
           <ImageItem
             key={i}
-            url={item.url}
+            url={item.preview}
             isNsfw={item.isNsfw}
             nsfwType={item.nsfwType}
             onClick={() => setLightbox(i)}

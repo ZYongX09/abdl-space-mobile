@@ -317,7 +317,7 @@ export default function HomeV3() {
                   {/* Images */}
                   {post.images?.length > 0 && (
                     <div style={{ marginTop: 12, borderRadius: 16, overflow: 'hidden', border: '1px solid var(--border)' }}>
-                      <ImageGrid images={post.images.map(i => i.image_url || i)} />
+                      <ImageGrid images={post.images} />
                     </div>
                   )}
 
