@@ -15,6 +15,7 @@ import AdBlockNotice from './components/AdBlockNotice'
 import PushPrompt from './components/PushPrompt'
 import { useExternalLinkInterceptor } from './hooks/useExternalLinkInterceptor'
 import AdminRoutes, { ADMIN_ROUTE_TITLES, isAdminPath } from './AdminRoutes.jsx'
+import MerchantHost from './MerchantHost.jsx'
 
 // 路由级懒加载
 const ForumFeed = lazy(() => import('./pages/ForumFeed'))
@@ -179,9 +180,10 @@ export default function App() {
   }, [pathname])
 
   const isAdmin = isAdminPath(pathname)
-  // 独立后台宿主；全局 ToastProvider 留在 main.jsx，前台浮层一律不挂载。
-  // CookieConsent 若恢复到宿主，也必须使用下方 !isAdmin 条件。
+  const isMerchant = pathname === '/merchant' || pathname.startsWith('/merchant/')
+  // 独立宿主；前台容器、推广浮层和底部导航不挂载。
   if (isAdmin) return <><AdminRoutes /><div className="ac-admin-theme"><ToastPopup /></div></>
+  if (isMerchant) return <MerchantHost />
 
   const isCertificate = pathname.startsWith('/c/')
   return (

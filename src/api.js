@@ -1497,7 +1497,7 @@ export const merchantAPI = {
   info: () => apiFetch('/api/merchant/info'),
   activate: (registrationCode) => apiFetch('/api/merchant/activate', {
     method: 'POST',
-    body: JSON.stringify({ registration_code: registrationCode }),
+    body: JSON.stringify({ code: registrationCode, registration_code: registrationCode }),
   }),
   profile: () => apiFetch('/api/merchant/profile'),
   updateProfile: (body) => apiFetch('/api/merchant/profile', {

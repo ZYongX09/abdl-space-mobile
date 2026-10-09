@@ -28,10 +28,16 @@ export default function MerchantCenter() {
     if (!user) return;
     setLoading(true);
     try {
-      const [nextInfo, nextAds] = await Promise.all([merchantAPI.info(), merchantAPI.ads().catch(() => ({ items: [] }))]);
+      const nextInfo = await merchantAPI.info();
       setInfo(nextInfo);
-      setAds(nextAds.items || nextAds.ads || []);
-    } catch (error) { toast.error(error.message); }
+      const active = Boolean(nextInfo?.authorized || nextInfo?.active || nextInfo?.merchant?.status === 'active' || nextInfo?.is_super_admin || user?.is_super_admin);
+      if (active) {
+        const [nextProfile, nextAds, nextStats] = await Promise.all([merchantAPI.profile(), merchantAPI.ads(), merchantAPI.stats()]);
+        setInfo(current => ({ ...current, profile: nextProfile?.profile || nextProfile, merchant: nextProfile?.merchant || nextProfile }));
+        setAds(nextAds.items || nextAds.ads || []);
+        setStats(nextStats?.stats || nextStats || null);
+      }
+    } catch (error) { if (error.status !== 401 && error.status !== 404) toast.error(error.message); }
     finally { setLoading(false); }
   }
 
