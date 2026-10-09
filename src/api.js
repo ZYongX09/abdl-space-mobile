@@ -1143,6 +1143,15 @@ export const adminAPI = {
     return { success: true };
   },
 
+  advertising: async () => {
+    if (USE_API) return apiFetch('/api/admin/advertising');
+    return { ads: [], codes: [], settings: {}, impressions: 0, clicks: 0 };
+  },
+  generateAdvertisingCodes: async (count = 1) => {
+    if (USE_API) return apiFetch('/api/admin/advertising/registration-codes', { method: 'POST', body: JSON.stringify({ code: crypto.randomUUID().replaceAll('-', '').slice(0, 16), count }) });
+    return { items: [] };
+  },
+
   // ── 站点设置 / 内测模式 ──────────────────────────
   settings: async () => {
     if (USE_API) return apiFetch('/api/admin/settings');
@@ -1480,4 +1489,31 @@ export const adminPushAPI = {
   jpushStats: async (msgIds) => {
     return apiFetch(`/api/push/admin/jpush-stats?msg_ids=${msgIds.join(',')}`);
   },
+};
+
+export const merchantAPI = {
+  info: () => apiFetch('/api/merchant/info'),
+  activate: (registrationCode) => apiFetch('/api/merchant/activate', {
+    method: 'POST',
+    body: JSON.stringify({ registration_code: registrationCode }),
+  }),
+  profile: () => apiFetch('/api/merchant/profile'),
+  updateProfile: (body) => apiFetch('/api/merchant/profile', {
+    method: 'PATCH',
+    body: JSON.stringify(body),
+  }),
+  ads: () => apiFetch('/api/merchant/ads'),
+  createAd: (body) => apiFetch('/api/merchant/ads', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  }),
+  updateAd: (id, body) => apiFetch(`/api/merchant/ads/${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    body: JSON.stringify(body),
+  }),
+  event: (id, eventType, metadata = {}) => apiFetch(`/api/merchant/ads/${encodeURIComponent(id)}/events`, {
+    method: 'POST',
+    body: JSON.stringify({ event_type: eventType, event_key: `${metadata.impression_id || crypto.randomUUID()}:${eventType}:${metadata.image_index ?? ''}`, ...metadata }),
+  }),
+  stats: (id) => apiFetch(`/api/merchant/ads/${encodeURIComponent(id)}/stats`),
 };

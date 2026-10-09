@@ -48,6 +48,7 @@ const PointsPage = lazy(() => import('./pages/PointsPage'))
 const InvitePage = lazy(() => import('./pages/InvitePage'))
 const ExternalLink = lazy(() => import('./pages/ExternalLink'))
 const CreatePost = lazy(() => import('./pages/CreatePost'))
+const MerchantCenter = lazy(() => import('./pages/MerchantCenter'))
 const BugDashboard = lazy(() => import('./pages/BugDashboard'))
 const AppDownload = lazy(() => import('./pages/AppDownload'))
 
@@ -89,6 +90,7 @@ const ROUTE_TITLES = {
   '/points': '积分',
   '/invite': '邀请码',
   '/external': '外部链接',
+  '/merchant': '商家服务中心',
   '/homev3': '首页',
 }
 
@@ -192,6 +194,7 @@ export default function App() {
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/account" element={<AccountPrivacy />} />
                 <Route path="/external" element={<ExternalLink />} />
+                <Route path="/merchant" element={<MerchantCenter />} />
                 <Route path="/create-post" element={<CreatePost />} />
                 <Route path="/bugs" element={<BugDashboard />} />
                 <Route path="/points" element={<PointsPage />} />

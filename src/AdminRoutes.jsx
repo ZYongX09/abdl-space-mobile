@@ -7,6 +7,7 @@ const AdminOverview = lazy(() => import('./pages/admin/overview.jsx'));
 const AdminUsers = lazy(() => import('./pages/admin/users.jsx'));
 const AdminAppClients = lazy(() => import('./pages/admin/appClients.jsx'));
 const AdminSponsors = lazy(() => import('./pages/admin/sponsors.jsx'));
+const AdminAdvertising = lazy(() => import('./pages/admin/advertising.jsx'));
 const AdminBabyVerifications = lazy(() => import('./pages/admin/babyVerifications.jsx'));
 const AdminBadges = lazy(() => import('./pages/admin/badges.jsx'));
 const AdminPosts = lazy(() => import('./pages/admin/posts.jsx'));
@@ -23,6 +24,7 @@ export const ADMIN_ROUTE_TITLES = {
   '/admin/users': '用户管理',
   '/admin/app-clients': 'App 管理',
   '/admin/sponsors': '赞助者管理',
+  '/admin/advertising': '广告管理',
   '/admin/baby-verifications': '宝宝认证审核',
   '/admin/badges': '徽章体系',
   '/admin/posts': '帖子管理',
@@ -52,6 +54,7 @@ export default function AdminRoutes() {
               <Route path="/admin/users" element={<AdminUsers />} />
               <Route path="/admin/app-clients" element={<AdminAppClients />} />
               <Route path="/admin/sponsors" element={<AdminSponsors />} />
+              <Route path="/admin/advertising" element={<AdminAdvertising />} />
               <Route path="/admin/baby-verifications" element={<AdminBabyVerifications />} />
               <Route path="/admin/badges" element={<AdminBadges />} />
               <Route path="/admin/posts" element={<AdminPosts />} />

@@ -9,13 +9,14 @@ import RichContent from '../components/RichContent';
 import OfficialBadge from '../components/OfficialBadge';
 import BetaBadge from '../components/BetaBadge';
 import ReportModal from '../components/ReportModal';
-import { forumAPI, followsAPI } from '../api';
+import { forumAPI, followsAPI, merchantAPI } from '../api';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { useFollowStatuses } from '../hooks/useFollowStatuses.js';
 
 export default function ForumFeed() {
   const [posts, setPosts] = useState([]);
+  const [advertisements, setAdvertisements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
@@ -42,6 +43,7 @@ export default function ForumFeed() {
         excludeNsfw: search && !searchNsfwEnabled ? true : undefined,
       });
       const newPosts = (data.posts || []).filter(p => !p.in_reply_to_id);
+      if (!append) setAdvertisements((data.advertisements || []).map(ad => ({ ...ad, is_advertisement: true })));
       setPosts(prev => append ? [...prev, ...newPosts] : newPosts);
       setHasMore(newPosts.length >= 20);
       setPage(pageNum);
@@ -140,8 +142,9 @@ export default function ForumFeed() {
         <EmptyState icon="fa-comments" title="暂无帖子" description="快来发第一帖吧！" />
       ) : (
         <div className="space-y-4 miui-list-enter">
-          {posts.map((post, i) => (
-            <MobilePostCard
+          {[...advertisements, ...posts].map((post) => post.is_advertisement || post.advertisement
+            ? <AdvertisementCard key={post.id || post.advertisement?.id} post={post} />
+            : <MobilePostCard
               key={post.id}
               post={post}
               followMap={followMap}
@@ -149,8 +152,7 @@ export default function ForumFeed() {
               onLike={handleLike}
               onFollow={handleFollow}
               onReport={setReportTarget}
-            />
-          ))}
+            />)}
           {hasMore && (
             <button
               onClick={() => loadPosts(page + 1, true)}
@@ -178,6 +180,32 @@ export default function ForumFeed() {
     )}
     </>
   );
+}
+
+function AdvertisementCard({ post }) {
+  const ad = post.advertisement || post;
+  const event = (type, metadata = {}) => {
+    if (!ad.id) return;
+    merchantAPI.event(ad.id, type, metadata).catch(() => {});
+  };
+  useEffect(() => { event('impression', { impression_id: ad.impression_id }); }, [ad.id]);
+  const openTarget = (type = 'ad_navigation') => {
+    event(type, { impression_id: ad.impression_id });
+    if (ad.target_url) window.open(ad.target_url, '_blank', 'noopener,noreferrer');
+  };
+  const images = ad.images || post.images || [];
+  return <article className="card miui-hover-lift" style={{ padding: '1.25rem', borderColor: 'var(--primary-light)' }}>
+    <div className="flex items-center gap-3 mb-2" role="button" tabIndex={ad.target_url ? 0 : undefined} onClick={() => ad.target_url && openTarget()} onKeyDown={e => { if (e.key === 'Enter' && ad.target_url) openTarget(); }}>
+      <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 overflow-hidden" style={{ background: 'var(--primary-light)', color: 'var(--primary-dark)' }}>
+        {ad.avatar_url || post.user?.avatar ? <img src={ad.avatar_url || post.user.avatar} alt="" className="w-full h-full rounded-full object-cover" /> : <i className="fa-solid fa-briefcase" aria-hidden="true" />}
+      </div>
+      <div className="min-w-0"><strong className="text-sm" style={{ color: 'var(--text)' }}>{ad.sponsor_name || post.user?.username || 'ABDL Space'}</strong><div className="text-xs" style={{ color: 'var(--primary-dark)' }}>{ad.type === 'official' ? '官方广告' : '商家广告'}</div></div>
+    </div>
+    {ad.title && <h3 className="font-semibold mb-1">{ad.title}</h3>}
+    <div className="text-sm whitespace-pre-wrap break-words" style={{ color: 'var(--text)' }}>{ad.body || post.content}</div>
+    {images.length > 0 && <div className="grid grid-cols-2 gap-2 mt-3">{images.map((image, index) => <button key={image.id || image.image_url || index} type="button" className="p-0 border-0 bg-transparent" onClick={() => { event('image_view', { image_index: index, impression_id: ad.impression_id }); window.open(image.image_url || image.url, '_blank', 'noopener,noreferrer'); }}><img src={image.preview_url || image.image_url || image.url} alt={image.alt_text || ''} className="w-full rounded-lg object-cover" style={{ aspectRatio: '1.4', background: 'var(--surface-muted)' }} /></button>)}</div>}
+    {ad.target_url && <button type="button" className="btn btn-primary mt-4" onClick={() => openTarget('link_click')}>查看商家详情</button>}
+  </article>;
 }
 
 /** 移动端帖子卡片（带长文折叠 + 公告样式） */

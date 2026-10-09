@@ -8,7 +8,7 @@ import { parseCertificate as parseFrontendCertificate } from '../src/babyVerific
 import { parseCertificate as parseAdminCertificate } from '../src/adminBabyVerification/model.js';
 
 const source = path => readFileSync(new URL(path, import.meta.url), 'utf8');
-const expectedRoutes = ['/admin', '/admin/users', '/admin/app-clients', '/admin/sponsors', '/admin/baby-verifications', '/admin/badges', '/admin/posts', '/admin/comments', '/admin/novels', '/admin/reports', '/admin/security', '/admin/settings', '/admin/diapers', '/admin/notifications'];
+const expectedRoutes = ['/admin', '/admin/users', '/admin/app-clients', '/admin/sponsors', '/admin/advertising', '/admin/baby-verifications', '/admin/badges', '/admin/posts', '/admin/comments', '/admin/novels', '/admin/reports', '/admin/security', '/admin/settings', '/admin/diapers', '/admin/notifications'];
 
 test('14 管理路由/title 完整，独立宿主与 gate 在数据页外阻止未授权挂载', async () => {
   let auth = { user: null, loading: false, accounts: [] };
