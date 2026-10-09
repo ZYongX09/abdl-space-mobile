@@ -1,8 +1,9 @@
-import { lazy, Suspense, useEffect } from 'react'
-import { Routes, Route, useLocation, useSearchParams } from 'react-router-dom'
+import { lazy, Suspense, useEffect, useLayoutEffect } from 'react'
+import { Routes, Route, useLocation, useNavigationType, useSearchParams } from 'react-router-dom'
 import { NotificationProvider } from './contexts/NotificationContext'
 import { NsfwProvider } from './contexts/NsfwContext'
 import { initNBWConfig } from './utils/nbwOAuth'
+import { rememberScroll, restoreScroll } from './utils/navigationState'
 import { MobileHeaderProvider, useMobileHeaderActions } from './contexts/MobileHeaderContext'
 import MobileHeader from './components/MobileHeader'
 import MobileBottomNav from './components/MobileBottomNav'
@@ -59,6 +60,9 @@ function Loading() {
     </div>
   )
 }
+
+// 测试里会用 renderToString 渲染路由，useLayoutEffect 在服务端渲染会告警；这里退化到 useEffect。
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
 const ROUTE_TITLES = {
   '/': '广场',
@@ -131,6 +135,39 @@ function AppMainContent({ children }) {
   )
 }
 
+/**
+ * 前进/首次进入回到顶部；返回（POP）时还原离开该页面时的滚动位置，
+ * 否则从帖子详情返回列表会被弹回顶部。
+ */
+function ScrollRestoration() {
+  const location = useLocation()
+  const navType = useNavigationType()
+
+  useIsomorphicLayoutEffect(() => {
+    if (navType === 'POP') {
+      restoreScroll(location.key)
+      return
+    }
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [location.pathname, location.key, navType])
+
+  useEffect(() => {
+    if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual'
+    const key = location.key
+    let frame = 0
+    const save = () => { frame = 0; rememberScroll(key) }
+    const onScroll = () => { if (!frame) frame = requestAnimationFrame(save) }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      if (frame) cancelAnimationFrame(frame)
+      rememberScroll(key)
+    }
+  }, [location.key])
+
+  return null
+}
+
 export default function App() {
   const { pathname } = useLocation()
   useExternalLinkInterceptor()
@@ -138,7 +175,6 @@ export default function App() {
   useEffect(() => { initNBWConfig() }, [])
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' })
     document.title = getTitle(pathname) + ' — ABDL Space 移动版'
   }, [pathname])
 
@@ -156,6 +192,7 @@ export default function App() {
     <NotificationProvider>
     <NsfwProvider>
     <div className="app-layout">
+      <ScrollRestoration />
       {!isCertificate && <MobileHeaderLayout />}
       <AppMainContent>
         <div className={isCertificate ? '' : 'container mx-auto px-3 py-4 max-w-[720px]'}>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PageLayout from '../components/PageLayout';
 import { useMobileHeaderActions } from '../contexts/MobileHeaderContext';
@@ -14,18 +14,29 @@ import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { useFollowStatuses } from '../hooks/useFollowStatuses.js';
 import { buildMediaPreviewUrl } from '../utils/mediaUrl';
+import { readFeedState, writeFeedState } from '../utils/navigationState';
 
 export default function ForumFeed() {
-  const [posts, setPosts] = useState([]);
-  const [advertisements, setAdvertisements] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const { user } = useAuth();
+  const feedKey = `${debouncedSearch}|${user?.id ?? 'guest'}`;
+
+  // 进详情再返回时本组件会被卸载；命中缓存就同步恢复，既不重新请求也不闪骨架屏。
+  const [cachedFeed] = useState(() => readFeedState(feedKey));
+
+  const [posts, setPosts] = useState(() => cachedFeed?.posts ?? []);
+  const [advertisements, setAdvertisements] = useState(() => cachedFeed?.advertisements ?? []);
+  const [loading, setLoading] = useState(() => !cachedFeed);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(() => cachedFeed?.page ?? 1);
+  const [hasMore, setHasMore] = useState(() => cachedFeed?.hasMore ?? true);
+  // 只有成功加载过（或来自缓存）的数据才写回缓存，避免把占位/报错状态固化下来。
+  const [ready, setReady] = useState(() => !!cachedFeed);
+  // 返回列表时列表已经在缓存里，跳过交错入场动画，否则看起来仍像重新加载。
+  const [restored] = useState(() => !!cachedFeed);
   const [reportTarget, setReportTarget] = useState(null);
   const likingRef = useRef(new Set());
-  const { user } = useAuth();
   const followTargetIds = posts
     .map(post => post.user?.id)
     .filter(id => id && String(id) !== String(user?.id));
@@ -40,14 +51,15 @@ export default function ForumFeed() {
       const data = await forumAPI.feed({
         page: pageNum,
         limit: 20,
-        search: search || undefined,
-        excludeNsfw: search && !searchNsfwEnabled ? true : undefined,
+        search: debouncedSearch || undefined,
+        excludeNsfw: debouncedSearch && !searchNsfwEnabled ? true : undefined,
       });
       const newPosts = (data.posts || []).filter(p => !p.in_reply_to_id);
       if (!append) setAdvertisements((data.advertisements || []).map(ad => ({ ...ad, is_advertisement: true })));
       setPosts(prev => append ? [...prev, ...newPosts] : newPosts);
       setHasMore(newPosts.length >= 20);
       setPage(pageNum);
+      setReady(true);
     } catch (e) {
       toast.error(e.message);
     } finally {
@@ -56,10 +68,40 @@ export default function ForumFeed() {
     }
   };
 
+  // 搜索防抖
   useEffect(() => {
-    const timer = setTimeout(() => { loadPosts(); }, 300);
+    const timer = setTimeout(() => setDebouncedSearch(search), 300);
     return () => clearTimeout(timer);
   }, [search]);
+
+  // 只在「列表 key」变化时加载：命中缓存直接恢复，否则拉第一页。
+  const loadPostsRef = useRef(loadPosts);
+  useEffect(() => { loadPostsRef.current = loadPosts; });
+
+  useEffect(() => {
+    const cached = readFeedState(feedKey);
+    if (cached) {
+      setPosts(cached.posts);
+      setAdvertisements(cached.advertisements);
+      setPage(cached.page);
+      setHasMore(cached.hasMore);
+      setLoading(false);
+      setReady(true);
+      return;
+    }
+    setPosts([]);
+    setAdvertisements([]);
+    setPage(1);
+    setHasMore(true);
+    setReady(false);
+    loadPostsRef.current(1);
+  }, [feedKey]);
+
+  // 加载完成后把列表写回缓存；占位/报错状态不写。
+  useEffect(() => {
+    if (!ready || loading) return;
+    writeFeedState(feedKey, { posts, advertisements, page, hasMore });
+  }, [feedKey, ready, loading, posts, advertisements, page, hasMore]);
 
   const handleLike = async (postId) => {
     if (!user) { toast.error('请先登录'); return; }
@@ -142,7 +184,7 @@ export default function ForumFeed() {
       ) : posts.length === 0 ? (
         <EmptyState icon="fa-comments" title="暂无帖子" description="快来发第一帖吧！" />
       ) : (
-        <div className="space-y-4 miui-list-enter">
+        <div className={`space-y-4 ${restored ? '' : 'miui-list-enter'}`}>
           {[...advertisements, ...posts].map((post) => post.is_advertisement || post.advertisement
             ? <AdvertisementCard key={post.id || post.advertisement?.id} post={post} />
             : <MobilePostCard
