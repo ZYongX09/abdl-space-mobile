@@ -13,6 +13,7 @@ import { forumAPI, followsAPI, merchantAPI } from '../api';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { useFollowStatuses } from '../hooks/useFollowStatuses.js';
+import { buildMediaPreviewUrl } from '../utils/mediaUrl';
 
 export default function ForumFeed() {
   const [posts, setPosts] = useState([]);
@@ -203,7 +204,7 @@ function AdvertisementCard({ post }) {
     </div>
     {ad.title && <h3 className="font-semibold mb-1">{ad.title}</h3>}
     <div className="text-sm whitespace-pre-wrap break-words" style={{ color: 'var(--text)' }}>{ad.body || post.content}</div>
-    {images.length > 0 && <div className="grid grid-cols-2 gap-2 mt-3">{images.map((image, index) => <button key={image.id || image.image_url || index} type="button" className="p-0 border-0 bg-transparent" onClick={() => { event('image_view', { image_index: index, impression_id: ad.impression_id }); window.open(image.image_url || image.url, '_blank', 'noopener,noreferrer'); }}><img src={image.preview_url || image.image_url || image.url} alt={image.alt_text || ''} className="w-full rounded-lg object-cover" style={{ aspectRatio: '1.4', background: 'var(--surface-muted)' }} /></button>)}</div>}
+    {images.length > 0 && <div className="grid grid-cols-2 gap-2 mt-3">{images.map((image, index) => <button key={image.id || image.image_url || index} type="button" className="p-0 border-0 bg-transparent" onClick={() => { event('image_view', { image_index: index, impression_id: ad.impression_id }); window.open(image.image_url || image.url, '_blank', 'noopener,noreferrer'); }}><img src={image.preview_url || buildMediaPreviewUrl(image.image_url || image.url || '')} alt={image.alt_text || ''} className="w-full rounded-lg object-cover" style={{ aspectRatio: '1.4', background: 'var(--surface-muted)' }} /></button>)}</div>}
     {ad.target_url && <button type="button" className="btn btn-primary mt-4" onClick={() => openTarget('link_click')}>查看商家详情</button>}
   </article>;
 }
