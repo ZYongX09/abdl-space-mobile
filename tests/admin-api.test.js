@@ -14,7 +14,7 @@ test('实际 src/api.js 暴露完整后台 API，分页、筛选、cookie/token 
     const { adminAPI } = await server.ssrLoadModule('/src/api');
     const explicit = await server.ssrLoadModule('/src/api.js');
     assert.equal(adminAPI, explicit.adminAPI, '扩展名省略的 ../api 必须命中实际 api.js');
-    for (const method of ['overview', 'trends', 'users', 'setUserRole', 'userDetail', 'userTracking', 'listComments', 'novels', 'novelStatus', 'badges', 'badgeGrant', 'badgeRevoke', 'settings', 'betaMode', 'blockedEmails', 'friendRequestReports', 'appClientReminder', 'saveAppClientReminder', 'appClientPolicy', 'saveAppClientPolicy', 'appClientStats', 'appClientUsers']) assert.equal(typeof adminAPI[method], 'function', method);
+    for (const method of ['overview', 'trends', 'users', 'setUserRole', 'userDetail', 'userTracking', 'listComments', 'novels', 'novelStatus', 'badges', 'badgeGrant', 'badgeRevoke', 'settings', 'betaMode', 'blockedEmails', 'friendRequestReports', 'appClientReminder', 'saveAppClientReminder', 'appClientPolicy', 'saveAppClientPolicy', 'appClientStats', 'appClientUsers', 'advertising', 'advertisingPolicy', 'updateAdvertisingPolicy', 'generateAdvertisingCodes']) assert.equal(typeof adminAPI[method], 'function', method);
     await adminAPI.users({ page: 2, limit: 30, q: 'QQ & test', role: 'admin', qq_bound: 'unbound' });
     const url = new URL(calls[0].url, 'http://fixture.invalid');
     assert.equal(url.pathname, '/api/admin/users');
@@ -26,6 +26,14 @@ test('实际 src/api.js 暴露完整后台 API，分页、筛选、cookie/token 
     await adminAPI.setPostNsfw(8, true);
     assert.equal(calls[2].options.method, 'PATCH');
     assert.deepEqual(JSON.parse(calls[2].options.body), { has_nsfw: true });
+    await adminAPI.advertisingPolicy();
+    assert.match(calls[3].url, /\/api\/admin\/advertising\/policy$/);
+    assert.equal(calls[3].options.method, undefined);
+    const policy = { enabled: true, max_per_timeline: 1, min_interval_seconds: 30, ad_probability: 35, fallback_probability: 10 };
+    await adminAPI.updateAdvertisingPolicy(policy);
+    assert.match(calls[4].url, /\/api\/admin\/advertising\/policy$/);
+    assert.equal(calls[4].options.method, 'PUT');
+    assert.deepEqual(JSON.parse(calls[4].options.body), policy);
     const count = calls.length;
     for (const key of ['app_client_policy', ' app_client_reminder ']) await assert.rejects(adminAPI.saveSetting(key, '{}'), /保留配置/);
     assert.equal(calls.length, count);

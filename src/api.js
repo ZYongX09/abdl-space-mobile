@@ -1147,7 +1147,15 @@ export const adminAPI = {
 
   advertising: async () => {
     if (USE_API) return apiFetch('/api/admin/advertising');
-    return { ads: [], codes: [], settings: {}, impressions: 0, clicks: 0 };
+    return { items: [], ads: [], codes: [], settings: {}, impressions: 0, clicks: 0 };
+  },
+  advertisingPolicy: async () => {
+    if (USE_API) return apiFetch('/api/admin/advertising/policy');
+    return { enabled: 0, max_per_timeline: 1, min_interval_seconds: 8, ad_probability: 20, fallback_probability: 5 };
+  },
+  updateAdvertisingPolicy: async (policy) => {
+    if (USE_API) return apiFetch('/api/admin/advertising/policy', { method: 'PUT', body: JSON.stringify(policy) });
+    return { ok: true };
   },
   generateAdvertisingCodes: async (count = 1) => {
     if (USE_API) return apiFetch('/api/admin/advertising/registration-codes', { method: 'POST', body: JSON.stringify({ code: crypto.randomUUID().replaceAll('-', '').slice(0, 16), count }) });
