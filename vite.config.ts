@@ -21,7 +21,11 @@ function copyDirSync(src, dest) {
   }
 }
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(async ({ mode }) => {
+  if (mode === 'merchant-fixture') {
+    const { merchantFixturePlugin } = await import('./tests/merchant-fixture-plugin.js');
+    return { plugins: [react(), merchantFixturePlugin()], server: { host: '127.0.0.1', port: 5174, strictPort: true } };
+  }
   const env = loadEnv(mode, process.cwd())
   return {
   plugins: [
