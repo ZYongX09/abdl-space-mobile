@@ -87,6 +87,17 @@ ABDL Space 移动端（abdl-space-mobile）是 ABDL Space 主站的移动端版�
 - 人机验证（QuantumVerify + Turnstile）
 - 外部链接拦截与跳转提示
 
+## 通知/私信请求预算测试
+
+```bash
+npm run test:d1                # node:test 纯调度 + Vite/API/SSR 合同，已纳入 npm test
+npm run test:d1-fixture -- 8796 # http://127.0.0.1:8796/messages?user=2
+```
+
+SSR 不执行 effects，不能代替运行时验收。fixture 不加载生产 config/env/proxy、第三方脚本/字体、SW、NSFW 或推送；真实 StrictMode 挂载 NotificationProvider/Toast/MessagesPage，按钮查看请求计数。场景含成功、429（Retry-After=3600 秒）、401、慢响应（20 秒）、消息失败、send-slow、load-send-error；配合账号 A/B/注销、同账号资料刷新、toast、手动刷新、隐藏/恢复和卸载检查。场景切换后用新 session 首拉；检查429冷却时不要切账号。send-slow 下发送后隐藏/恢复须解除 sending 且不重放写；load-send-error 下加载中发送失败不得卡 loading。全部 API 为本机合成数据。
+
+每个资源完成后 30 秒再拉取、独立 singleflight；错误 30/60/120/300 秒退避，429 取更长 Retry-After（秒数/HTTP-date）；手动与可见恢复同样遵守预算。401 暂停当前账号/凭据 session；隐藏/卸载/注销/A-B-A 取消并作废旧结果，总时限 15 秒。Provider 独占会话 snapshot，已读成功取消旧在途快照；聊天不增加周期、发送/已读不自动重试。跨域后端须 expose `Retry-After`。main.jsx 为唯一 NotificationProvider，其他 Provider 与 admin/merchant 宿主边界不改；API_BASE/localStorage 兼容逻辑不改。
+
 ## 路由表
 
 | 路径 | 页面 | 说明 |

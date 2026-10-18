@@ -1,6 +1,5 @@
 import { lazy, Suspense, useEffect, useLayoutEffect } from 'react'
 import { Routes, Route, useLocation, useNavigationType, useSearchParams } from 'react-router-dom'
-import { NotificationProvider } from './contexts/NotificationContext'
 import { NsfwProvider } from './contexts/NsfwContext'
 import { initNBWConfig } from './utils/nbwOAuth'
 import { rememberScroll, restoreScroll } from './utils/navigationState'
@@ -191,7 +190,6 @@ export default function App() {
     {!isAdmin && !isCertificate && <RedirectNotice />}
     {!isAdmin && !isCertificate && <AppDownloadBanner />}
     {!isAdmin && !isCertificate && <AdBlockNotice />}
-    <NotificationProvider>
     <NsfwProvider>
     <div className="app-layout">
       <ScrollRestoration />
@@ -261,7 +259,6 @@ export default function App() {
       {!isAdmin && !isCertificate && <PushPrompt />}
     </div>
     </NsfwProvider>
-    </NotificationProvider>
     </MobileHeaderProvider>
   )
 }
