@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
@@ -374,6 +374,19 @@ export default function SettingsV2() {
             right={<MiToggle value={autoTheme} onChange={handleToggleAutoTheme} disabled={colorfulLocked} />}
           />
         </div>
+      </div>
+
+      <div style={{ paddingTop: 12 }}>
+        <Group title="赞助支持" anim={stagger(2.5)}>
+          <Link to="/sponsors" style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '15px 20px', color: 'var(--text)', textDecoration: 'none', minHeight: 72 }}>
+            <i className="fa-solid fa-heart" aria-hidden="true" style={{ width: 22, textAlign: 'center', fontSize: 17, color: 'var(--primary)', flexShrink: 0 }} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 15 }}>赞助者中心</div>
+              <div style={{ fontSize: 12.5, color: 'var(--text-muted)', marginTop: 2 }}>购买与兑换、权益、兑换记录</div>
+            </div>
+            <i className="fa-solid fa-chevron-right" aria-hidden="true" style={{ fontSize: 11, color: 'var(--text-light)' }} />
+          </Link>
+        </Group>
       </div>
 
       {/* ── 账户 ── */}

@@ -13,6 +13,12 @@ test('does not cache API, cross-origin, or authorized requests', () => {
   }), origin), false)
 })
 
+test('does not cache sponsor or settings HTML', () => {
+  for (const path of ['/', '/sponsors', '/settings', '/login']) {
+    assert.equal(globalThis.shouldCacheRequest(new Request(`${origin}${path}`, { headers: { Accept: 'text/html' } }), origin), false)
+  }
+})
+
 test('allows same-origin static GET requests only', () => {
   assert.equal(globalThis.shouldCacheRequest(new Request(`${origin}/app-icon.png`), origin), true)
   assert.equal(globalThis.shouldCacheRequest(new Request(`${origin}/app-icon.png`, { method: 'POST' }), origin), false)

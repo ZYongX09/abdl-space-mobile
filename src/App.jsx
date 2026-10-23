@@ -37,6 +37,7 @@ const Register = lazy(() => import('./pages/Register'))
 const NBWCallback = lazy(() => import('./pages/NBWCallback'))
 const Profile = lazy(() => import('./pages/Profile'))
 const Settings = lazy(() => import('./pages/Settings'))
+const SponsorCenter = lazy(() => import('./sponsors/SponsorCenter'))
 const MessagesPage = lazy(() => import('./pages/MessagesPage'))
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage'))
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
@@ -77,6 +78,7 @@ const ROUTE_TITLES = {
   '/register': '注册',
   '/beta-register': '创始成员计划',
   '/settings': '设置',
+  '/sponsors': '赞助者中心',
   '/about': '关于',
   '/terms': '用户协议',
   '/privacy': '隐私政策',
@@ -223,6 +225,7 @@ export default function App() {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/profile/:id" element={<Profile />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="/sponsors" element={<SponsorCenter />} />
                 <Route path="/user/:id" element={<Profile />} />
                 <Route path="/messages" element={<MessagesPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { externalLinkUrl } from '../utils/externalLink';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
@@ -211,7 +211,7 @@ export default function AboutV2() {
             <i className="fa-solid fa-heart mr-2" style={{ color: 'var(--accent)' }} />
             支持我们
           </div>
-          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10 }}>如果 ABDL Space 对你有帮助，欢迎鼓励一下 🍼</div>
+          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10 }}>感谢支持 ABDL Space。前往赞助者中心查看方案，购买后凭兑换码激活权益。</div>
           {/* 爱发电官方认证提示 */}
           <div
             style={{
@@ -236,19 +236,10 @@ export default function AboutV2() {
               ，谨防仿冒
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            {[
-              { price: '￥5', label: '一片裤裤', color: 'var(--primary-dark)', url: 'https://ifdian.net/order/create?plan_id=a9a8a704508c11f1be9a52540025c377&product_type=0' },
-              { price: '￥20', label: '一包裤裤', color: 'var(--accent)', url: 'https://ifdian.net/order/create?plan_id=bde9dab2508c11f1b80752540025c377&product_type=0' },
-              { price: '···', label: '自定义', color: 'var(--text)', url: 'https://ifdian.net/order/create?user_id=399f44cc508c11f18b7752540025c377' },
-            ].map(item => (
-              <a key={item.label} href={externalLinkUrl(item.url)} className="miui-press"
-                style={{ flex: 1, padding: '10px 8px', borderRadius: 10, background: 'var(--input-bg)', textDecoration: 'none', textAlign: 'center' }}>
-                <div style={{ fontSize: 18, fontWeight: 700, color: item.color }}>{item.price}</div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{item.label}</div>
-              </a>
-            ))}
-          </div>
+          <Link to="/sponsors" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
+            <i className="fa-solid fa-heart" aria-hidden="true" /> 前往赞助者中心
+          </Link>
+          <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 10 }}>方案、价格和权益以赞助者中心实时信息为准。返回购买页不代表权益已激活。</p>
         </div>
       </HyperCard>
 
