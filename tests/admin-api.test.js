@@ -14,7 +14,7 @@ test('实际 src/api.js 暴露完整后台 API，分页、筛选、cookie/token 
     const { adminAPI } = await server.ssrLoadModule('/src/api');
     const explicit = await server.ssrLoadModule('/src/api.js');
     assert.equal(adminAPI, explicit.adminAPI, '扩展名省略的 ../api 必须命中实际 api.js');
-    for (const method of ['overview', 'trends', 'users', 'setUserRole', 'userDetail', 'userTracking', 'listComments', 'novels', 'novelStatus', 'badges', 'badgeGrant', 'badgeRevoke', 'settings', 'betaMode', 'blockedEmails', 'friendRequestReports', 'appClientReminder', 'saveAppClientReminder', 'appClientPolicy', 'saveAppClientPolicy', 'appClientStats', 'appClientUsers', 'advertising', 'advertisingPolicy', 'updateAdvertisingPolicy', 'generateAdvertisingCodes']) assert.equal(typeof adminAPI[method], 'function', method);
+    for (const method of ['overview', 'trends', 'users', 'setUserRole', 'userDetail', 'userTracking', 'listComments', 'novels', 'novelStatus', 'badges', 'badgeGrant', 'badgeRevoke', 'settings', 'betaMode', 'blockedEmails', 'friendRequestReports', 'appClientReminder', 'saveAppClientReminder', 'appClientNbwLocalOnly', 'saveAppClientNbwLocalOnly', 'appClientPolicy', 'saveAppClientPolicy', 'appClientStats', 'appClientUsers', 'advertising', 'advertisingPolicy', 'updateAdvertisingPolicy', 'generateAdvertisingCodes']) assert.equal(typeof adminAPI[method], 'function', method);
     await adminAPI.users({ page: 2, limit: 30, q: 'QQ & test', role: 'admin', qq_bound: 'unbound' });
     const url = new URL(calls[0].url, 'http://fixture.invalid');
     assert.equal(url.pathname, '/api/admin/users');
@@ -35,7 +35,7 @@ test('实际 src/api.js 暴露完整后台 API，分页、筛选、cookie/token 
     assert.equal(calls[4].options.method, 'PUT');
     assert.deepEqual(JSON.parse(calls[4].options.body), policy);
     const count = calls.length;
-    for (const key of ['app_client_policy', ' app_client_reminder ']) await assert.rejects(adminAPI.saveSetting(key, '{}'), /保留配置/);
+    for (const key of ['app_client_policy', ' app_client_reminder ', ' app_client_nbw_local_only ']) await assert.rejects(adminAPI.saveSetting(key, '{}'), /保留配置/);
     assert.equal(calls.length, count);
     for (const role of ['admin', 'user']) {
       await adminAPI.setUserRole('id / fixture', role);
