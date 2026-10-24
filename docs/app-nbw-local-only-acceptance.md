@@ -1,6 +1,6 @@
 # 指定版本仅本站模式前端交付
 
-日期：2026-10-24。仅本地功能实现，无提交、推送、切分支或部署，不改真实配置/凭据与后端。
+日期：2026-10-24。用户后续授权上线，main固定`690c787c5591dc4d2fa46dd5a06497b34a896265`已快进推送，Pages production部署`6096e8d9-8a8e-4ca7-9353-423a0f995792`成功；正式入口及appClients-D_zTgyiV.js含新卡片/专用接口。发布前重新npm test/build均exit0，原262项通过。浏览器正式管理入口匿名显示登录门禁，未用真实会话操作；配套Worker759已100%，生产策略记录为空保持默认关闭，无DDL/无APK/无V2实施。证据`~/.local/share/abdl-space-release/20261024-nbw-local-only/`。本段只develop维护，不为文档重复部署；以下保留开发记录。
 
 - `/admin/app-clients` 新增「指定版本仅本站模式（关闭NBW）」独立卡片；代码与主站一致，沿用原 Card、表单、提示和三主题样式，原 policy/reminder 不变。
 - 默认 `{ enabled: false, version_codes: [], include_unversioned: false }`，不预选版本。支持版本文本规范化预览、编辑/保存/错误重试、已保存快照、未保存更改与独立未上报选项；关闭保留配置。
