@@ -6,11 +6,12 @@ Mobile-first React web app (m.abdl-space.top) sharing backend API with main site
 ## Commands
 - `npm run dev` — Start dev server (port 5174, not default 5173)
 - `npm run build` — Build for production (outputs to `dist/`)
-- `npm run lint` — Run ESLint (no typecheck or test scripts exist)
+- `npm run lint` — Run ESLint (no typecheck script exists)
+- `npm test` — Run the full Node test suite; `npm run test:registration` runs the registration guard regressions
 
 ## Key Architecture
 - **Pure JavaScript** — No TypeScript (.js/.jsx only)
-- **No tests** — No test framework configured
+- **Tests** — Node built-in test runner (`node --test`), registered in `package.json`
 - **API proxy** — Dev server proxies `/api` to `https://api.abdl-space.top`
 - **Offline mode** — Set `VITE_API_BASE` to undefined/null to use localStorage fallback
 - **Cloudflare Pages** — Deployed via `wrangler.jsonc`, output dir: `./dist`
