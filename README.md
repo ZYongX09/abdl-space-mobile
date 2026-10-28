@@ -37,6 +37,14 @@ ABDL Space 的移动优先 React Web 客户端，与主站和 Android App 共用
 
 广告管理位于 `/admin/advertising`，支持投放总开关、商家/兜底概率、注册码和广告启停。页面明确说明 `min_interval_seconds` 目前仅保存、投放路径尚未读取，不能把它视为已经生效的频控。宝宝认证后台支持认领、审核、受控查看证据、证书撤销/补发、审计和配置；敏感照片与证书验真请求使用禁止缓存的专用适配层。
 
+### 新版 App 注册安全验证策略（开发集成，未发布）
+
+`/admin/app-clients` 新增安全验证策略卡，通过专用 `GET/PUT /api/admin/app-human-check/policy` 管理 `off`、`risk`、`always` 三种模式；默认关闭，风险阈值仅在 `risk` 模式可编辑。卡片区分已保存快照与未保存草稿，保存带 revision CAS；冲突后须重新加载，不自动重放覆盖。功能交付于 `develop` 开发线，未合入或发布 `main`，不代表生产已启用，也不强制旧 App 升级。
+
+首期只作用于新版 App 新协议 `type=register` 的注册验证码邮件首次发送与重发，429 硬限流优先；旧版 App、网页注册及其他验证码用途不变。旧发送端点仍保留且可被调用，协议头与版本号不构成授权，不能将此功能称为全站防机器人。
+
+本次未配置生产 Turnstile key、secret 或其他 Cloudflare 资源。管理卡只显示 `turnstile_configured` 布尔状态，不编辑或回显 sitekey / secret，也不发送邮件或加载挑战；无可用配置时仍允许保存策略，但需要挑战的操作会明确不可用，不会绕过验证，`off` 不依赖验证组件。已完成 Node 模型/API/fixture 与实际组件 SSR 可见内容验证，移动站完整测试 341/341、构建通过；未进行浏览器 GUI、真实邮件或真实 Turnstile 闭环验收，SSR 不等同于 GUI 验收。
+
 ## 技术架构
 
 - React 18、React Router 6、Vite 5、Tailwind CSS 3；业务主体为 JavaScript / JSX，构建配置为 `vite.config.ts`，未配置独立类型检查脚本。

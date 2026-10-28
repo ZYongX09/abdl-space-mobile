@@ -6,6 +6,7 @@
 import { fetchFollowStatuses } from './utils/followStatus.js';
 import { createAppClientsAPI } from './appClients/api.js';
 import { createAppAIAPI } from './appAI/api.js';
+import { createAppHumanCheckAPI } from './appHumanCheck/api.js';
 import { isReservedAppClientSetting } from './appClients/model.js';
 import { withAvatarPreviews } from './utils/mediaUrl.js';
 import { requestTestVerificationCode } from './pages/admin/testVerificationCode.js';
@@ -960,6 +961,7 @@ export const usersAPI = {
 export const adminAPI = {
   ...createAppClientsAPI(apiFetch),
   ...createAppAIAPI(apiFetch),
+  ...createAppHumanCheckAPI(apiFetch),
   // ── 统计卡片（简单合计） ──────────────────────────
   stats: async () => {
     if (USE_API) return apiFetch('/api/admin/stats');
