@@ -1,11 +1,11 @@
 # ABDL Space 移动端发展规划
 
-## 2026-10-31 本地修复进度（未发布）
+## 2026-10-31 本地修复进度（已发布）
 
 - Pages API 代理重建响应时保留上游 `webSocket`，修复 101 升级丢 socket 后的 500；请求、鉴权、IP 签名、移动端 Origin 补全及普通 HTTP/CORS 行为保持不变。
 - 新增并注册 `tests/api-proxy.test.js`：修复前升级回归失败，修复后代理及签名专项 34/34、完整 `npm test` 407/407 通过；主站构建完成后串行 `npm run build` 成功，保留既有 Captcha 环境变量和大 chunk 警告。
 - 仓外真实 Miniflare/workerd 两站共 16/16 通过，含网络 101、双向文本/二进制帧、关闭、401/502、流式/headers/CORS 和注册双层签名；修复前两站均复现升级 500。harness 与前后日志保存在 `/home/ZYongX/.local/share/abdl-diagnostics/d1-2026-10-31/proxy-runtime/`。
-- 隔离 worktree 开发验证完成，按开发流程提交到 develop；main/正式站点不变，未部署或探测生产账号，未修改后端、Android、路由、DNS、配置或 CDN。
+- 用户授权上线：main移植提交`26a7f94` Pages production success（ee3e450a），正式域200、代理API 200核验；merge回develop，真实101升级与账号闭环未代验，未修改后端、Android、路由、DNS、配置或 CDN。
 
 ## 项目概述
 
