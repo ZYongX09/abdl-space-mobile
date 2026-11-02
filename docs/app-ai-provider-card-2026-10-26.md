@@ -2,7 +2,9 @@
 
 日期：2026-10-26。分支 `feat/app-ai-forum-controls-20261026`。移动站管理后台新增 App AI 上游配置卡片，与主站同构（组件、模型、fixture 均为同源副本），对接后端 `GET/PUT /api/admin/app-ai/provider`。**本轮仅交付 develop 分支代码，不部署生产。**
 
-## 2026-10-29 自定义主机与测试按钮（开发线，未上线）
+## 2026-10-29自定义主机与测试按钮（2026-11-02已上线）
+
+当前移动main `fa4c4168` / Pages3ad11f41 production已成功，后端Worker812/`0df46f0b`及主站同步生效。427/427与build通过，正式appClients资源与验证构建逐字节匹配；保留AI未配置、NBW local_only/默认primary，不代真实供应商测试或保存。下文保留原开发验收时点，发布证据在 `~/.local/share/abdl-release/20261102-combined/`，最新状态见PLAN联合上线节。
 
 本轮与主站同步：取消固定供应商主机白名单，允许符合安全格式的自定义公网 HTTPS 域名；保留私网/本机/IP/危险URL、重定向及跨origin keep令牌限制。后端公共DNS预检不是连接IP pinning，管理员须信任自己选择的供应商，不宣称解决所有DNS rebinding。
 

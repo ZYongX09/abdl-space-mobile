@@ -1,5 +1,12 @@
 # ABDL Space 移动端发展规划
 
+## 2026-11-02 AI / NBW / D1 联合上线
+
+- 用户授权联合发布main固定 `fa4c4168`，Pages production `3ad11f41` 于03:45:37UTC成功；主站Pages545fa7a0与后端Worker812/`0df46f0b`同步生效。AI自定义公网主机/不保存草稿测试/Chat Completions说明和NBW固定主备切换卡片正式可用。
+- 固定移动站完整427/427与build通过、源码指纹稳定；正式appClients模块逐字节匹配本地验证构建，按钮/卡片/共享API标记确认。正式浏览器管理页登录门禁正常，三条访问链最终34/34探针通过。
+- 保留NBW当前local_only与默认primary、AIprovider空和人机off，未改真实配置/密钥/Android/CDN。并行帖子翻译策略 `0ae19f2` / `7c9a72a`仅在develop，未夹带上线；本次文档在其最新基线隔离提交。
+- 0102只补唯一ledger id23，索引文件未重跑。证据 `/home/ZYongX/.local/share/abdl-release/20261102-combined/`；真实管理员AI测试、主备切换和有效账号闭环未代验。
+
 ## 2026-10-31 本地修复进度（已发布）
 
 - Pages API 代理重建响应时保留上游 `webSocket`，修复 101 升级丢 socket 后的 500；请求、鉴权、IP 签名、移动端 Origin 补全及普通 HTTP/CORS 行为保持不变。
