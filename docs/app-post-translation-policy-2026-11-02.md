@@ -1,6 +1,6 @@
 # App 帖子 AI 翻译策略卡
 
-本轮仅开发交付。新增 `src/translationPolicy/` 并挂载于管理端 App 客户端页面；没有部署移动站、修改生产策略或发送真实 AI 请求。
+本记录保留最初开发验证。新增 `src/translationPolicy/` 并挂载于管理端App页面；用户随后授权词库前端上线，2026-11-03已随词库发布移动main `0103718`、Pages production `c58afa16`。未修改生产策略或发送真实AI，详见[生产记录](translation-glossary-web-production-2026-11-03.md)。
 
 ## 配置与交互
 
@@ -18,4 +18,4 @@ PUT 精确七字段：`enabled/daily_limit/english_daily_limit/sponsor_daily_lim
 - 首轮浏览器已观察 390px 实际页面 GET 的默认 5/10/100 与只读时区；保存/冲突点击遇工具超时，首轮不记为通过。随后在隔离的本地内存 fixture 实际补验：5→8 保存 PUT200；草稿9遇PUT409后保留并禁写；重新加载GET200后恢复8并可再次保存。390×844浅色、深色及colorful三主题均无横向溢出并截图。标准点击/等待曾超时的原始证据保留，成功保存为真实DOM点击，不用 Node/SSR 或直接网络写入替代。
 - 环境变量占位、旧 Browserslist、既有大 chunk 告警仍在，构建并非无告警。
 
-证据：`~/.local/share/abdl-post-translation-20261102/web-final-summary.json` 与逐轮原始日志。未改依赖锁、现有 provider/human 策略或生产配置。新端点与迁移须另获授权上线；推送 develop 不等于生产可用。
+证据：`~/.local/share/abdl-post-translation-20261102/web-final-summary.json` 与逐轮原始日志。未改依赖锁、现有 provider/human 策略或生产配置。开发阶段develop推送不等于生产可用；后续后端已独立发布Worker819/0104唯一id25，本卡2026-11-03已随词库前端授权发布，不需要重复迁移。

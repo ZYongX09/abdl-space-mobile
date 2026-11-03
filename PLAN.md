@@ -1,5 +1,11 @@
 # ABDL Space 移动端发展规划
 
+## 2026-11-03 翻译词库与策略管理上线
+
+- 用户授权后移动main固定`0103718`自动部署Pages production `c58afa16`成功；主站`0b7b7e1`/`e14449c5`同步上线，`/admin/app-clients`词库及帖子翻译策略可用。
+- 完整移动483/483、主站474/474与双build通过，源指纹不变。正式移动appClients/共享API依赖/CSS逐字节匹配已验构建，两站代理health/匿名管理及实际浏览器登录门禁通过；首轮移动传输失败保留后完整复验通过。
+- 不改后端Worker819/已迁移0104唯一id25，不改NBW/AI/版本策略，不发布App，不代管理员保存词库或计费AI。NBW全端联动另为只读评估，不能只靠backend覆盖客户端固定授权host/旧缓存；不在本轮实施。[生产记录](docs/translation-glossary-web-production-2026-11-03.md)。
+
 ## 2026-11-02 AI / NBW / D1 联合上线
 
 - 用户授权联合发布main固定 `fa4c4168`，Pages production `3ad11f41` 于03:45:37UTC成功；主站Pages545fa7a0与后端Worker812/`0df46f0b`同步生效。AI自定义公网主机/不保存草稿测试/Chat Completions说明和NBW固定主备切换卡片正式可用。
