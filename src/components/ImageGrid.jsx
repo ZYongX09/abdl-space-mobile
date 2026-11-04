@@ -2,6 +2,8 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import NsfwGuard from './NsfwGuard';
 import { buildMediaPreviewUrl } from '../utils/mediaUrl';
+import { resolveNBWDisplayURL } from '../utils/nbwEndpoints.js';
+import { useNBWEndpoints } from '../utils/useNBWEndpoints.js';
 
 function ImageItem({ url, fallbackUrl, onClick, overlay, isNsfw, nsfwType }) {
   const [loaded, setLoaded] = useState(false);
@@ -355,6 +357,7 @@ function MobileLightbox({ urls, index, onClose, onNavigate }) {
 
 export default function ImageGrid({ images = [] }) {
   const [lightbox, setLightbox] = useState(null);
+  const { endpoints } = useNBWEndpoints();
   if (!images.length) return null;
 
   const imageItems = images.map(img => {
@@ -362,6 +365,10 @@ export default function ImageGrid({ images = [] }) {
     const src = img?.image_url || img?.src || '';
     return { url: src, preview: img?.preview_url || buildMediaPreviewUrl(src), isNsfw: img?.is_nsfw, nsfwType: img?.nsfw_type };
   });
+  for (const item of imageItems) {
+    item.url = resolveNBWDisplayURL(item.url, endpoints, 'media');
+    item.preview = resolveNBWDisplayURL(item.preview, endpoints, 'media');
+  }
   const urls = imageItems.map(i => i.preview);
   const count = Math.min(urls.length, 4);
   const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth <= 768);

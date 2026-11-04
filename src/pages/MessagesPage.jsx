@@ -1,6 +1,7 @@
 import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import ChatMessage from '../components/ChatMessage';
+import NBWImage from '../components/NBWImage.jsx';
 import NewConversation from '../components/NewConversation';
 import { Spinner } from '../components/Feedback';
 import { useAuth } from '../contexts/AuthContext';
@@ -212,7 +213,7 @@ export default function MessagesPage() {
                 >
                   <div className="msg-avatar">
                     {c.avatar
-                      ? <img src={c.avatar} alt="" className="w-full h-full rounded-full object-cover" />
+                      ? <NBWImage src={c.avatar} alt="" className="w-full h-full rounded-full object-cover" />
                       : (c.username || '?')[0]?.toUpperCase()
                     }
                   </div>
@@ -249,7 +250,7 @@ export default function MessagesPage() {
                       className="msg-avatar msg-avatar-sm"
                     >
                       {otherUser.avatar
-                        ? <img src={otherUser.avatar} alt="" className="w-full h-full rounded-full object-cover" />
+                        ? <NBWImage src={otherUser.avatar} alt="" className="w-full h-full rounded-full object-cover" />
                         : otherUser.username?.[0]?.toUpperCase() || '?'
                       }
                     </Link>

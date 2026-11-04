@@ -1,3 +1,4 @@
+import NBWImage from '../components/NBWImage.jsx';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PageLayout from '../components/PageLayout';
@@ -6,7 +7,8 @@ import VerificationInput from '../components/VerificationInput';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { authAPI } from '../api';
-import { isNBWConfigured, whenNBWReady, startNBWBind } from '../utils/nbwOAuth';
+import { startNBWBind } from '../utils/nbwOAuth';
+import { useNBWOAuth } from '../utils/useNBWEndpoints.js';
 
 const NBW_LOGO = 'https://img.abdl-space.top/file/nbwlogo.png';
 
@@ -48,7 +50,7 @@ export default function AccountPrivacy() {
             <div className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold overflow-hidden"
               style={{ background: 'var(--primary-light)', color: 'var(--primary-dark)' }}>
               {user.avatar
-                ? <img src={user.avatar} alt="" className="w-full h-full rounded-full object-cover" />
+                ? <NBWImage src={user.avatar} alt="" className="w-full h-full rounded-full object-cover" />
                 : user.username?.[0]?.toUpperCase()
               }
             </div>
@@ -143,7 +145,7 @@ export default function AccountPrivacy() {
                 }}
               >
                 <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: 'var(--primary-light)', color: 'var(--primary-dark)' }}>
-                  {a.avatar ? <img src={a.avatar} alt="" className="w-full h-full rounded-full object-cover" /> : a.username?.[0]?.toUpperCase()}
+                  {a.avatar ? <NBWImage src={a.avatar} alt="" className="w-full h-full rounded-full object-cover" /> : a.username?.[0]?.toUpperCase()}
                 </div>
                 <span className="text-sm font-medium" style={{ color: 'var(--text)' }}>{a.username}</span>
               </button>
@@ -302,18 +304,12 @@ function EmailSection({ user, toast }) {
 
 /* ===== NBW 绑定 ===== */
 function NBWBindSection({ user, toast, onUserChange }) {
-  const [nbwReady, setNbwReady] = useState(false);
+  const { available: nbwReady } = useNBWOAuth();
   const [nbwUsername, setNbwUsername] = useState(null);
   const [binding, setBinding] = useState(false);
   const [unbinding, setUnbinding] = useState(false);
   const isBound = !!user?.nbw_uid;
   const navigate = useNavigate();
-
-  useEffect(() => {
-    whenNBWReady().then(() => {
-      setNbwReady(isNBWConfigured());
-    });
-  }, []);
 
   useEffect(() => {
     if (user?.nbw_uid) {

@@ -174,7 +174,7 @@ export default function App() {
   const { pathname } = useLocation()
   useExternalLinkInterceptor()
 
-  useEffect(() => { initNBWConfig() }, [])
+  useEffect(() => initNBWConfig(), [])
 
   useEffect(() => {
     document.title = getTitle(pathname) + ' — ABDL Space 移动版'

@@ -4,6 +4,7 @@ import PageLayout from '../components/PageLayout';
 import { useMobileHeaderActions } from '../contexts/MobileHeaderContext';
 import { LoadingSkeleton, EmptyState } from '../components/Feedback';
 import ImageGrid from '../components/ImageGrid';
+import NBWImage from '../components/NBWImage.jsx';
 import PullToRefresh from '../components/PullToRefresh';
 import RichContent from '../components/RichContent';
 import OfficialBadge from '../components/OfficialBadge';
@@ -15,6 +16,8 @@ import { useToast } from '../contexts/ToastContext';
 import { useFollowStatuses } from '../hooks/useFollowStatuses.js';
 import { buildMediaPreviewUrl } from '../utils/mediaUrl';
 import { readFeedState, writeFeedState } from '../utils/navigationState';
+import { getNBWEndpointState, hasNBWDisplayData, nbwAcquisitionEpoch } from '../utils/nbwEndpoints.js';
+import { useNBWEndpoints } from '../utils/useNBWEndpoints.js';
 
 export default function ForumFeed() {
   const [search, setSearch] = useState('');
@@ -25,6 +28,9 @@ export default function ForumFeed() {
   // 进详情再返回时本组件会被卸载；命中缓存就同步恢复，既不重新请求也不闪骨架屏。
   const [cachedFeed] = useState(() => readFeedState(feedKey));
 
+  const { epoch: endpointEpoch } = useNBWEndpoints();
+  const [acquiredEpoch, setAcquiredEpoch] = useState(() => cachedFeed?.nbwAcquiredEpoch ?? getNBWEndpointState().epoch);
+  const requestGeneration = useRef(0);
   const [posts, setPosts] = useState(() => cachedFeed?.posts ?? []);
   const [advertisements, setAdvertisements] = useState(() => cachedFeed?.advertisements ?? []);
   const [loading, setLoading] = useState(() => !cachedFeed);
@@ -45,6 +51,7 @@ export default function ForumFeed() {
   const navigate = useNavigate();
 
   const loadPosts = async (pageNum = 1, append = false) => {
+    const ticket = ++requestGeneration.current;
     try {
       if (append) setLoadingMore(true); else setLoading(true);
       const searchNsfwEnabled = localStorage.getItem('abdl_search_nsfw') === 'true';
@@ -54,17 +61,21 @@ export default function ForumFeed() {
         search: debouncedSearch || undefined,
         excludeNsfw: debouncedSearch && !searchNsfwEnabled ? true : undefined,
       });
+      if (ticket !== requestGeneration.current) return;
       const newPosts = (data.posts || []).filter(p => !p.in_reply_to_id);
+      // API 的整笔重取可跨首次discovery；只记录最终成功响应的 acquisition lease。
+      const lease = nbwAcquisitionEpoch(data);
+      if (hasNBWDisplayData(data) && lease !== getNBWEndpointState().epoch) return;
+      setAcquiredEpoch(lease ?? getNBWEndpointState().epoch);
       if (!append) setAdvertisements((data.advertisements || []).map(ad => ({ ...ad, is_advertisement: true })));
       setPosts(prev => append ? [...prev, ...newPosts] : newPosts);
       setHasMore(newPosts.length >= 20);
       setPage(pageNum);
       setReady(true);
     } catch (e) {
-      toast.error(e.message);
+      if (ticket === requestGeneration.current) toast.error(e.message);
     } finally {
-      setLoading(false);
-      setLoadingMore(false);
+      if (ticket === requestGeneration.current) { setLoading(false); setLoadingMore(false); }
     }
   };
 
@@ -79,8 +90,10 @@ export default function ForumFeed() {
   useEffect(() => { loadPostsRef.current = loadPosts; });
 
   useEffect(() => {
+    requestGeneration.current += 1;
     const cached = readFeedState(feedKey);
     if (cached) {
+      setAcquiredEpoch(cached.nbwAcquiredEpoch ?? getNBWEndpointState().epoch);
       setPosts(cached.posts);
       setAdvertisements(cached.advertisements);
       setPage(cached.page);
@@ -97,11 +110,20 @@ export default function ForumFeed() {
     loadPostsRef.current(1);
   }, [feedKey]);
 
-  // 加载完成后把列表写回缓存；占位/报错状态不写。
+  // 旧代 NBW rows 立即从 mounted state 剔除；本站 rows 不清，随后仅重新获取此混合列表。
+  useEffect(() => {
+    if (acquiredEpoch === endpointEpoch || !hasNBWDisplayData({ posts })) return;
+    requestGeneration.current += 1;
+    setPosts(previous => previous.filter(post => !hasNBWDisplayData(post)));
+    setReady(false);
+    void loadPostsRef.current(1);
+  }, [endpointEpoch, acquiredEpoch, posts]);
+
+  // 加载完成后写回原始 acquisition lease；点赞/关注不能把旧 rows 重标为新代。
   useEffect(() => {
     if (!ready || loading) return;
-    writeFeedState(feedKey, { posts, advertisements, page, hasMore });
-  }, [feedKey, ready, loading, posts, advertisements, page, hasMore]);
+    writeFeedState(feedKey, { posts, advertisements, page, hasMore }, acquiredEpoch);
+  }, [feedKey, ready, loading, posts, advertisements, page, hasMore, acquiredEpoch]);
 
   const handleLike = async (postId) => {
     if (!user) { toast.error('请先登录'); return; }
@@ -240,7 +262,7 @@ function AdvertisementCard({ post }) {
   return <article className="card miui-hover-lift" style={{ padding: '1.25rem', borderColor: 'var(--primary-light)' }}>
     <div className="flex items-center gap-3 mb-2" role="button" tabIndex={ad.target_url ? 0 : undefined} onClick={() => ad.target_url && openTarget()} onKeyDown={e => { if (e.key === 'Enter' && ad.target_url) openTarget(); }}>
       <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 overflow-hidden" style={{ background: 'var(--primary-light)', color: 'var(--primary-dark)' }}>
-        {ad.avatar_url || post.user?.avatar ? <img src={ad.avatar_url || post.user.avatar} alt="" className="w-full h-full rounded-full object-cover" /> : <i className="fa-solid fa-briefcase" aria-hidden="true" />}
+        {ad.avatar_url || post.user?.avatar ? <NBWImage src={ad.avatar_url || post.user.avatar} alt="" className="w-full h-full rounded-full object-cover" /> : <i className="fa-solid fa-briefcase" aria-hidden="true" />}
       </div>
       <div className="min-w-0"><strong className="text-sm" style={{ color: 'var(--text)' }}>{ad.sponsor_name || post.user?.username || 'ABDL Space'}</strong><div className="text-xs" style={{ color: 'var(--primary-dark)' }}>{ad.type === 'official' ? '官方广告' : '商家广告'}</div></div>
     </div>
@@ -282,7 +304,7 @@ function MobilePostCard({ post, followMap, currentUser, onLike, onFollow, onRepo
           style={{ background: 'var(--primary-light)', color: 'var(--primary-dark)' }}
         >
           {post.user?.avatar
-            ? <img src={post.user.avatar} alt="" className="w-full h-full rounded-full object-cover" />
+            ? <NBWImage src={post.user.avatar} alt="" className="w-full h-full rounded-full object-cover" />
             : post.user?.username?.[0]?.toUpperCase() || '?'
           }
         </div>

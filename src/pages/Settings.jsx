@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
+import NBWImage from '../components/NBWImage.jsx';
 import { useToast } from '../contexts/ToastContext';
 import { useNsfw } from '../contexts/NsfwContext';
 import { useNotifications } from '../contexts/NotificationContext';
@@ -299,7 +300,7 @@ export default function SettingsV2() {
               flexShrink: 0, overflow: 'hidden',
             }}>
               {user?.avatar ? (
-                <img src={user.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <NBWImage src={user.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
                 <i className="fa-solid fa-user" />
               )}

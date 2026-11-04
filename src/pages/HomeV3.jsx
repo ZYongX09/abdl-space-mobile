@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { useMobileHeaderActions } from '../contexts/MobileHeaderContext';
 import ImageGrid from '../components/ImageGrid';
+import NBWImage from '../components/NBWImage.jsx';
 import RichContent from '../components/RichContent';
 import OfficialBadge from '../components/OfficialBadge';
 import BetaBadge from '../components/BetaBadge';
@@ -179,7 +180,7 @@ export default function HomeV3() {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
           {user?.avatar ? (
-            <img src={user.avatar} alt="" style={{ width: 32, height: 32, objectFit: 'cover' }} />
+            <NBWImage src={user.avatar} alt="" style={{ width: 32, height: 32, objectFit: 'cover' }} />
           ) : (
             <div style={{
               width: 32, height: 32, borderRadius: '50%',
@@ -265,7 +266,7 @@ export default function HomeV3() {
                 {/* X: 40x40 circle */}
                 <Link to={`/user/${post.user?.id}`} onClick={e => e.stopPropagation()} style={{ flexShrink: 0 }}>
                   {post.user?.avatar ? (
-                    <img src={post.user.avatar} alt="" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }} />
+                    <NBWImage src={post.user.avatar} alt="" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }} />
                   ) : (
                     <div style={{
                       width: 40, height: 40, borderRadius: '50%',

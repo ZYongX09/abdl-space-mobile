@@ -3,7 +3,8 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import PageLayout from '../components/PageLayout';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
-import { isNBWConfigured, startNBWOAuth } from '../utils/nbwOAuth';
+import { startNBWOAuth } from '../utils/nbwOAuth';
+import { useNBWOAuth } from '../utils/useNBWEndpoints.js';
 import { useInlineVerify } from '../components/useInlineVerify';
 import { isWebAuthnReallyAvailable, authenticateWithPasskey, getMyCredentials } from '../utils/webauthn';
 import { shouldOfferWebAuthn } from '../utils/webauthnAvailability';
@@ -29,7 +30,7 @@ export default function Login() {
 
   const needCaptcha = failCount >= FAIL_THRESHOLD;
   const canSubmit = !loading && (!needCaptcha || verified);
-  const nbwConfigured = isNBWConfigured();
+  const { available: nbwConfigured, error: nbwError } = useNBWOAuth();
 
   const [showBiometricLogin, setShowBiometricLogin] = useState(false);
   const [showBiometricPrompt, setShowBiometricPrompt] = useState(false);
@@ -157,7 +158,7 @@ export default function Login() {
               title="暂未开放"
             >
               <img src={NBW_LOGO} alt="" style={{ width: 22, height: 22, objectFit: 'contain', opacity: 0.5 }} />
-              <span className="text-sm">使用 宝宝新天地 账户授权登录（暂未开放）</span>
+              <span className="text-sm">{nbwError || '使用 宝宝新天地 账户授权登录（暂未开放）'}</span>
             </button>
             <div className="flex items-center gap-3 my-5">
               <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
@@ -188,7 +189,7 @@ export default function Login() {
                 <button className="btn btn-primary btn-sm" onClick={async () => {
                   saveConsent({ privacy: true });
                   if (user) await logout(); // 已登录时先退出，避免 cookie 冲突
-                  startNBWOAuth();
+                  try { await startNBWOAuth(); } catch (error) { toast.error(error.message); setShowNBWConsent(false); }
                 }}>
                   同意并继续
                 </button>
