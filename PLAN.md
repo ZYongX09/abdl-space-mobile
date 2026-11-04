@@ -1,5 +1,11 @@
 # ABDL Space 移动端发展规划
 
+## 2026-11-04 NBW全链路主备联动网页已上线
+
+- 用户明确授权两网页上线，移动main `122b08c` / Pages `8979c5ae`、主main `b8bb02e` / Pages `d1c65ffd` production成功且canonical准确。完整515/515、508/508与双build通过，292/315业务源码配置指纹不变。
+- GitHub push内部错误与Pages webhook未入队保留证据，确认无目标build后以官方branch-only Git构建各触发一次，不Direct Upload、不改部署配置/环境/绑定。正式域关键JS/CSS和目标canonical一致，移动entry+7模块与本地构建字节同，14项同源代理通过。
+- 两站实际登录页和管理路由门禁已读，移动窄屏截图中曾显示配置不可用安全禁用状态，不能把网络不稳期间观察称为真实授权成功。未真实NBW操作/管理员保存/AI，本轮不再动Worker822/0105id26或App正式发布。[生产记录](docs/nbw-web-production-2026-11-04.md)。
+
 ## 2026-11-03 翻译词库与策略管理上线
 
 - 用户授权后移动main固定`0103718`自动部署Pages production `c58afa16`成功；主站`0b7b7e1`/`e14449c5`同步上线，`/admin/app-clients`词库及帖子翻译策略可用。
