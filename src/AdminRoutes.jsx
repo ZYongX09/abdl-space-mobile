@@ -16,6 +16,7 @@ const AdminNovels = lazy(() => import('./pages/admin/novels.jsx'));
 const AdminReports = lazy(() => import('./pages/admin/reports.jsx'));
 const AdminSecurity = lazy(() => import('./pages/admin/security.jsx'));
 const AdminSettings = lazy(() => import('./pages/admin/settings.jsx'));
+const AdminSiteAccess = lazy(() => import('./pages/admin/siteAccess.jsx'));
 const AdminDiapers = lazy(() => import('./pages/admin/diapers.jsx'));
 const AdminNotifications = lazy(() => import('./pages/admin/notifications.jsx'));
 
@@ -33,6 +34,7 @@ export const ADMIN_ROUTE_TITLES = {
   '/admin/reports': '举报中心',
   '/admin/security': '安全中心',
   '/admin/settings': '站点设置',
+  '/admin/site-access': '站点状态',
   '/admin/diapers': '纸尿裤 / 品牌',
   '/admin/notifications': '推送管理',
 };
@@ -63,6 +65,7 @@ export default function AdminRoutes() {
               <Route path="/admin/reports" element={<AdminReports />} />
               <Route path="/admin/security" element={<AdminSecurity />} />
               <Route path="/admin/settings" element={<AdminSettings />} />
+              <Route path="/admin/site-access" element={<AdminSiteAccess />} />
               <Route path="/admin/diapers" element={<AdminDiapers />} />
               <Route path="/admin/notifications" element={<AdminNotifications />} />
           </Route>

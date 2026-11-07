@@ -9,6 +9,7 @@ import { useInlineVerify } from '../components/useInlineVerify';
 import { isWebAuthnReallyAvailable, authenticateWithPasskey, getMyCredentials } from '../utils/webauthn';
 import { shouldOfferWebAuthn } from '../utils/webauthnAvailability';
 import BiometricPrompt from '../components/BiometricPrompt';
+import { getSiteAccess } from '../siteAccess.js';
 
 const FAIL_THRESHOLD = 2;
 const NBW_LOGO = 'https://img.abdl-space.top/file/nbwlogo.png';
@@ -198,6 +199,10 @@ export default function Login() {
           </div>
         )}
 
+        {location.state?.notice && (
+          <div className="login-access-notice" role="status">{location.state.notice}</div>
+        )}
+
         <form onSubmit={handleSubmit}>
           <div className="mb-4 miui-input-group">
             <label className="block text-sm font-semibold mb-1.5" style={{ color: 'var(--text)' }}>用户名 / 邮箱</label>
@@ -256,8 +261,8 @@ export default function Login() {
           </button>
         </form>
         <p className="text-center mt-4 text-sm" style={{ color: 'var(--text-light)' }}>
-          还没有账号？ <Link to="/register" style={{ color: 'var(--link-color)' }}>注册</Link>
-          <span style={{ color: 'var(--text-muted)', margin: '0 8px' }}>|</span>
+          {getSiteAccess().status === 'ok' && (<>还没有账号？ <Link to="/register" style={{ color: 'var(--link-color)' }}>注册</Link>
+          <span style={{ color: 'var(--text-muted)', margin: '0 8px' }}>|</span></>)}
           <Link to="/forgot-password" style={{ color: 'var(--link-color)' }}>忘记密码？</Link>
         </p>
       </div>

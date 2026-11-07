@@ -9,24 +9,39 @@ import { NotificationProvider } from './contexts/NotificationContext'
 import { NsfwProvider } from './contexts/NsfwContext'
 import './styles/global.css'
 import './styles/mobile.css'
+import './styles/siteAccess.css'
+import { getSiteAccess, isAdminPage, loadSiteAccess, startSiteAccessWatch } from './siteAccess.js'
+import { installMediaGuard } from './utils/mediaGuard.js'
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <ThemeProvider>
-        <AuthProvider>
-          <ToastProvider>
-            <NotificationProvider>
-              <NsfwProvider>
-                <App />
-              </NsfwProvider>
-            </NotificationProvider>
-          </ToastProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </BrowserRouter>
-  </React.StrictMode>
-)
+loadSiteAccess().then(() => {
+  if (getSiteAccess().status !== 'ok' && !isAdminPage(window.location.pathname)) installMediaGuard()
+
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    <React.StrictMode>
+      <BrowserRouter>
+        <ThemeProvider>
+          <AuthProvider>
+            <ToastProvider>
+              <NotificationProvider>
+                <NsfwProvider>
+                  <App />
+                </NsfwProvider>
+              </NotificationProvider>
+            </ToastProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </BrowserRouter>
+    </React.StrictMode>
+  )
+
+  startSiteAccessWatch()
+
+  // Signal intro animation that React is mounted
+  var __ph = document.getElementById('intro-placeholder')
+  if (__ph) __ph.remove()
+  window.__introMounted = true
+  if (window.__introReady) window.__introReady()
+})
 
 // Register Service Worker for PWA + Push Notifications
 if ('serviceWorker' in navigator) {
@@ -34,9 +49,3 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {});
   });
 }
-
-// Signal intro animation that React is mounted
-var __ph = document.getElementById('intro-placeholder')
-if (__ph) __ph.remove()
-window.__introMounted = true
-if (window.__introReady) window.__introReady()

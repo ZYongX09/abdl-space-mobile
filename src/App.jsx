@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useLayoutEffect } from 'react'
-import { Routes, Route, useLocation, useNavigationType, useSearchParams } from 'react-router-dom'
+import { Routes, Route, useLocation, useNavigationType, useSearchParams, Navigate } from 'react-router-dom'
 import { NsfwProvider } from './contexts/NsfwContext'
 import { initNBWConfig } from './utils/nbwOAuth'
 import { rememberScroll, restoreScroll } from './utils/navigationState'
@@ -15,6 +15,9 @@ import PushPrompt from './components/PushPrompt'
 import { useExternalLinkInterceptor } from './hooks/useExternalLinkInterceptor'
 import AdminRoutes, { ADMIN_ROUTE_TITLES, isAdminPath } from './AdminRoutes.jsx'
 import MerchantHost from './MerchantHost.jsx'
+import { useAuth } from './contexts/AuthContext'
+import SiteUnavailablePage from './components/SiteUnavailablePage.jsx'
+import { getSiteAccess, isClosedFor, isRegistrationPath, isStaticPage } from './siteAccess.js'
 
 // 路由级懒加载
 const ForumFeed = lazy(() => import('./pages/ForumFeed'))
@@ -171,7 +174,8 @@ function ScrollRestoration() {
 }
 
 export default function App() {
-  const { pathname } = useLocation()
+  const { pathname, search } = useLocation()
+  const { user, loading } = useAuth()
   useExternalLinkInterceptor()
 
   useEffect(() => initNBWConfig(), [])
@@ -182,6 +186,20 @@ export default function App() {
 
   const isAdmin = isAdminPath(pathname)
   const isMerchant = pathname === '/merchant' || pathname.startsWith('/merchant/')
+
+  // 站点可访问性投影：关闭态只保留管理后台与登录入口；登录态未登录时先等会话恢复再判定。
+  const access = getSiteAccess()
+  if (isClosedFor(pathname)) return <SiteUnavailablePage message={access.message} />
+  if (access.status !== 'ok' && isRegistrationPath(pathname)) {
+    return <Navigate to="/login" replace state={{ notice: access.login_prompt || '当前暂不开放注册' }} />
+  }
+  if (access.status === 'login' && !isAdmin) {
+    if (loading) return <Loading />
+    if (!user && !isStaticPage(pathname)) {
+      return <Navigate to="/login" replace state={{ from: `${pathname}${search}`, notice: access.login_prompt }} />
+    }
+  }
+
   // 独立宿主；前台容器、推广浮层和底部导航不挂载。
   if (isAdmin) return <><AdminRoutes /><div className="ac-admin-theme"><ToastPopup /></div></>
   if (isMerchant) return <MerchantHost />
