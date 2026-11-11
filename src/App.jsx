@@ -18,7 +18,6 @@ import MerchantHost from './MerchantHost.jsx'
 import { useAuth } from './contexts/AuthContext'
 import SiteUnavailablePage from './components/SiteUnavailablePage.jsx'
 import { getSiteAccess, isClosedFor, isRegistrationPath, isStaticPage } from './siteAccess.js'
-import { setMediaGuardEnabled } from './utils/mediaGuard.js'
 
 // 路由级懒加载
 const ForumFeed = lazy(() => import('./pages/ForumFeed'))
@@ -184,12 +183,6 @@ export default function App() {
   useEffect(() => {
     document.title = getTitle(pathname) + ' — ABDL Space 移动版'
   }, [pathname])
-
-  // 腾讯云媒体：仅登录状态模式下，只有已通过宝宝认证的登录用户可以加载。
-  useEffect(() => {
-    const current = getSiteAccess()
-    setMediaGuardEnabled(current.status !== 'ok' && !isAdminPath(pathname) && !(current.status === 'login' && user?.baby_verified))
-  }, [pathname, user])
 
   const isAdmin = isAdminPath(pathname)
   const isMerchant = pathname === '/merchant' || pathname.startsWith('/merchant/')

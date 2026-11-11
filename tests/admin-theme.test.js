@@ -430,7 +430,7 @@ test('Auth refresh 旧成功/失败不覆盖新会话，当前401清身份且保
   assert.ok(body);
   let reply, user = 'unchanged', saved = [];
   const context = {
-    USE_API: true, API_BASE: '', refreshRequest: { current: 0 }, currentSession: { current: 'A' }, sessionVersionRef: { current: 0 }, withAuthHeader: () => ({ Authorization: 'Bearer fixture-1' }),
+    USE_API: true, API_BASE: '', refreshRequest: { current: 0 }, currentSession: { current: 'A' }, sessionVersionRef: { current: 0 }, sessionChangingRef: { current: false }, withAuthHeader: () => ({ Authorization: 'Bearer fixture-1' }),
     fetch: () => new Promise(resolve => { reply = resolve; }), setUser: value => { user = value; },
     setActiveAccountId() {}, getSavedAccounts: () => [], saveAccounts: value => { saved = value; }, setAccounts() {}, window: {},
   };
