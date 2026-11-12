@@ -26,6 +26,6 @@
 
 普通浏览器本地Pages合成深链接标题正确，robots原文可读；不等于整站React视觉或生产验收。所有上游用本地协议替身，终端出网被阻断；没有真实API/归档服务/用户内容访问。初轮workerd网络配置、RPCOrigin工具问题均保留日志后仅修harness，未放宽业务断言。
 
-证据：仓外`abdl-space-archive-evidence-20261112/runtime-BT71vx/result.json`和既有`abdl-space-novel-evidence-20261112/archive-*.log`；主站对应完整记录`ABDL-Space-V2-alipay-gate-20261106/docs/web-archive-guard-2026-11-12.md`。待实际提交/推送登记，生产不动。
+证据：仓外`abdl-space-archive-evidence-20261112/runtime-BT71vx/result.json`和既有`abdl-space-novel-evidence-20261112/archive-*.log`；主站对应完整记录`ABDL-Space-V2-alipay-gate-20261106/docs/web-archive-guard-2026-11-12.md`。业务已提交并推远端develop：移动`032c760`、主站`9244d89`；main仍`7044824`/`f10003d`、未部署。依赖/.mimosa/产物未入提交，其他本地工作树旧暂存改动不覆盖。
 
 参考：[RFC9309](https://www.rfc-editor.org/rfc/rfc9309.html)、[CCBot](https://commoncrawl.org/ccbot)、[Pages Middleware](https://developers.cloudflare.com/pages/functions/middleware/)、[Routing](https://developers.cloudflare.com/pages/functions/routing/)、[Headers](https://developers.cloudflare.com/pages/configuration/headers/)、[Functions pricing](https://developers.cloudflare.com/pages/functions/pricing/)。IA移除与Google现行noarchive细则官方访问超时，未写成已证实事实；清理已有快照另需授权。
