@@ -55,11 +55,11 @@ test('global noarchive preserves CSP, security headers and sensitive-route decla
   }
 });
 
-test('existing API and shared client-IP Functions stay byte-for-byte unchanged', async () => {
-  // Pin existing handlers only; additional develop guard files remain compatible.
+test('API and client-IP Functions match the reviewed observation signing integration', async () => {
+  // Observation adds only a separately scoped signed IP envelope; response/proxy contracts have dedicated tests.
   for (const [path, digest] of [
-    ['functions/api/[[path]].js', '9fc3bc8567e0239f6fa442c98a50daec69e1d22c0faad732bf825bf6a9d1c66d'],
-    ['functions/_shared/auth-client-ip.js', 'f3a82a5ae364177699881bd13c1a311e6d8349c477ce20d6500c934ac38c20c9'],
+    ['functions/api/[[path]].js', '85e69380879197ae59d1aecded3234a15011ceb09af55cb3fe51fd6daca2f1d2'],
+    ['functions/_shared/auth-client-ip.js', 'e13ab4b43808520659aaf3d76ad301bc6587da75aca59cc19351f674b0c9f2b7'],
   ]) {
     assert.equal(sha256(await readFile(new URL(`../${path}`, import.meta.url))), digest, path);
   }
