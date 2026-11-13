@@ -1188,6 +1188,10 @@ export const adminAPI = {
     if (USE_API) return apiFetch('/api/admin/advertising');
     return { items: [], ads: [], codes: [], settings: {}, impressions: 0, clicks: 0 };
   },
+  advertisingAction: async (id, action) => {
+    if (USE_API) return apiFetch(`/api/admin/advertising/ads/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify({ status: action === 'approve' ? 'active' : 'paused' }) });
+    throw new Error('广告状态操作需要在线连接，未提交任何更改');
+  },
   advertisingPolicy: async () => {
     if (USE_API) return apiFetch('/api/admin/advertising/policy');
     return { enabled: 0, max_per_timeline: 1, min_interval_seconds: 8, ad_probability: 20, fallback_probability: 5 };
