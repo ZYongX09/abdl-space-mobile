@@ -17,6 +17,7 @@ import AdminRoutes, { ADMIN_ROUTE_TITLES, isAdminPath } from './AdminRoutes.jsx'
 import MerchantHost from './MerchantHost.jsx'
 import { useAuth } from './contexts/AuthContext'
 import SiteUnavailablePage from './components/SiteUnavailablePage.jsx'
+import ContentAccessNotice, { useContentAccessGate } from './components/ContentAccessNotice.jsx'
 import { getSiteAccess, isClosedFor, isRegistrationPath, isStaticPage } from './siteAccess.js'
 
 // 路由级懒加载
@@ -92,6 +93,7 @@ const ROUTE_TITLES = {
   '/notifications': '通知',
   ...ADMIN_ROUTE_TITLES,
   '/baby-verification': '宝宝认证',
+  '/settings/baby-verification': '宝宝认证',
   '/create-post': '发帖',
   '/account': '账户与隐私',
   '/forgot-password': '找回密码',
@@ -176,6 +178,7 @@ function ScrollRestoration() {
 export default function App() {
   const { pathname, search } = useLocation()
   const { user, loading } = useAuth()
+  const contentGate = useContentAccessGate(pathname)
   useExternalLinkInterceptor()
 
   useEffect(() => initNBWConfig(), [])
@@ -199,6 +202,9 @@ export default function App() {
       return <Navigate to="/login" replace state={{ from: `${pathname}${search}`, notice: access.login_prompt }} />
     }
   }
+
+  // 组合策略取更严格者：必要入口不绕过既有全站关闭/登录策略。
+  if (contentGate) return <ContentAccessNotice access={contentGate} />
 
   // 独立宿主；前台容器、推广浮层和底部导航不挂载。
   if (isAdmin) return <><AdminRoutes /><div className="ac-admin-theme"><ToastPopup /></div></>
@@ -248,6 +254,7 @@ export default function App() {
                 <Route path="/messages" element={<MessagesPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/baby-verification" element={<BabyVerificationStatus />} />
+                <Route path="/settings/baby-verification" element={<BabyVerificationStatus />} />
                 <Route path="/c/:token" element={<CertificateVerify />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/account" element={<AccountPrivacy />} />

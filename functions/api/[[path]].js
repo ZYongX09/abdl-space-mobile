@@ -13,6 +13,7 @@
  */
 
 import { attachAuthClientIp, attachObservationClientIp } from '../_shared/auth-client-ip.js';
+import { attachContentClient } from '../_shared/content-client.js';
 
 const API_ORIGIN = 'https://abdl-space-api.zhx589.workers.dev';
 
@@ -44,6 +45,7 @@ export async function onRequest(context) {
   headers.set('X-Forwarded-Proto', url.protocol.replace(':', ''));
   await attachAuthClientIp(request, headers, context.env?.AUTH_PROXY_HMAC_KEY);
   await attachObservationClientIp(request, headers, context.env?.AUTH_PROXY_HMAC_KEY);
+  await attachContentClient(request, headers, context.env?.AUTH_PROXY_HMAC_KEY);
 
   // 补 Origin — 同源请求浏览器不发 Origin，后端需要它判断移动端来源
   if (!headers.has('Origin')) {
@@ -55,6 +57,7 @@ export async function onRequest(context) {
     method: request.method,
     headers,
     redirect: 'manual',
+    cache: 'no-store',
   };
 
   // GET/HEAD 不带 body
@@ -87,6 +90,14 @@ export async function onRequest(context) {
       continue;
     }
     responseHeaders.set(key, value);
+  }
+
+  // 内容决策响应不能进入浏览器/CDN缓存；保留每次真实请求的 Set-Cookie，但不跨请求存储。
+  if (responseHeaders.has('X-ABDL-Content-Access') || url.pathname === '/api/access') {
+    responseHeaders.set('Cache-Control', 'private, no-store, max-age=0');
+    responseHeaders.set('CDN-Cache-Control', 'no-store');
+    responseHeaders.set('Cloudflare-CDN-Cache-Control', 'no-store');
+    responseHeaders.delete('ETag');
   }
 
   // 确保 CORS 头（兜底，正常情况后端已经返回）

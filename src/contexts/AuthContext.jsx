@@ -472,7 +472,7 @@ export function AuthProvider({ children }) {
   return (
 
     <AuthContext.Provider value={{
-      user, loading, accounts,
+      user, loading, accounts, contentAccessSessionKey: mediaSessionKey,
       login, installSession, register, betaRegister, logout, logoutAll,
       switchAccount, removeAccount, updateProfile,
       getConsentStatus, saveConsent, withdrawConsent,
