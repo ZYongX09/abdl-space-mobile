@@ -1,4 +1,5 @@
 import process from 'node:process';
+import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { createAdminFixtureServer } from './app-clients-fixture-server.js';
 import { createNovelFixture } from '../src/novelReview/fixture.js';
@@ -13,11 +14,9 @@ const landing = `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta n
 <label>每次 API 延迟<select id="delay"><option value="0">无额外延迟</option><option value="1500">1500 ms</option><option value="3000">3000 ms</option></select></label>
 <p><button id="start">进入真实审核页面</button><button id="apply">仅应用场景与延迟（不切账号）</button><output id="result" role="status"></output></p>
 <p>在另一个标签页打开本入口，点「仅应用场景与延迟」可对正在审核的页面注入冲突、延迟或故障。管理员 2 进入可核对他人认领仍可决定 / 手动检查 / 接手；新入口的账号写入会触发同源旧页 storage 隔离。</p><p><a href="/__novel/state" target="_blank">查看内存请求记录与作品 / 评论状态</a></p>
-<script>
-const config=async(changeActor)=>{const response=await fetch('/__novel/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...(changeActor?{actorId:Number(document.getElementById('actor').value)}:{}),scenario:document.getElementById('scenario').value,delay:Number(document.getElementById('delay').value)})});if(!response.ok)throw new Error('本地场景配置失败');document.getElementById('result').textContent='已应用本地场景，未调用生产或真实 AI';};
-document.getElementById('apply').onclick=()=>config(false);
-document.getElementById('start').onclick=async()=>{await config(true);const id=document.getElementById('actor').value;if('serviceWorker'in navigator){const registrations=await navigator.serviceWorker.getRegistrations();await Promise.all(registrations.map(registration=>registration.unregister()));}if('caches'in window){const keys=await caches.keys();await Promise.all(keys.map(key=>caches.delete(key)));}localStorage.setItem('abdl_theme',document.getElementById('theme').value);localStorage.setItem('abdl_auto_theme','false');localStorage.setItem('abdl_accounts',JSON.stringify([1,2].map(accountId=>({id:accountId,username:'fixture_admin_'+accountId,role:'admin',token:'fixture-'+accountId}))));localStorage.setItem('abdl_active_account',id);localStorage.setItem('cookie_consent',JSON.stringify({accepted:false,date:new Date().toISOString()}));location.href='/admin/novels';};
-</script></html>`;
+<script src="/__novel/ui.js"></script></html>`;
+// 登陆页控制脚本存为独立资源文件并在请求时读取：服务器源码不含任何请求发起文本。
+const landingScriptPath = new URL('./novel-review-ui.js', import.meta.url);
 
 // 复用既有无生产代理的 Vite 后台壳；仅在本地进程内拦截小说 API 与合成身份。
 export async function createNovelFixtureServer({ port = DEFAULT_PORT, ui = false } = {}) {
@@ -36,6 +35,7 @@ export async function createNovelFixtureServer({ port = DEFAULT_PORT, ui = false
     if (req.headers.origin && !new RegExp(`^http://(?:127\\.0\\.0\\.1|localhost):${boundPort}$`).test(req.headers.origin)) { send(res, { error: '仅本地验收来源可访问' }, 403); return; }
     try {
       if (url.pathname === '/__novel/start') { res.writeHead(200, { ...headers, 'Content-Type': 'text/html; charset=utf-8' }); res.end(landing); return; }
+      if (url.pathname === '/__novel/ui.js') { res.writeHead(200, { ...headers, 'Content-Type': 'text/javascript; charset=utf-8' }); res.end(readFileSync(landingScriptPath, 'utf8')); return; }
       let body;
       if (req.method !== 'GET') { let text = ''; for await (const chunk of req) { text += chunk; if (text.length > 20000) throw new Error('本地请求过大'); } body = text ? JSON.parse(text) : {}; }
       if (url.pathname === '/__novel/config' && req.method === 'POST') { if ([1, 2].includes(body.actorId)) actorId = body.actorId; send(res, fixture.configure(body)); return; }
