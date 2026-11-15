@@ -4,6 +4,7 @@ import { useToast } from '../../contexts/ToastContext';
 import AdminLayout from './layout';
 import { Card, Pill, Pagination, Loading, Empty, ErrorBox, UserCell, useConfirm, StatCard } from './ui';
 import { fmtFull, fmtNum } from './util';
+import PostModerationModal from '../../postModeration/PostModerationModal.jsx';
 import './moderation-ux.css';
 
 const PAGE_SIZE = 20;
@@ -16,6 +17,8 @@ export default function AdminPosts() {
   const [resource, setResource] = useState({ key: '', items: null, loading: true, error: '', pagination: { page: 1, total: 0, totalPages: 1 } });
   const [busy, setBusy] = useState({});
   const [actionErrors, setActionErrors] = useState({});
+  const [moderationPost, setModerationPost] = useState(null);
+  const moderationAttempts = useRef(new Map());
   const queryRef = useRef(query);
   const requestSeq = useRef(0);
   const alive = useRef(false);
@@ -142,6 +145,7 @@ export default function AdminPosts() {
       <div className="ac-action-group">
         <button type="button" className="ac-btn" disabled={loading || !!error || !!busy[post.id]} onClick={() => togglePin(post)}>{busy[post.id] === 'pin' ? '置顶更新中…' : post.pinned ? '取消置顶' : '置顶'}</button>
         <button type="button" className="ac-btn" aria-pressed={!!post.has_nsfw} disabled={loading || !!error || !!busy[post.id]} onClick={() => setNsfw(post)}>{busy[post.id] === 'nsfw' ? '标记更新中…' : post.has_nsfw ? '取消敏感标记' : '标记敏感'}</button>
+        <button type="button" className="ac-btn" aria-haspopup="dialog" disabled={loading || !!error || !!busy[post.id]} onClick={() => setModerationPost(post)}>违规处理</button>
         <button type="button" className="ac-btn danger" disabled={loading || !!error || !!busy[post.id]} onClick={() => remove(post)}>{busy[post.id] === 'delete' ? '删除中…' : '删除帖子'}</button>
       </div>
       <ErrorBox msg={actionErrors[post.id]} />
@@ -193,6 +197,12 @@ export default function AdminPosts() {
           </section>
         </Card>
       </div>
+      {moderationPost && <PostModerationModal
+        post={moderationPost}
+        attempts={moderationAttempts.current}
+        onClose={() => setModerationPost(null)}
+        onStored={() => { toast.success('案件已入库并永久留证；帖子列表已刷新。'); load(queryRef.current); }}
+      />}
     </AdminLayout>
   );
 }

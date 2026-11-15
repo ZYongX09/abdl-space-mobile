@@ -1,0 +1,41 @@
+/* 违规处理弹窗专用布局；沿用管理端模态框与主题变量，不覆盖其他页面。 */
+.pm-body { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.pm-lead { margin: 0; color: var(--ac-text-secondary); font-size: 13px; line-height: 1.7; }
+.pm-target { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px 16px; margin: 0; padding: 10px 12px; border: 1px solid var(--ac-border); border-radius: var(--ac-radius-sm); background: var(--ac-surface-soft); font-size: 13px; }
+.pm-target > div { min-width: 0; }
+.pm-target dt { color: var(--ac-text-muted); font-size: 12px; }
+.pm-target dd { margin: 2px 0 0; overflow-wrap: anywhere; }
+.pm-warning { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border: 1px solid var(--ac-warning); border-radius: var(--ac-radius-sm); background: color-mix(in srgb, var(--ac-warning) 8%, var(--ac-surface)); font-size: 12px; line-height: 1.7; }
+.pm-warning p { margin: 0; }
+.pm-warning strong { color: var(--ac-warning); }
+.pm-reason { width: 100%; }
+.pm-counter { margin: -8px 0 0; color: var(--ac-text-muted); font-size: 12px; text-align: right; }
+.pm-section-label { margin-bottom: 4px; color: var(--ac-text-muted); font-size: 12px; }
+.pm-notice { padding: 10px 12px; border: 1px solid var(--ac-border); border-left: 3px solid var(--ac-action); border-radius: var(--ac-radius-sm); background: var(--ac-surface-soft); }
+.pm-notice p { margin: 0; overflow-wrap: anywhere; line-height: 1.7; }
+.pm-ack { align-items: flex-start; }
+.pm-live { display: flex; flex-direction: column; gap: 4px; }
+.pm-live p, .pm-error { margin: 0; }
+.pm-pending { color: var(--ac-action); font-size: 13px; }
+.pm-message { color: var(--ac-text-secondary); font-size: 13px; line-height: 1.7; }
+.pm-error { color: var(--ac-danger); font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }
+.pm-case { display: flex; flex-direction: column; gap: 12px; padding-top: 12px; border-top: 1px solid var(--ac-border); }
+.pm-case h3 { margin: 0; font-size: 14px; }
+.pm-case-meta { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 12px; margin: 0; font-size: 13px; }
+.pm-case-meta dt { color: var(--ac-text-muted); }
+.pm-case-meta dd { min-width: 0; margin: 0; overflow-wrap: anywhere; }
+.pm-asset-summary { margin: 0; color: var(--ac-text-secondary); font-size: 13px; line-height: 1.7; }
+.pm-assets { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.pm-asset { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border: 1px solid var(--ac-border); border-radius: var(--ac-radius-sm); font-size: 13px; }
+.pm-asset-head { overflow-wrap: anywhere; }
+.pm-asset-state { color: var(--ac-text-secondary); }
+.pm-thumb { max-width: min(100%, 220px); max-height: 220px; border: 1px solid var(--ac-border); border-radius: var(--ac-radius-sm); object-fit: contain; }
+.pm-evidence, .pm-retry, .pm-readback { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.pm-note { margin: 0; color: var(--ac-text-muted); font-size: 12px; line-height: 1.65; }
+.pm-snapshot { width: 100%; max-height: 260px; margin: 0; padding: 10px 12px; overflow: auto; border: 1px solid var(--ac-border); border-radius: var(--ac-radius-sm); background: var(--ac-surface-soft); font-size: 12px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (max-width: 767px) {
+  .pm-target { grid-template-columns: minmax(0, 1fr); }
+  .pm-case-meta { grid-template-columns: minmax(0, 1fr); gap: 3px; }
+  .pm-case-meta dd + dt { margin-top: 6px; }
+  .pm-evidence .ac-btn, .pm-retry .ac-btn, .pm-readback .ac-btn, .pm-asset .ac-btn { min-height: 44px; }
+}
