@@ -57,7 +57,6 @@ export async function onRequest(context) {
     method: request.method,
     headers,
     redirect: 'manual',
-    cache: 'no-store',
   };
 
   // GET/HEAD 不带 body

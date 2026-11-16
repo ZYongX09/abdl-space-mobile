@@ -35,7 +35,7 @@ export async function checkWebContentAccess(context) {
     const headers = new Headers({ Accept: 'application/json', 'Cache-Control': 'no-store' });
     for (const name of ['Cookie', 'Authorization']) if (request.headers.has(name)) headers.set(name, request.headers.get(name));
     await signContentClient(probe, headers, secret, client);
-    const response = await fetch(probe.url, { method: 'GET', headers, redirect: 'manual', cache: 'no-store', signal: controller.signal });
+    const response = await fetch(probe.url, { method: 'GET', headers, redirect: 'manual', signal: controller.signal });
     if (!response.ok) return decisionResponse(request, 'unavailable');
     const value = await response.json();
     if (value?.schema_version !== 1 || value.action_path !== ACTION || typeof value.message !== 'string') return decisionResponse(request, 'unavailable');
