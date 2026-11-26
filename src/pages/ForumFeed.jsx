@@ -18,21 +18,28 @@ import { buildMediaPreviewUrl } from '../utils/mediaUrl';
 import { readFeedState, writeFeedState } from '../utils/navigationState';
 import { getNBWEndpointState, hasNBWDisplayData, nbwAcquisitionEpoch } from '../utils/nbwEndpoints.js';
 import { useNBWEndpoints } from '../utils/useNBWEndpoints.js';
+import { useBillableImpression } from '../merchant/useBillableImpression.js';
+import { supportsAdViewability } from '../merchant/viewability.js';
 
 export default function ForumFeed() {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const { user } = useAuth();
+  const { user, loading: authLoading, contentAccessSessionKey } = useAuth();
+  const adViewability = !debouncedSearch && supportsAdViewability();
   const feedKey = `${debouncedSearch}|${user?.id ?? 'guest'}`;
+  const scope = `${feedKey}|${authLoading}|${contentAccessSessionKey ?? ''}`;
 
   // 进详情再返回时本组件会被卸载；命中缓存就同步恢复，既不重新请求也不闪骨架屏。
-  const [cachedFeed] = useState(() => readFeedState(feedKey));
+  const [cachedFeed] = useState(() => adViewability || authLoading ? null : readFeedState(feedKey));
 
   const { epoch: endpointEpoch } = useNBWEndpoints();
   const [acquiredEpoch, setAcquiredEpoch] = useState(() => cachedFeed?.nbwAcquiredEpoch ?? getNBWEndpointState().epoch);
   const requestGeneration = useRef(0);
+  const firstPageRequest = useRef(null);
+  const activeScope = useRef(scope); activeScope.current = scope;
+  const [adResponse, setAdResponse] = useState(null);
   const [posts, setPosts] = useState(() => cachedFeed?.posts ?? []);
-  const [advertisements, setAdvertisements] = useState(() => cachedFeed?.advertisements ?? []);
+  const advertisements = !authLoading && search === debouncedSearch && adResponse?.scope === scope ? adResponse.items : [];
   const [loading, setLoading] = useState(() => !cachedFeed);
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(() => cachedFeed?.page ?? 1);
@@ -51,7 +58,16 @@ export default function ForumFeed() {
   const navigate = useNavigate();
 
   const loadPosts = async (pageNum = 1, append = false) => {
+    if (authLoading || activeScope.current !== scope) return;
     const ticket = ++requestGeneration.current;
+    const current = () => ticket === requestGeneration.current && activeScope.current === scope;
+    let signal;
+    if (!append) {
+      firstPageRequest.current?.abort();
+      firstPageRequest.current = new AbortController();
+      signal = firstPageRequest.current.signal;
+      setAdResponse(null);
+    }
     try {
       if (append) setLoadingMore(true); else setLoading(true);
       const searchNsfwEnabled = localStorage.getItem('abdl_search_nsfw') === 'true';
@@ -60,22 +76,23 @@ export default function ForumFeed() {
         limit: 20,
         search: debouncedSearch || undefined,
         excludeNsfw: debouncedSearch && !searchNsfwEnabled ? true : undefined,
+        adViewability, signal,
       });
-      if (ticket !== requestGeneration.current) return;
+      if (!current()) return;
       const newPosts = (data.posts || []).filter(p => !p.in_reply_to_id);
       // API 的整笔重取可跨首次discovery；只记录最终成功响应的 acquisition lease。
       const lease = nbwAcquisitionEpoch(data);
       if (hasNBWDisplayData(data) && lease !== getNBWEndpointState().epoch) return;
       setAcquiredEpoch(lease ?? getNBWEndpointState().epoch);
-      if (!append) setAdvertisements((data.advertisements || []).map(ad => ({ ...ad, is_advertisement: true })));
+      if (!append) setAdResponse({ scope, items: data.advertisements || [] });
       setPosts(prev => append ? [...prev, ...newPosts] : newPosts);
       setHasMore(newPosts.length >= 20);
       setPage(pageNum);
       setReady(true);
     } catch (e) {
-      if (ticket === requestGeneration.current) toast.error(e.message);
+      if (current() && e.name !== 'AbortError') toast.error(e.message);
     } finally {
-      if (ticket === requestGeneration.current) { setLoading(false); setLoadingMore(false); }
+      if (current()) { setLoading(false); setLoadingMore(false); }
     }
   };
 
@@ -91,11 +108,11 @@ export default function ForumFeed() {
 
   useEffect(() => {
     requestGeneration.current += 1;
-    const cached = readFeedState(feedKey);
+    const cached = adViewability || authLoading ? null : readFeedState(feedKey);
     if (cached) {
       setAcquiredEpoch(cached.nbwAcquiredEpoch ?? getNBWEndpointState().epoch);
       setPosts(cached.posts);
-      setAdvertisements(cached.advertisements);
+      setAdResponse(null);
       setPage(cached.page);
       setHasMore(cached.hasMore);
       setLoading(false);
@@ -103,12 +120,13 @@ export default function ForumFeed() {
       return;
     }
     setPosts([]);
-    setAdvertisements([]);
+    setAdResponse(null);
     setPage(1);
     setHasMore(true);
     setReady(false);
     loadPostsRef.current(1);
-  }, [feedKey]);
+    return () => { requestGeneration.current += 1; firstPageRequest.current?.abort(); };
+  }, [feedKey, scope, adViewability, authLoading]);
 
   // 旧代 NBW rows 立即从 mounted state 剔除；本站 rows 不清，随后仅重新获取此混合列表。
   useEffect(() => {
@@ -121,9 +139,9 @@ export default function ForumFeed() {
 
   // 加载完成后写回原始 acquisition lease；点赞/关注不能把旧 rows 重标为新代。
   useEffect(() => {
-    if (!ready || loading) return;
-    writeFeedState(feedKey, { posts, advertisements, page, hasMore }, acquiredEpoch);
-  }, [feedKey, ready, loading, posts, advertisements, page, hasMore, acquiredEpoch]);
+    if (adViewability || authLoading || !ready || loading) return;
+    writeFeedState(feedKey, { posts, page, hasMore }, acquiredEpoch);
+  }, [feedKey, adViewability, authLoading, ready, loading, posts, page, hasMore, acquiredEpoch]);
 
   const handleLike = async (postId) => {
     if (!user) { toast.error('请先登录'); return; }
@@ -200,15 +218,16 @@ export default function ForumFeed() {
       </div>
 
       {/* 帖子列表 */}
-      <PullToRefresh onRefresh={loadPosts}>
+      <PullToRefresh onRefresh={() => loadPosts(1)}>
       {loading ? (
         <LoadingSkeleton count={4} height={100} />
-      ) : posts.length === 0 ? (
+      ) : posts.length === 0 && advertisements.length === 0 ? (
         <EmptyState icon="fa-comments" title="暂无帖子" description="快来发第一帖吧！" />
       ) : (
         <div className={`space-y-4 ${restored ? '' : 'miui-list-enter'}`}>
-          {[...advertisements, ...posts].map((post) => post.is_advertisement || post.advertisement
-            ? <AdvertisementCard key={post.id || post.advertisement?.id} post={post} />
+          {advertisements.map(ad => <AdvertisementCard key={`ad-${ad.id}`} post={ad} viewerId={adViewability ? user?.id : null} />)}
+          {posts.map(post => post.is_advertisement || post.advertisement
+            ? <AdvertisementCard key={`ad-${post.id || post.advertisement?.id}`} post={post} />
             : <MobilePostCard
               key={post.id}
               post={post}
@@ -218,7 +237,7 @@ export default function ForumFeed() {
               onFollow={handleFollow}
               onReport={setReportTarget}
             />)}
-          {hasMore && (
+          {hasMore && posts.length > 0 && (
             <button
               onClick={() => loadPosts(page + 1, true)}
               disabled={loadingMore}
@@ -247,24 +266,28 @@ export default function ForumFeed() {
   );
 }
 
-function AdvertisementCard({ post }) {
+function AdvertisementCard({ post, viewerId }) {
   const ad = post.advertisement || post;
+  const card = useBillableImpression(ad.id, ad.billable_impression_token, viewerId);
   const event = (type, metadata = {}) => {
     if (!ad.id) return;
     merchantAPI.event(ad.id, type, metadata).catch(() => {});
   };
-  useEffect(() => { event('impression', { impression_id: ad.impression_id }); }, [ad.id]);
+  useEffect(() => {
+    // The legacy impression is analytics only; a separate visible receipt can be billed.
+    event('impression', { impression_id: ad.impression_id });
+  }, [ad.id, ad.impression_id]);
   const openTarget = (type = 'ad_navigation') => {
     event(type, { impression_id: ad.impression_id });
     if (ad.target_url) window.open(ad.target_url, '_blank', 'noopener,noreferrer');
   };
   const images = ad.images || post.images || [];
-  return <article className="card miui-hover-lift" style={{ padding: '1.25rem', borderColor: 'var(--primary-light)' }}>
+  return <article className="card miui-hover-lift" ref={card} style={{ padding: '1.25rem', borderColor: 'var(--primary-light)' }}>
     <div className="flex items-center gap-3 mb-2" role="button" tabIndex={ad.target_url ? 0 : undefined} onClick={() => ad.target_url && openTarget()} onKeyDown={e => { if (e.key === 'Enter' && ad.target_url) openTarget(); }}>
       <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 overflow-hidden" style={{ background: 'var(--primary-light)', color: 'var(--primary-dark)' }}>
         {ad.avatar_url || post.user?.avatar ? <NBWImage src={ad.avatar_url || post.user.avatar} alt="" className="w-full h-full rounded-full object-cover" /> : <i className="fa-solid fa-briefcase" aria-hidden="true" />}
       </div>
-      <div className="min-w-0"><strong className="text-sm" style={{ color: 'var(--text)' }}>{ad.sponsor_name || post.user?.username || 'ABDL Space'}</strong><div className="text-xs" style={{ color: 'var(--primary-dark)' }}>{ad.type === 'official' ? '官方广告' : '商家广告'}</div></div>
+      <div className="min-w-0"><strong className="text-sm" style={{ color: 'var(--text)' }}>{ad.display_name || ad.merchant_name || ad.sponsor_name || post.user?.username || 'ABDL Space'}</strong><div className="text-xs" style={{ color: 'var(--primary-dark)' }}>{ad.official || ['official', 'system'].includes(ad.type) ? '官方广告' : '商家广告'}</div></div>
     </div>
     {ad.title && <h3 className="font-semibold mb-1">{ad.title}</h3>}
     <div className="text-sm whitespace-pre-wrap break-words" style={{ color: 'var(--text)' }}>{ad.body || post.content}</div>

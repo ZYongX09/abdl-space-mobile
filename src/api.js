@@ -18,6 +18,7 @@ import { withAvatarPreviews } from './utils/mediaUrl.js';
 import { NBWError, getNBWEndpointState, hasNBWDisplayData, markNBWAcquisition } from './utils/nbwEndpoints.js';
 import { requestTestVerificationCode } from './pages/admin/testVerificationCode.js';
 import { nbwRegistrationFields } from './utils/nbwOAuth.js';
+import { shouldRequestAdViewability } from './merchant/viewability.js';
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? '';
 // 空字符串也是有效值（相对路径），只有显式设为 undefined/null 时才走离线
@@ -512,12 +513,16 @@ export const rankingsAPI = {
 // 广场 Posts（后端路径 /api/posts）
 // =====================================================================
 export const forumAPI = {
-  feed: async ({ page = 1, limit = 20, search, excludeNsfw, filter } = {}) => {
+  feed: async ({ page = 1, limit = 20, search, excludeNsfw, filter, adViewability, signal } = {}) => {
     if (USE_API) {
       const qs = new URLSearchParams({ page: String(page), limit: String(limit) });
       if (search) qs.set('search', search);
       if (excludeNsfw) qs.set('exclude_nsfw', '1');
       if (filter) qs.set('filter', filter);
+      if (shouldRequestAdViewability({ page, search, filter, excludeNsfw, adViewability })) {
+        qs.set('ad_viewability', '1');
+        return readNBWPosts(() => apiFetch(`/api/posts?${qs}`, { signal, cache: 'no-store' }));
+      }
       const cacheKey = `feed:${qs}`;
       if (search || filter) return readNBWPosts(() => apiFetch(`/api/posts?${qs}`));
       return cachedFetch(cacheKey, () => apiFetch(`/api/posts?${qs}`), CACHE_TTL.short);
@@ -1194,9 +1199,14 @@ export const adminAPI = {
   },
 
   advertising: async () => {
-    if (USE_API) return apiFetch('/api/admin/advertising');
+    if (USE_API) return apiFetch('/api/admin/advertising', { cache: 'no-store' });
     return { items: [], ads: [], codes: [], settings: {}, impressions: 0, clicks: 0 };
   },
+  advertisingBillingStatus: (options = {}) => apiFetch('/api/admin/advertising/billing-status', { ...options, cache: 'no-store', redirect: 'error' }),
+  advertisingBillingCodes: ({ page, limit }, options = {}) => apiFetch(`/api/admin/advertising/billing-codes?${new URLSearchParams({ page, limit })}`, { ...options, cache: 'no-store', redirect: 'error' }),
+  createAdvertisingBillingCode: (amountMinor, options = {}) => apiFetch('/api/admin/advertising/billing-codes', {
+    ...options, cache: 'no-store', redirect: 'error', method: 'POST', body: JSON.stringify({ amount_minor: amountMinor }),
+  }),
   advertisingAction: async (id, action) => {
     if (USE_API) return apiFetch(`/api/admin/advertising/ads/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify({ status: action === 'approve' ? 'active' : 'paused' }) });
     throw new Error('广告状态操作需要在线连接，未提交任何更改');
@@ -1566,6 +1576,9 @@ export const adminPushAPI = {
 };
 
 export const merchantAPI = {
+  billableImpression: (id, token) => apiFetch(`/api/merchant/ads/${encodeURIComponent(id)}/billable-impression`, {
+    method: 'POST', cache: 'no-store', redirect: 'error', body: JSON.stringify({ token }),
+  }),
   info: () => apiFetch('/api/merchant/info'),
   activate: (registrationCode) => apiFetch('/api/merchant/activate', {
     method: 'POST',
