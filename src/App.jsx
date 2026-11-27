@@ -88,7 +88,7 @@ const ROUTE_TITLES = {
   '/privacy': '隐私政策',
   '/cookies': 'Cookie 政策',
   '/minor-protection': '未成年人保护说明',
-  '/app': '下载客户端',
+  '/app': 'ABDL Space APP 下载',
   '/messages': '私信',
   '/notifications': '通知',
   ...ADMIN_ROUTE_TITLES,
@@ -179,13 +179,14 @@ export default function App() {
   const { pathname, search } = useLocation()
   const { user, loading } = useAuth()
   const contentGate = useContentAccessGate(pathname)
-  useExternalLinkInterceptor()
+  const isAppDownload = /^\/app\/?$/i.test(pathname)
+  useExternalLinkInterceptor(!isAppDownload)
 
   useEffect(() => initNBWConfig(), [])
 
   useEffect(() => {
-    document.title = getTitle(pathname) + ' — ABDL Space 移动版'
-  }, [pathname])
+    document.title = getTitle(isAppDownload ? '/app' : pathname) + ' — ABDL Space 移动版'
+  }, [isAppDownload, pathname])
 
   const isAdmin = isAdminPath(pathname)
   const isMerchant = pathname === '/merchant' || pathname.startsWith('/merchant/')
@@ -209,6 +210,14 @@ export default function App() {
   // 独立宿主；前台容器、推广浮层和底部导航不挂载。
   if (isAdmin) return <><AdminRoutes /><div className="ac-admin-theme"><ToastPopup /></div></>
   if (isMerchant) return <MerchantHost />
+  if (isAppDownload) return (
+    <>
+      <ScrollRestoration />
+      <ErrorBoundary>
+        <Suspense fallback={<Loading />}><AppDownload /></Suspense>
+      </ErrorBoundary>
+    </>
+  )
 
   const isCertificate = pathname.startsWith('/c/')
   return (
@@ -237,7 +246,6 @@ export default function App() {
                 <Route path="/diaper-wiki" element={<DiaperWikiList />} />
                 <Route path="/diaper-wiki/:id" element={<DiaperWiki />} />
                 <Route path="/about" element={<About />} />
-                <Route path="/app" element={<AppDownload />} />
                 <Route path="/cookies" element={<CookiePolicy />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/minor-protection" element={<MinorProtection />} />
