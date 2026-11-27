@@ -1517,11 +1517,11 @@ export const betaInfoAPI = {
 /**
  * App 版本管理
  * 对接后端 GET /api/v1/version，返回最新安装包信息。
- * hasUpdate=false 时表示尚未发布任何版本（即"即将上线"）。
  */
 export const appVersionAPI = {
-  getLatest: async () => {
-    const res = await fetch('https://api.abdl-space.top/api/v1/version');
+  getLatest: async ({ signal } = {}) => {
+    const base = API_BASE || (import.meta.env.DEV ? '' : 'https://api.abdl-space.top');
+    const res = await fetch(`${base}/api/v1/version`, { signal });
     if (!res.ok) return null;
     return res.json();
   },
