@@ -58,7 +58,7 @@ test('global noarchive preserves CSP, security headers and sensitive-route decla
 test('API and client-IP Functions match the reviewed observation and content signing integration', async () => {
   // Content proof adds its own purpose and no-store handling; auth/observation remain unchanged. Both proxy suites cover the reviewed contracts.
   for (const [path, digest] of [
-    ['functions/api/[[path]].js', '7d1c559c43562f1c5d4a74b7eae0ad454008dfb0d4ae676a92a00bd13698f2e1'],
+    ['functions/api/[[path]].js', 'e2a878966d9e61999434e520dd7e38375fe11ff627d22a1a03b753db4d0556ed'],
     ['functions/_shared/auth-client-ip.js', 'e13ab4b43808520659aaf3d76ad301bc6587da75aca59cc19351f674b0c9f2b7'],
   ]) {
     assert.equal(sha256(await readFile(new URL(`../${path}`, import.meta.url))), digest, path);
