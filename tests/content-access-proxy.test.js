@@ -49,7 +49,7 @@ test('candidate CDN → actual Pages → API preserves GET/HEAD user geo and met
         const headers = new Headers(input.headers); headers.set('CF-Connecting-IP', synthetic);
         return api({ request: new Request(input.url, { method: input.method, headers }), env: { AUTH_PROXY_HMAC_KEY: secret } });
       }
-      assert.equal(input, 'https://abdl-space-api.zhx589.workers.dev/api/posts?x=1'); assert.equal(init.method, method); assert.equal(init.cache, 'no-store'); assert.equal(init.body, undefined);
+      assert.equal(input, 'https://abdl-space-api.zhx589.workers.dev/api/posts?x=1'); assert.equal(init.method, method); assert.equal(init.cache, undefined, 'Pages does not support RequestInit.cache'); assert.equal(init.body, undefined);
       const request = new Request(input, { method, headers: init.headers }); assert.deepEqual(await trustedContentClient(request, secret, now), fixture); assert.equal(init.headers.has('X-Content-Client-Future'), false); assert.equal(init.headers.has('X-ABDL-Content-Access'), false);
       return new Response(method === 'HEAD' ? null : 'original', { status: 200, headers: { 'X-ABDL-Content-Access': 'v1:open', 'Set-Cookie': 'own=one', 'Cache-Control': 'public, max-age=3600' } });
     });
